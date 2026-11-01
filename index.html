@@ -253,7 +253,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
 <!-- CUSTOMER SHOP -->
 <div id="screen-shop" class="screen">
-  <!-- PWA Install Banner for shared links -->
   <div class="install-banner" id="shopInstallBanner">
     <span>📥 Install FAIZ FASHION App</span>
     <button onclick="installPWA()">Install Now</button>
@@ -804,8 +803,26 @@ function loadOrders() {
 }
 
 /* Init */
-if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{})); }
 Object.assign(window, { showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, previewBanner, openCategoryForm, previewPhoto, saveCategory, deleteCategory, setMainCategory, filterProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrderWA, installPWA });
+
+/* SERVICE WORKER WITH AUTO-UPDATE */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      reg.onupdatefound = () => {
+        const installingWorker = reg.installing;
+        installingWorker.onstatechange = () => {
+          if (installingWorker.state === 'installed') {
+            if (navigator.serviceWorker.controller) {
+              console.log('New update found, refreshing...');
+              window.location.reload(); 
+            }
+          }
+        };
+      };
+    }).catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
