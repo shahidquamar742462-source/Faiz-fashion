@@ -300,7 +300,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
       <div style="display:flex;gap:8px">
         <button class="icon-btn" onclick="showScreen('orders')">📦</button>
         <button class="icon-btn" onclick="goCart()">🛒<span class="badge" id="shopCartBadge">0</span></button>
-        <!-- LOGOUT BUTTON REMOVED FROM HERE -->
       </div>
     </div>
     <input type="text" class="search-bar" placeholder="Search products..." oninput="filterProducts(this.value)">
@@ -929,21 +928,35 @@ function loadOrders() {
 
 Object.assign(window, { showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, previewBanner, openCategoryForm, previewPhoto, saveCategory, deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, changeSecurityCode, setMainCategory, filterProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrderWA, installPWA });
 
+/* =========================================================
+   FORCE AUTO-UPDATE LOGIC (Network First)
+   ========================================================= */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(reg => {
+      // 1. Check for updates on load
+      reg.update();
+
+      // 2. When new worker is installed, force reload
       reg.onupdatefound = () => {
         const installingWorker = reg.installing;
-        installingWorker.onstatechange = () => {
-          if (installingWorker.state === 'installed') {
-            if (navigator.serviceWorker.controller) {
-              console.log('New update found, refreshing...');
-              window.location.reload(); 
+        if (installingWorker) {
+          installingWorker.onstatechange = () => {
+            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('New update found, reloading...');
+              window.location.reload(true);
             }
-          }
-        };
+          };
+        }
       };
-    }).catch(() => {});
+    }).catch(err => console.log('SW reg error:', err));
+
+    // 3. Check for updates when user switches back to the app
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        navigator.serviceWorker.ready.then(reg => reg.update());
+      }
+    });
   });
 }
 </script>
