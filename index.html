@@ -16,7 +16,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .screen.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* Common UI */
+/* Landing */
 .landing-container{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center}
 .logo-circle{width:180px;height:180px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:24px}
 .logo-circle img{width:100%;height:100%;object-fit:contain;}
@@ -28,6 +28,8 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .box-icon{font-size:32px;margin-bottom:8px}
 .box-title{font-size:17px;font-weight:700;color:var(--gold)}
 .box-sub{font-size:12px;color:var(--text-dim)}
+
+/* Common UI */
 .header{display:flex;align-items:center;gap:14px;padding:8px 0 24px;border-bottom:1px solid var(--border);margin-bottom:24px}
 .header h2{font-size:20px;font-weight:700;color:var(--gold)}
 .back-btn{background:var(--card);border:1px solid var(--border);color:var(--gold);width:40px;height:40px;border-radius:10px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -577,7 +579,7 @@ function renderAdminCategories() {
       <img src="${mainImg}" class="cat-img">
       <div class="cat-body">
         <div class="cat-tag">${c.mainCategory || 'Men'}</div>
-        <div class="cat-name">${escapeHtml(c.name)} ${(c.times||0)<=0?'<span class="out-stock-badge">OUT</span>':''}</div>
+        <div class="cat-name">${escapeHtml(c.name)} ${(c.times||0)<=0?'<span class="out-stock-badge" style="background:var(--danger);color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;margin-left:5px">OUT</span>':''}</div>
         <div class="cat-price-row"><span class="cat-discount">₹${c.discountPrice}</span><span class="cat-original">₹${c.originalPrice}</span>${off > 0 ? `<span class="cat-off">${off}% OFF</span>` : ''}</div>
         <div class="cat-actions"><button class="btn-small" onclick="openCategoryForm('${c.id}')">Edit</button><button class="btn-small" style="color:var(--danger)" onclick="deleteCategory('${c.id}')">Delete</button></div>
       </div>
@@ -704,10 +706,12 @@ async function changeAdminPassword() {
 function loadAdminOrders() {
   const list = document.getElementById('adminOrdersList'); if(!list) return;
   if(unsubAdminOrders) unsubAdminOrders();
-  unsubAdminOrders = onSnapshot(query(collection(db, 'orders'), orderBy('date', 'desc')), snap => {
+  unsubAdminOrders = onSnapshot(collection(db, 'orders'), snap => {
     if(snap.empty) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim)">No orders yet.</div>'; return; }
-    list.innerHTML = snap.docs.map(d => {
-      const o = d.data();
+    let ordersData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    ordersData.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
+    
+    list.innerHTML = ordersData.map(o => {
       const date = o.date ? new Date(o.date.toMillis()).toLocaleString() : 'Recent';
       let statusColor = o.status === 'Shipped' ? 'status-Shipped' : (o.status === 'Delivered' ? 'status-Delivered' : 'status-Pending');
       return `
@@ -717,7 +721,7 @@ function loadAdminOrders() {
         <p>📅 ${date}</p>
         <ul class="order-items-list">${o.items.map(i => `<li>${i.name} - ₹${i.price}</li>`).join('')}</ul>
         <span class="order-status ${statusColor}">${o.status || 'Pending'}</span>
-        <select style="background:var(--card2);color:#fff;border:1px solid #444;padding:5px;border-radius:5px;float:right" onchange="updateOrderStatus('${d.id}', this.value)">
+        <select style="background:var(--card2);color:#fff;border:1px solid #444;padding:5px;border-radius:5px;float:right" onchange="updateOrderStatus('${o.id}', this.value)">
           <option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option>
           <option value="Shipped" ${o.status==='Shipped'?'selected':''}>Shipped</option>
           <option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option>
@@ -746,7 +750,6 @@ function renderShop() {
   
   if(searchQuery) items = items.filter(c => c.name.toLowerCase().includes(searchQuery) || (c.description||'').toLowerCase().includes(searchQuery));
 
-  // SORTING
   if(sortOrder === 'low-high') items.sort((a,b) => a.discountPrice - b.discountPrice);
   if(sortOrder === 'high-low') items.sort((a,b) => b.discountPrice - a.discountPrice);
   
@@ -800,12 +803,14 @@ function openProductDetails(id) {
 
 /* REVIEWS */
 function loadReviews(productId) {
-  const list = document.getElementById('reviewList'); list.innerHTML = 'Loading reviews...';
+  const list = document.getElementById('reviewList'); list.innerHTML = 'Loading...';
   if(unsubReviews) unsubReviews();
   unsubReviews = onSnapshot(query(collection(db, 'reviews'), where('productId', '==', productId)), snap => {
     if(snap.empty) { list.innerHTML = '<div style="color:var(--text-dim);font-size:13px">No reviews yet. Be the first!</div>'; return; }
-    list.innerHTML = snap.docs.map(d => {
-      const r = d.data(); let stars = ''; for(let i=0; i<5; i++) stars += i < r.rating ? '★' : '☆';
+    let revs = snap.docs.map(d => d.data());
+    revs.sort((a,b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
+    list.innerHTML = revs.map(r => {
+      let stars = ''; for(let i=0; i<5; i++) stars += i < r.rating ? '★' : '☆';
       return `<div class="review-card"><div class="review-stars">${stars}</div><div class="review-text">${escapeHtml(r.text)}</div><div class="review-name">- ${escapeHtml(r.name)}</div></div>`;
     }).join('');
   });
@@ -904,15 +909,19 @@ function submitOrderWA() {
   });
 }
 
-/* MY ORDERS */
+/* MY ORDERS (FIXED: NO INDEX REQUIRED) */
 function loadCustomerOrders() {
   const list = document.getElementById('ordersList'); if(!list) return;
   list.innerHTML = 'Loading...';
   if(unsubOrders) unsubOrders();
-  unsubOrders = onSnapshot(query(collection(db, 'orders'), where('userId', '==', currentUid), orderBy('date', 'desc')), snap => {
+  
+  unsubOrders = onSnapshot(query(collection(db, 'orders'), where('userId', '==', currentUid)), snap => {
     if(snap.empty) { list.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:20px">No orders yet.</div>'; return; }
-    list.innerHTML = snap.docs.map(d => {
-      const o = d.data();
+    
+    let ordersData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    ordersData.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
+
+    list.innerHTML = ordersData.map(o => {
       const date = o.date ? new Date(o.date.toMillis()).toLocaleDateString() : 'Recent';
       let statusColor = o.status === 'Shipped' ? 'status-Shipped' : (o.status === 'Delivered' ? 'status-Delivered' : 'status-Pending');
       return `
@@ -925,6 +934,9 @@ function loadCustomerOrders() {
         <div><span class="order-status ${statusColor}">${o.status || 'Pending'}</span></div>
       </div>`;
     }).join('');
+  }, (error) => {
+    console.error("Orders error:", error);
+    list.innerHTML = '<div style="text-align:center;color:var(--danger);padding:20px">Error loading orders.</div>';
   });
 }
 
