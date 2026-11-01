@@ -1,4 +1,4 @@
-const CACHE = 'faiz-fashion-v4'; // <-- Future mein update aane par isko v5, v6 karte rehna
+const CACHE = 'faiz-fashion-v5'; // <-- Future mein update aane par isko v5, v6 karte rehna
 const ASSETS = ['./', './index.html', './manifest.json', './photo.png'];
 
 self.addEventListener('install', e => {
