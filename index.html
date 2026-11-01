@@ -6,8 +6,10 @@
 <meta name="theme-color" content="#0a0a0a">
 <title>FAIZ FASHION</title>
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" href="photo.png">
-<link rel="apple-touch-icon" href="photo.png">
+<!-- Naya Logo Yahan Set Kar Diya Hai -->
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+<link rel="apple-touch-icon" sizes="192x192" href="logo.png">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
 :root{--bg:#0a0a0a;--card:#161616;--card2:#1f1f1f;--border:#2a2a2a;--gold:#d4af37;--gold-light:#f4d47a;--gold-dark:#b8941f;--text:#f0f0f0;--text-dim:#888;--danger:#e74c3c;--success:#2ecc71;}
@@ -148,7 +150,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <div id="screen-landing" class="screen active">
   <div class="landing-container">
     <div class="logo-circle" id="logoContainer">
-      <img src="photo.png" alt="FAIZ FASHION" onerror="this.style.display='none'; this.parentElement.classList.add('fallback')">
+      <img src="logo.png" alt="FAIZ FASHION" onerror="this.style.display='none'; this.parentElement.classList.add('fallback')">
       <span class="fallback-text" style="font-size:40px;color:var(--gold);display:none">FF</span>
     </div>
     <h1 class="app-name">FAIZ FASHION</h1>
@@ -256,7 +258,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
       <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
     </div>
 
-    <!-- COUPON MANAGER -->
     <div class="settings-section">
       <h3>Manage Coupons</h3>
       <div style="display:flex;gap:10px;margin-bottom:15px">
@@ -267,7 +268,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
       <div id="couponList"></div>
     </div>
 
-    <!-- PASSWORD CHANGE SECTION -->
     <div class="settings-section" style="border: 1px solid var(--gold);">
       <h3 style="color:var(--gold); margin-bottom:15px;">🔐 Change Admin Password</h3>
       <div class="input-group"><input type="password" id="currentPwd" placeholder="Current Password"></div>
@@ -276,7 +276,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
       <button class="btn-primary" onclick="changeAdminPassword()">Update Password</button>
     </div>
     
-    <!-- SECURITY CODE SECTION -->
     <div class="settings-section">
       <h3>Change Security Code</h3>
       <div class="input-group"><input type="password" id="currentSec" placeholder="Current security code"></div>
@@ -934,16 +933,12 @@ Object.assign(window, { showScreen, customerLogin, handleLogin, handleReset, han
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(reg => {
-      // 1. Check for updates on load
       reg.update();
-
-      // 2. When new worker is installed, force reload
       reg.onupdatefound = () => {
         const installingWorker = reg.installing;
         if (installingWorker) {
           installingWorker.onstatechange = () => {
             if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('New update found, reloading...');
               window.location.reload(true);
             }
           };
@@ -951,7 +946,6 @@ if ('serviceWorker' in navigator) {
       };
     }).catch(err => console.log('SW reg error:', err));
 
-    // 3. Check for updates when user switches back to the app
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         navigator.serviceWorker.ready.then(reg => reg.update());
