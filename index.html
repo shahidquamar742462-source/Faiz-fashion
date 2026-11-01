@@ -7,19 +7,18 @@
 <title>FAIZ FASHION</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="logo.png">
-<link rel="apple-touch-icon" sizes="180x180" href="logo.png">
-<link rel="apple-touch-icon" sizes="192x192" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
-:root{--bg:#0a0a0a;--card:#161616;--card2:#1f1f1f;--border:#2a2a2a;--gold:#d4af37;--gold-light:#f4d47a;--gold-dark:#b8941f;--text:#f0f0f0;--text-dim:#888;--danger:#e74c3c;--success:#2ecc71;}
+:root{--bg:#0a0a0a;--card:#161616;--card2:#1f1f1f;--border:#2a2a2a;--gold:#d4af37;--gold-light:#f4d47a;--gold-dark:#b8941f;--text:#f0f0f0;--text-dim:#888;--danger:#e74c3c;--success:#2ecc71;--star:#f1c40f;}
 body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .screen{display:none;min-height:100vh;padding:20px;animation:fadeIn .3s ease}
 .screen.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* Landing */
+/* Common UI */
 .landing-container{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center}
-.logo-circle{width:180px;height:180px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:24px;position:relative}
+.logo-circle{width:180px;height:180px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:24px}
 .logo-circle img{width:100%;height:100%;object-fit:contain;}
 .app-name{font-size:26px;font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,var(--gold-light),var(--gold),var(--gold-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
 .tagline{color:var(--text-dim);font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:50px}
@@ -29,8 +28,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .box-icon{font-size:32px;margin-bottom:8px}
 .box-title{font-size:17px;font-weight:700;color:var(--gold)}
 .box-sub{font-size:12px;color:var(--text-dim)}
-
-/* Common UI */
 .header{display:flex;align-items:center;gap:14px;padding:8px 0 24px;border-bottom:1px solid var(--border);margin-bottom:24px}
 .header h2{font-size:20px;font-weight:700;color:var(--gold)}
 .back-btn{background:var(--card);border:1px solid var(--border);color:var(--gold);width:40px;height:40px;border-radius:10px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -39,7 +36,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .input-group label{display:block;font-size:13px;font-weight:600;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase}
 .input-group input,.input-group textarea,.input-group select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;color:var(--text);font-size:15px;outline:none}
 .input-group input:focus,.input-group select:focus{border-color:var(--gold)}
-.input-group input:read-only{opacity:0.7;background:var(--card2)}
 .btn-primary{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#0a0a0a;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:700;cursor:pointer}
 .btn-link{display:block;width:100%;background:transparent;border:none;color:var(--gold);font-size:14px;padding:16px 0;cursor:pointer;text-decoration:underline}
 .error-msg{color:var(--danger);font-size:14px;text-align:center;margin-top:12px}
@@ -58,20 +54,27 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .cat-body{padding:16px}
 .cat-name{font-size:16px;font-weight:700}
 .cat-tag{font-size:10px;background:var(--gold);color:#000;padding:2px 6px;border-radius:4px;display:inline-block;margin-bottom:6px;font-weight:700}
-.out-stock-badge{background:var(--danger);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;margin-left:5px}
 .cat-price-row{display:flex;align-items:baseline;gap:10px;margin:10px 0;flex-wrap:wrap}
 .cat-discount{font-size:20px;font-weight:800;color:var(--gold)}
 .cat-original{font-size:14px;color:var(--text-dim);text-decoration:line-through}
 .cat-off{color:var(--success);font-size:12px;font-weight:800}
 .cat-actions{display:flex;gap:10px}
-.btn-small{flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px;font-size:13px;font-weight:600}
+.btn-small{flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
 .photo-upload{background:var(--card);border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer}
-
-/* Admin Multiple Photo Previews */
 #photoPreviews{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
 .preview-box{position:relative;width:70px;height:70px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
 .preview-box img{width:100%;height:100%;object-fit:cover}
 .preview-box .remove-btn{position:absolute;top:2px;right:2px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* Admin Orders */
+.order-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px;margin-bottom:15px}
+.order-card h4{color:var(--gold);margin-bottom:5px;font-size:15px}
+.order-card p{font-size:13px;color:var(--text-dim);margin-bottom:3px}
+.order-items-list{font-size:13px;margin:10px 0;padding-left:15px;color:var(--text)}
+.order-status{padding:6px 10px;border-radius:6px;font-size:12px;font-weight:700;display:inline-block;margin-top:10px}
+.status-Pending{background:#f39c12;color:#000}
+.status-Shipped{background:#3498db;color:#fff}
+.status-Delivered{background:var(--success);color:#000}
 
 /* Customer Shop */
 .install-banner{background:linear-gradient(135deg, var(--gold), var(--gold-dark)); color:#000; padding:12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-weight:700; font-size:14px; box-shadow:0 4px 15px rgba(212,175,55,0.3)}
@@ -79,7 +82,9 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .top-bar{display:flex;flex-direction:column;gap:12px;padding:10px 0 16px;border-bottom:1px solid var(--border);margin-bottom:16px;position:sticky;top:0;background:var(--bg);z-index:10}
 .top-row{display:flex;justify-content:space-between;align-items:center}
 .top-bar h2{font-size:18px;color:var(--gold);font-weight:800}
-.search-bar{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 15px;color:var(--text);font-size:14px}
+.search-row{display:flex;gap:8px}
+.search-bar{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 15px;color:var(--text);font-size:14px}
+.sort-select{background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:0 10px;font-size:13px;outline:none}
 .tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;scrollbar-width:none}
 .tab{background:var(--card2);border:1px solid var(--border);padding:8px 16px;border-radius:20px;font-size:13px;white-space:nowrap;color:var(--text-dim);cursor:pointer}
 .tab.active{background:var(--gold);color:#000;border-color:var(--gold);font-weight:700}
@@ -106,20 +111,17 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .product-actions button{flex:1;padding:8px 0;border-radius:8px;font-size:11px;font-weight:700;border:none;cursor:pointer}
 .btn-cart{background:var(--card2);color:var(--text);border:1px solid var(--border)!important}
 
-/* FULL SCREEN PRODUCT DETAILS */
+/* PRODUCT DETAILS */
 #screen-product-details{padding:0;padding-bottom:80px}
 .detail-header{position:fixed;top:0;left:0;right:0;padding:15px 20px;display:flex;justify-content:space-between;z-index:10;background:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)}
-
-/* Multiple Photos Slider */
 .detail-gallery{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;width:100%;height:55vh;background:var(--card2);scrollbar-width:none;}
 .detail-gallery::-webkit-scrollbar{display:none;}
 .detail-gallery img{width:100%;height:100%;object-fit:cover;flex-shrink:0;scroll-snap-align:center;}
-
 .detail-body{padding:20px;background:var(--bg);border-radius:24px 24px 0 0;margin-top:-20px;position:relative;z-index:2}
 .detail-title{font-size:24px;font-weight:800;margin-bottom:5px}
 .detail-price{display:flex;align-items:baseline;gap:10px;margin-bottom:15px;flex-wrap:wrap}
 .detail-price .disc{font-size:28px;color:var(--gold);font-weight:800}
-.detail-price .orig{font-size:16px;color:var(--text-dim);text-decoration:line-through;font-weight:normal}
+.detail-price .orig{font-size:16px;color:var(--text-dim);text-decoration:line-through}
 .detail-price .off{font-size:16px;color:var(--success);font-weight:800}
 .detail-desc{font-size:15px;color:var(--text-dim);line-height:1.6;margin-bottom:20px}
 .size-color-row{display:flex;gap:10px;margin-bottom:20px}
@@ -127,27 +129,41 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .detail-bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);padding:15px 20px;display:flex;gap:10px;border-top:1px solid var(--border);z-index:20}
 .detail-bottom-bar button{padding:15px;border-radius:12px;font-size:16px;font-weight:800;border:none;flex:1;cursor:pointer}
 
+/* Reviews */
+.review-section{margin-top:30px;border-top:1px solid var(--border);padding-top:20px}
+.review-card{background:var(--card2);padding:12px;border-radius:10px;margin-bottom:10px}
+.review-stars{color:var(--star);font-size:14px;margin-bottom:5px}
+.review-text{font-size:13px;color:var(--text)}
+.review-name{font-size:11px;color:var(--text-dim);margin-top:5px}
+
+/* Related Products */
+.related-title{font-size:16px;font-weight:700;margin:20px 0 10px}
+.related-grid{display:flex;gap:10px;overflow-x:auto;padding-bottom:10px}
+.related-card{min-width:120px;background:var(--card2);border-radius:10px;overflow:hidden;cursor:pointer}
+.related-card img{width:100%;height:120px;object-fit:cover}
+.related-card p{font-size:12px;padding:5px;font-weight:700}
+
 /* Bottom Nav */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:none;justify-content:space-around;padding:10px 0;z-index:20}
 .nav-item{background:none;border:none;color:var(--text-dim);font-size:10px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;cursor:pointer}
 .nav-item.active{color:var(--gold)}
 .nav-icon{font-size:18px}
 
-/* Cart & Checkout */
+/* Cart */
 .cart-item{display:flex;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:10px;align-items:center}
 .cart-item img{width:60px;height:60px;object-fit:cover;border-radius:8px}
 .ci-info{flex:1}
 .ci-name{font-size:14px;font-weight:700}
 .ci-price{font-size:13px;color:var(--gold);font-weight:700}
 .ci-remove{color:var(--danger);background:none;border:none;font-size:16px;padding:8px;cursor:pointer}
-.cart-total{background:var(--card2);border-radius:12px;padding:14px;margin:16px 0;display:flex;justify-content:space-between;font-weight:700}
-.cart-total span:last-child{color:var(--gold);font-size:18px}
+.cart-summary{background:var(--card2);border-radius:12px;padding:15px;margin:16px 0}
+.summary-row{display:flex;justify-content:space-between;font-size:14px;color:var(--text-dim);margin-bottom:8px}
+.summary-row.total{font-weight:800;color:var(--text);font-size:18px;border-top:1px solid var(--border);padding-top:10px;margin-top:10px}
+.summary-row.total span:last-child{color:var(--gold)}
 .coupon-box{display:flex;gap:10px;margin-bottom:15px}
 .coupon-box input{flex:1;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);outline:none}
 .btn-wa{width:100%;background:#25D366;color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:800;cursor:pointer}
 .settings-section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}
-
-/* Coupon List UI in Admin */
 .coupon-item{display:flex;justify-content:space-between;align-items:center;background:var(--card2);padding:10px;border-radius:8px;margin-bottom:8px;border:1px dashed var(--gold)}
 .coupon-code{font-weight:800;color:var(--gold);font-size:16px}
 .coupon-disc{font-size:12px;color:var(--success);font-weight:700}
@@ -178,7 +194,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
   </div>
 </div>
 
-<!-- ADMIN LOGIN & FORGOT -->
+<!-- LOGIN -->
 <div id="screen-login" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('landing')">←</button><h2>Admin Login</h2></div>
   <div class="form-container">
@@ -202,7 +218,11 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <div id="screen-admin" class="screen">
   <div class="admin-header">
     <div><h2>FAIZ FASHION</h2><p style="font-size:12px;color:var(--text-dim)">Admin Panel</p></div>
-    <div style="display:flex;gap:8px"><button class="btn-small" onclick="openSettings()">⚙️ Settings</button><button class="logout-btn" onclick="handleLogout()">Logout</button></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-small" onclick="showScreen('admin-orders')">📦 Orders</button>
+      <button class="btn-small" onclick="openSettings()">⚙️</button>
+      <button class="logout-btn" onclick="handleLogout()">Logout</button>
+    </div>
   </div>
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-val" id="statTotal">0</div><div class="stat-label">Total Items</div></div>
@@ -212,23 +232,23 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
   <div id="categoryList" class="category-list"></div>
 </div>
 
-<!-- ADD/EDIT PRODUCT FORM -->
+<!-- ADMIN ORDERS -->
+<div id="screen-admin-orders" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>All Orders</h2></div>
+  <div id="adminOrdersList"></div>
+</div>
+
+<!-- ADD/EDIT PRODUCT -->
 <div id="screen-category-form" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2 id="formTitle">Add Product</h2></div>
   <div class="form-container">
     <div class="input-group"><label>Product Name</label><input type="text" id="catName" placeholder="e.g. Cotton Shirt"></div>
     <div class="input-group"><label>Main Category</label>
       <select id="catMainCat">
-        <option value="Men">Men</option>
-        <option value="Women">Women</option>
-        <option value="Kids">Kids</option>
-        <option value="Accessories">Accessories</option>
-        <option value="Grocery">Grocery</option>
-        <option value="Beauty">Beauty</option>
+        <option value="Men">Men</option><option value="Women">Women</option><option value="Kids">Kids</option>
+        <option value="Accessories">Accessories</option><option value="Grocery">Grocery</option><option value="Beauty">Beauty</option>
       </select>
     </div>
-    
-    <!-- MULTIPLE PHOTOS UPLOAD -->
     <div class="input-group">
       <label>Photos (Select Multiple)</label>
       <div class="photo-upload" onclick="document.getElementById('catPhoto').click()">
@@ -237,16 +257,15 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
       </div>
       <div id="photoPreviews"></div>
     </div>
-
     <div style="display:flex;gap:10px">
       <div class="input-group" style="flex:1"><label>Stock</label><input type="number" id="catTimes" placeholder="0" min="0"></div>
-      <div class="input-group" style="flex:1"><label>Sizes (Comma)</label><input type="text" id="catSizes" placeholder="S, M, L"></div>
+      <div class="input-group" style="flex:1"><label>Sizes</label><input type="text" id="catSizes" placeholder="S, M, L"></div>
     </div>
-    <div class="input-group"><label>Colors (Comma)</label><input type="text" id="catColors" placeholder="Black, White, Red"></div>
+    <div class="input-group"><label>Colors</label><input type="text" id="catColors" placeholder="Black, White"></div>
     <div class="input-group"><label>Description</label><textarea id="catDescription" rows="2"></textarea></div>
     <div style="display:flex;gap:10px">
-      <div class="input-group" style="flex:1"><label>Original Price</label><input type="number" id="catOriginalPrice" placeholder="₹"></div>
-      <div class="input-group" style="flex:1"><label>Discount Price</label><input type="number" id="catDiscountPrice" placeholder="₹"></div>
+      <div class="input-group" style="flex:1"><label>Original Price</label><input type="number" id="catOriginalPrice"></div>
+      <div class="input-group" style="flex:1"><label>Discount Price</label><input type="number" id="catDiscountPrice"></div>
     </div>
     <button class="btn-primary" id="saveCatBtn" onclick="saveCategory()">Save Product</button>
     <div id="catError" class="error-msg"></div>
@@ -257,10 +276,13 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <div id="screen-settings" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>Settings</h2></div>
   <div class="form-container">
-    
     <div class="settings-section">
-      <h3>WhatsApp & Banner</h3>
+      <h3>Shop Settings & Delivery</h3>
       <div class="input-group"><label>WhatsApp Number</label><input type="tel" id="settingsWhatsapp" placeholder="917838647693"></div>
+      <div style="display:flex;gap:10px">
+        <div class="input-group" style="flex:1"><label>Delivery Charge (₹)</label><input type="number" id="settingsDelCharge" placeholder="50"></div>
+        <div class="input-group" style="flex:1"><label>Free Delivery Above (₹)</label><input type="number" id="settingsFreeAbove" placeholder="1000"></div>
+      </div>
       <div class="input-group"><label>Sale Banner Image</label>
         <div class="photo-upload" onclick="document.getElementById('bannerPhoto').click()">
           <input type="file" id="bannerPhoto" accept="image/*" hidden onchange="previewBanner(event)">
@@ -284,18 +306,10 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
     <div class="settings-section" style="border: 1px solid var(--gold);">
       <h3 style="color:var(--gold); margin-bottom:15px;">🔐 Change Admin Password</h3>
       <div class="input-group"><input type="password" id="currentPwd" placeholder="Current Password"></div>
-      <div class="input-group"><input type="password" id="newPwd" placeholder="New Password (min 6 chars)"></div>
+      <div class="input-group"><input type="password" id="newPwd" placeholder="New Password"></div>
       <div class="input-group"><input type="password" id="confirmPwd" placeholder="Confirm New Password"></div>
       <button class="btn-primary" onclick="changeAdminPassword()">Update Password</button>
     </div>
-    
-    <div class="settings-section">
-      <h3>Change Security Code</h3>
-      <div class="input-group"><input type="password" id="currentSec" placeholder="Current security code"></div>
-      <div class="input-group"><input type="password" id="newSec" placeholder="New security code (min 6 chars)"></div>
-      <button class="btn-primary" onclick="changeSecurityCode()">Update Security Code</button>
-    </div>
-
   </div>
 </div>
 
@@ -305,7 +319,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
     <span>📥 Install FAIZ FASHION App</span>
     <button onclick="installPWA()">Install Now</button>
   </div>
-
   <div class="top-bar">
     <div class="top-row">
       <h2>FAIZ FASHION</h2>
@@ -314,14 +327,19 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
         <button class="icon-btn" onclick="goCart()">🛒<span class="badge" id="shopCartBadge">0</span></button>
       </div>
     </div>
-    <input type="text" class="search-bar" placeholder="Search products..." oninput="filterProducts(this.value)">
+    <div class="search-row">
+      <input type="text" class="search-bar" placeholder="Search..." oninput="filterProducts(this.value)">
+      <select class="sort-select" onchange="sortProducts(this.value)">
+        <option value="default">Sort</option>
+        <option value="low-high">Low to High</option>
+        <option value="high-low">High to Low</option>
+      </select>
+    </div>
     <div class="tabs" id="mainTabs">
       <div class="tab active" onclick="setMainCategory('All')">All</div>
       <div class="tab" onclick="setMainCategory('Men')">Men</div>
       <div class="tab" onclick="setMainCategory('Women')">Women</div>
       <div class="tab" onclick="setMainCategory('Kids')">Kids</div>
-      <div class="tab" onclick="setMainCategory('Grocery')">Grocery</div>
-      <div class="tab" onclick="setMainCategory('Beauty')">Beauty</div>
       <div class="tab" onclick="setMainCategory('Watchlist')" style="color:#ff4d6d;border-color:#ff4d6d">❤️ Watchlist</div>
     </div>
   </div>
@@ -329,7 +347,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
   <div id="shopGrid" class="product-grid"></div>
 </div>
 
-<!-- FULL SCREEN PRODUCT DETAILS -->
+<!-- PRODUCT DETAILS -->
 <div id="screen-product-details" class="screen">
   <div class="detail-header">
     <button class="back-btn" style="background:rgba(0,0,0,0.5);border:none;color:#fff" onclick="showScreen('shop')">←</button>
@@ -338,56 +356,78 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
       <button class="back-btn" style="background:rgba(0,0,0,0.5);border:none;color:#fff" onclick="shareProduct()">🔗</button>
     </div>
   </div>
-  
   <div class="detail-gallery" id="detailGallery"></div>
-  
   <div class="detail-body">
     <div class="detail-title" id="detailName"></div>
     <div class="detail-price">
-      <span class="disc" id="detailDisc"></span> 
-      <span class="orig" id="detailOrig"></span>
-      <span class="off" id="detailOff"></span>
+      <span class="disc" id="detailDisc"></span><span class="orig" id="detailOrig"></span><span class="off" id="detailOff"></span>
     </div>
     <div class="detail-desc" id="detailDesc"></div>
-    
-    <div style="font-size:14px;font-weight:700;margin-bottom:10px">Select Options:</div>
     <div class="size-color-row">
       <select id="detailSize"><option value="">Size</option></select>
       <select id="detailColor"><option value="">Color</option></select>
     </div>
-    
     <div id="detailStockMsg" style="font-size:12px;color:var(--danger);font-weight:700"></div>
-  </div>
 
+    <!-- Reviews Section -->
+    <div class="review-section">
+      <h3 style="font-size:16px;margin-bottom:10px">Customer Reviews</h3>
+      <button class="btn-small" style="width:100%;margin-bottom:15px" onclick="openReviewForm()">+ Write a Review</button>
+      <div id="reviewList"></div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="related-title">You May Also Like</div>
+    <div class="related-grid" id="relatedProducts"></div>
+  </div>
   <div class="detail-bottom-bar">
     <button style="background:var(--card2);color:var(--text);border:1px solid var(--border)" onclick="addToCartDetails()">Add to Cart</button>
     <button style="background:var(--gold);color:#000" onclick="buyNowDetails()">Buy Now</button>
   </div>
 </div>
 
-<!-- CART & CHECKOUT -->
+<!-- REVIEW FORM MODAL -->
+<div id="reviewModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);padding:20px;border-radius:16px;width:100%;max-width:400px">
+    <h3 style="margin-bottom:15px;color:var(--gold)">Write a Review</h3>
+    <div class="input-group"><label>Your Name</label><input type="text" id="revName" placeholder="Your name"></div>
+    <div class="input-group"><label>Rating (1-5)</label><input type="number" id="revRating" min="1" max="5" value="5"></div>
+    <div class="input-group"><label>Comment</label><textarea id="revText" rows="3"></textarea></div>
+    <div style="display:flex;gap:10px;margin-top:15px">
+      <button class="btn-small" onclick="closeReviewForm()">Cancel</button>
+      <button class="btn-primary" style="flex:1;padding:10px" onclick="submitReview()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- CART -->
 <div id="screen-cart" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Cart</h2></div>
   <div id="cartList"></div>
   <div class="coupon-box">
-    <input type="text" id="couponInput" placeholder="Enter Coupon Code">
+    <input type="text" id="couponInput" placeholder="Coupon Code">
     <button class="btn-small" style="flex:0;padding:0 20px" onclick="applyCoupon()">Apply</button>
   </div>
-  <div class="cart-total"><span>Total</span><span id="cartTotal">₹0</span></div>
+  <div class="cart-summary">
+    <div class="summary-row"><span>Subtotal</span><span id="cartSubtotal">₹0</span></div>
+    <div class="summary-row"><span>Delivery Charge</span><span id="cartDelivery">₹0</span></div>
+    <div class="summary-row total"><span>Total</span><span id="cartTotal">₹0</span></div>
+  </div>
   <button class="btn-wa" onclick="openCheckout()">Proceed to Checkout</button>
 </div>
 
-<!-- CHECKOUT FORM -->
+<!-- CHECKOUT -->
 <div id="screen-checkout" class="screen">
-  <div class="header"><button class="back-btn" onclick="showScreen('cart')">←</button><h2>Checkout Details</h2></div>
+  <div class="header"><button class="back-btn" onclick="showScreen('cart')">←</button><h2>Checkout</h2></div>
   <div class="form-container">
-    <div class="input-group"><label>Full Name</label><input type="text" id="chkName" placeholder="Your Name"></div>
-    <div class="input-group"><label>Phone Number</label><input type="tel" id="chkPhone" placeholder="10 digit mobile"></div>
-    <div class="input-group"><label>Building / House No.</label><input type="text" id="chkBuilding" placeholder="Building Name"></div>
-    <div class="input-group"><label>Full Address</label><textarea id="chkAddress" rows="2" placeholder="Street, Area"></textarea></div>
-    <div class="input-group"><label>Famous Place Near You</label><input type="text" id="chkLandmark" placeholder="Landmark"></div>
-    
-    <div class="cart-total" style="margin:10px 0 20px"><span>Final Amount</span><span id="chkTotal">₹0</span></div>
+    <div class="input-group"><label>Full Name</label><input type="text" id="chkName"></div>
+    <div class="input-group"><label>Phone Number</label><input type="tel" id="chkPhone"></div>
+    <div class="input-group"><label>Building / House No.</label><input type="text" id="chkBuilding"></div>
+    <div class="input-group"><label>Full Address</label><textarea id="chkAddress" rows="2"></textarea></div>
+    <div class="input-group"><label>Famous Place Near You</label><input type="text" id="chkLandmark"></div>
+    <div class="cart-summary">
+      <div class="summary-row total"><span>Final Amount</span><span id="chkTotal">₹0</span></div>
+    </div>
     <button class="btn-wa" onclick="submitOrderWA()">📱 Send Order on WhatsApp</button>
     <div id="chkError" class="error-msg"></div>
   </div>
@@ -409,17 +449,9 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc, getDoc, deleteDoc, onSnapshot, serverTimestamp, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, getDoc, deleteDoc, onSnapshot, serverTimestamp, addDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCBLRe3QajETrVTuK-ljrOVndJO9ndZiuU",
-  authDomain: "faiz-fashion.firebaseapp.com",
-  databaseURL: "https://faiz-fashion-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "faiz-fashion",
-  storageBucket: "faiz-fashion.firebasestorage.app",
-  messagingSenderId: "188226858699",
-  appId: "1:188226858699:web:328e68db2b95b366a1f54e"
-};
+const firebaseConfig = { apiKey: "AIzaSyCBLRe3QajETrVTuK-ljrOVndJO9ndZiuU", authDomain: "faiz-fashion.firebaseapp.com", databaseURL: "https://faiz-fashion-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "faiz-fashion", storageBucket: "faiz-fashion.firebasestorage.app", messagingSenderId: "188226858699", appId: "1:188226858699:web:328e68db2b95b366a1f54e" };
 
 const ADMIN_EMAIL = "shahidquamar72@gmail.com"; 
 const CLOUDINARY_CLOUD_NAME = "vsp6mp0d";
@@ -429,28 +461,12 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let currentUid = null;
-let isAdminUser = false;
-let categoriesCache = [];
-let cartIds = new Set();
-let watchlistIds = new Set();
-let couponsCache = [];
-let whatsappNumber = "917838647693";
-let mainCategory = 'All';
-let searchQuery = '';
-let discountPercent = 0;
-let appliedCoupon = '';
-let currentDetailProduct = null;
-let bannerUrl = '';
-let editingCouponCode = null;
-
-// MULTI-PHOTO STATE
-let editingId = null; 
-let currentPhotoFiles = []; // Array of {file, url}
-let existingPhotoUrls = []; 
-let currentBannerFile = null;
-
-let unsubCategories = null, unsubConfig = null, unsubCart = null, unsubOrders = null, unsubWatchlist = null, unsubCoupons = null;
+let currentUid = null, isAdminUser = false, categoriesCache = [], cartIds = new Set(), watchlistIds = new Set(), couponsCache = [];
+let whatsappNumber = "917838647693", mainCategory = 'All', searchQuery = '', sortOrder = 'default';
+let discountPercent = 0, appliedCoupon = '', currentDetailProduct = null, bannerUrl = '';
+let deliveryCharge = 50, freeDeliveryAbove = 1000; 
+let editingCouponCode = null, editingId = null, currentPhotoFiles = [], existingPhotoUrls = [], currentBannerFile = null;
+let unsubCategories, unsubConfig, unsubCart, unsubOrders, unsubWatchlist, unsubCoupons, unsubReviews, unsubAdminOrders;
 
 function escapeHtml(str) { return String(str ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 async function sha256(str) { const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)); return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join(''); }
@@ -463,7 +479,8 @@ function showScreen(name) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.screen === name));
   if (name === 'shop') renderShop();
   if (name === 'cart') renderCart();
-  if (name === 'orders') loadOrders();
+  if (name === 'orders') loadCustomerOrders();
+  if (name === 'admin-orders') loadAdminOrders();
   if (name === 'settings' && isAdminUser) renderAdminCoupons();
   window.scrollTo(0,0);
 }
@@ -474,27 +491,19 @@ function getDiscountPercent(original, discount) {
 }
 
 let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault(); deferredPrompt = e;
-});
-
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
 function installPWA() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
-  } else {
-    alert("📱 App Install Karne Ke Liye:\n\n1. Niche 'Share' (📤) button par click karein.\n2. List me 'Add to Home Screen' (🏠) select karein.\n3. App aapke phone me install ho jayega!");
-  }
+  if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; }); } 
+  else { alert("📱 App Install Karne Ke Liye:\n\n1. Niche 'Share' (📤) button par click karein.\n2. List me 'Add to Home Screen' (🏠) select karein."); }
 }
 
 onAuthStateChanged(auth, async (user) => {
-  if(unsubCategories) unsubCategories(); if(unsubConfig) unsubConfig(); if(unsubCart) unsubCart(); if(unsubOrders) unsubOrders(); if(unsubWatchlist) unsubWatchlist(); if(unsubCoupons) unsubCoupons();
+  if(unsubCategories) unsubCategories(); if(unsubConfig) unsubConfig(); if(unsubCart) unsubCart(); if(unsubOrders) unsubOrders(); if(unsubWatchlist) unsubWatchlist(); if(unsubCoupons) unsubCoupons(); if(unsubAdminOrders) unsubAdminOrders();
   watchlistIds = new Set(); cartIds = new Set(); couponsCache = [];
   if (!user) { currentUid = null; showScreen('landing'); return; }
   currentUid = user.uid; isAdminUser = user.email === ADMIN_EMAIL;
   
   listenCategories(); listenConfig(); listenCoupons();
-  
   if (isAdminUser) { showScreen('admin'); renderAdminCategories(); }
   else { listenCart(); listenWatchlist(); showScreen('shop'); }
 });
@@ -515,9 +524,13 @@ async function handleReset() {
 function listenConfig() {
   unsubConfig = onSnapshot(doc(db, 'settings', 'config'), snap => {
     if (snap.exists()) { 
-      whatsappNumber = (snap.data().whatsappNumber || "917838647693").replace(/\D/g, ''); 
-      bannerUrl = snap.data().bannerUrl || '';
+      const data = snap.data();
+      whatsappNumber = (data.whatsappNumber || "917838647693").replace(/\D/g, ''); 
+      bannerUrl = data.bannerUrl || '';
+      deliveryCharge = data.deliveryCharge !== undefined ? data.deliveryCharge : 50;
+      freeDeliveryAbove = data.freeDeliveryAbove !== undefined ? data.freeDeliveryAbove : 1000;
       if(bannerUrl) { document.getElementById('shopBanner').style.display = 'block'; document.getElementById('bannerImg').src = bannerUrl; }
+      if(document.getElementById('screen-cart').classList.contains('active')) calculateTotal();
     }
   });
 }
@@ -549,10 +562,10 @@ function listenCoupons() {
   });
 }
 
+/* ADMIN LOGIC */
 function renderAdminCategories() {
   const list = document.getElementById('categoryList'); if (!list) return;
-  let out = 0;
-  categoriesCache.forEach(c => { if((c.times||0) <= 0) out++; });
+  let out = 0; categoriesCache.forEach(c => { if((c.times||0) <= 0) out++; });
   document.getElementById('statTotal').textContent = categoriesCache.length;
   document.getElementById('statOut').textContent = out;
   
@@ -564,27 +577,18 @@ function renderAdminCategories() {
       <img src="${mainImg}" class="cat-img">
       <div class="cat-body">
         <div class="cat-tag">${c.mainCategory || 'Men'}</div>
-        <div class="cat-name">${escapeHtml(c.name)} ${(c.times||0)<=0?'<span class="out-stock-badge">OUT OF STOCK</span>':''}</div>
-        <div class="cat-price-row">
-          <span class="cat-discount">₹${c.discountPrice}</span>
-          <span class="cat-original">₹${c.originalPrice}</span>
-          ${off > 0 ? `<span class="cat-off">${off}% OFF</span>` : ''}
-        </div>
+        <div class="cat-name">${escapeHtml(c.name)} ${(c.times||0)<=0?'<span class="out-stock-badge">OUT</span>':''}</div>
+        <div class="cat-price-row"><span class="cat-discount">₹${c.discountPrice}</span><span class="cat-original">₹${c.originalPrice}</span>${off > 0 ? `<span class="cat-off">${off}% OFF</span>` : ''}</div>
         <div class="cat-actions"><button class="btn-small" onclick="openCategoryForm('${c.id}')">Edit</button><button class="btn-small" style="color:var(--danger)" onclick="deleteCategory('${c.id}')">Delete</button></div>
       </div>
     </div>`}).join('');
 }
 
-/* MULTI PHOTO LOGIC */
 function openCategoryForm(id) {
-  editingId = id || null; 
-  currentPhotoFiles = []; 
-  existingPhotoUrls = [];
+  editingId = id || null; currentPhotoFiles = []; existingPhotoUrls = [];
   document.getElementById('photoPreviews').innerHTML = '';
-  
   document.getElementById('formTitle').textContent = editingId ? 'Edit Product' : 'Add Product';
-  document.getElementById('catError').textContent = '';
-  document.getElementById('catPhoto').value = '';
+  document.getElementById('catError').textContent = ''; document.getElementById('catPhoto').value = '';
   
   if (editingId) {
     const c = categoriesCache.find(x => x.id === editingId);
@@ -597,12 +601,7 @@ function openCategoryForm(id) {
       document.getElementById('catDescription').value = c.description || '';
       document.getElementById('catOriginalPrice').value = c.originalPrice;
       document.getElementById('catDiscountPrice').value = c.discountPrice;
-      
-      if(c.photoUrls && c.photoUrls.length > 0) {
-        existingPhotoUrls = [...c.photoUrls];
-      } else if(c.photoUrl) {
-        existingPhotoUrls = [c.photoUrl];
-      }
+      existingPhotoUrls = (c.photoUrls && c.photoUrls.length > 0) ? [...c.photoUrls] : (c.photoUrl ? [c.photoUrl] : []);
       renderPhotoPreviews();
     }
   } else {
@@ -612,223 +611,149 @@ function openCategoryForm(id) {
 }
 
 function previewPhoto(e) {
-  const files = Array.from(e.target.files);
-  if(files.length === 0) return;
-  
-  files.forEach(file => {
-    // Save the object URL once so it doesn't refresh or disappear
-    currentPhotoFiles.push({
-      file: file,
-      url: URL.createObjectURL(file) 
-    });
-  });
-  
-  renderPhotoPreviews();
-  document.getElementById('catPhoto').value = ''; 
+  Array.from(e.target.files).forEach(file => currentPhotoFiles.push({ file: file, url: URL.createObjectURL(file) }));
+  renderPhotoPreviews(); document.getElementById('catPhoto').value = ''; 
 }
-
 function renderPhotoPreviews() {
-  const container = document.getElementById('photoPreviews');
   let html = '';
-  
-  existingPhotoUrls.forEach((url, index) => {
-    html += `
-      <div class="preview-box">
-        <img src="${url}">
-        <button type="button" class="remove-btn" onclick="removeExistingPhoto(${index})">✕</button>
-      </div>
-    `;
-  });
-  
-  currentPhotoFiles.forEach((item, index) => {
-    html += `
-      <div class="preview-box">
-        <img src="${item.url}">
-        <button type="button" class="remove-btn" onclick="removeNewPhoto(${index})">✕</button>
-      </div>
-    `;
-  });
-  
-  container.innerHTML = html;
+  existingPhotoUrls.forEach((url, index) => { html += `<div class="preview-box"><img src="${url}"><button type="button" class="remove-btn" onclick="removeExistingPhoto(${index})">✕</button></div>`; });
+  currentPhotoFiles.forEach((item, index) => { html += `<div class="preview-box"><img src="${item.url}"><button type="button" class="remove-btn" onclick="removeNewPhoto(${index})">✕</button></div>`; });
+  document.getElementById('photoPreviews').innerHTML = html;
 }
-
-function removeExistingPhoto(index) {
-  existingPhotoUrls.splice(index, 1);
-  renderPhotoPreviews();
-}
-function removeNewPhoto(index) {
-  currentPhotoFiles.splice(index, 1);
-  renderPhotoPreviews();
-}
+function removeExistingPhoto(index) { existingPhotoUrls.splice(index, 1); renderPhotoPreviews(); }
+function removeNewPhoto(index) { currentPhotoFiles.splice(index, 1); renderPhotoPreviews(); }
 
 async function saveCategory() {
-  const name = document.getElementById('catName').value;
-  const main = document.getElementById('catMainCat').value;
+  const name = document.getElementById('catName').value, main = document.getElementById('catMainCat').value;
   const times = parseInt(document.getElementById('catTimes').value) || 0;
   const sizes = document.getElementById('catSizes').value.split(',').map(s=>s.trim()).filter(s=>s);
   const colors = document.getElementById('catColors').value.split(',').map(s=>s.trim()).filter(s=>s);
   const desc = document.getElementById('catDescription').value;
-  const op = parseFloat(document.getElementById('catOriginalPrice').value) || 0;
-  const dp = parseFloat(document.getElementById('catDiscountPrice').value) || 0;
+  const op = parseFloat(document.getElementById('catOriginalPrice').value) || 0, dp = parseFloat(document.getElementById('catDiscountPrice').value) || 0;
   
   if(!name || op <= 0) { document.getElementById('catError').textContent = 'Name & Price zaroori hai'; return; }
-  if(existingPhotoUrls.length === 0 && currentPhotoFiles.length === 0) { document.getElementById('catError').textContent = 'Kam se kam 1 photo upload karein'; return; }
+  if(existingPhotoUrls.length === 0 && currentPhotoFiles.length === 0) { document.getElementById('catError').textContent = 'Photo upload karein'; return; }
   
-  const btn = document.getElementById('saveCatBtn');
-  btn.disabled = true; btn.textContent = 'Saving...';
+  const btn = document.getElementById('saveCatBtn'); btn.disabled = true; btn.textContent = 'Saving...';
   const id = editingId || doc(collection(db,'categories')).id;
 
   try {
     let finalPhotoUrls = [...existingPhotoUrls];
-    
     for (let i = 0; i < currentPhotoFiles.length; i++) {
-      const file = currentPhotoFiles[i].file;
-      const fd = new FormData(); 
-      fd.append('file', file); 
-      fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-      
+      const fd = new FormData(); fd.append('file', currentPhotoFiles[i].file); fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
       const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method:'POST', body: fd });
-      const data = await res.json(); 
-      if(!data.secure_url) throw new Error('Upload failed for image ' + (i+1));
-      
+      const data = await res.json(); if(!data.secure_url) throw new Error('Upload failed');
       finalPhotoUrls.push(data.secure_url);
     }
-
-    await setDoc(doc(db,'categories',id), { 
-      name, 
-      mainCategory: main, 
-      times, 
-      sizes, 
-      colors, 
-      description: desc, 
-      originalPrice: op, 
-      discountPrice: dp, 
-      photoUrl: finalPhotoUrls[0], 
-      photoUrls: finalPhotoUrls,   
-      createdAt: serverTimestamp() 
-    }, { merge: true });
-    
+    await setDoc(doc(db,'categories',id), { name, mainCategory: main, times, sizes, colors, description: desc, originalPrice: op, discountPrice: dp, photoUrl: finalPhotoUrls[0], photoUrls: finalPhotoUrls, createdAt: serverTimestamp() }, { merge: true });
     showScreen('admin');
-  } catch(e) { 
-    document.getElementById('catError').textContent = e.message; 
-  }
+  } catch(e) { document.getElementById('catError').textContent = e.message; }
   btn.disabled = false; btn.textContent = 'Save Product';
 }
 async function deleteCategory(id) { if(confirm('Delete?')) await deleteDoc(doc(db,'categories',id)); }
 
 async function openSettings() {
   const snap = await getDoc(doc(db,'settings','config'));
-  if(snap.exists()) document.getElementById('settingsWhatsapp').value = snap.data().whatsappNumber || '';
-  renderAdminCoupons();
-  showScreen('settings');
+  if(snap.exists()) {
+    const d = snap.data();
+    document.getElementById('settingsWhatsapp').value = d.whatsappNumber || '';
+    document.getElementById('settingsDelCharge').value = d.deliveryCharge !== undefined ? d.deliveryCharge : 50;
+    document.getElementById('settingsFreeAbove').value = d.freeDeliveryAbove !== undefined ? d.freeDeliveryAbove : 1000;
+  }
+  renderAdminCoupons(); showScreen('settings');
 }
-function previewBanner(e) {
-  const f = e.target.files[0]; if(f) currentBannerFile = f;
-  document.getElementById('bannerPreview').src = URL.createObjectURL(f); document.getElementById('bannerPreview').style.display='block'; document.getElementById('bannerPlaceholder').style.display='none';
-}
+function previewBanner(e) { const f = e.target.files[0]; if(f) currentBannerFile = f; document.getElementById('bannerPreview').src = URL.createObjectURL(f); document.getElementById('bannerPreview').style.display='block'; document.getElementById('bannerPlaceholder').style.display='none'; }
 async function saveSettings() {
   const num = document.getElementById('settingsWhatsapp').value.replace(/\D/g,'');
+  const delC = parseFloat(document.getElementById('settingsDelCharge').value) || 0;
+  const freeAbv = parseFloat(document.getElementById('settingsFreeAbove').value) || 0;
   let bUrl = bannerUrl;
   if(currentBannerFile) {
     const fd = new FormData(); fd.append('file', currentBannerFile); fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method:'POST', body: fd });
     const data = await res.json(); bUrl = data.secure_url;
   }
-  await setDoc(doc(db,'settings','config'), { whatsappNumber: num, bannerUrl: bUrl }, { merge: true });
+  await setDoc(doc(db,'settings','config'), { whatsappNumber: num, bannerUrl: bUrl, deliveryCharge: delC, freeDeliveryAbove: freeAbv }, { merge: true });
   alert('Saved!');
 }
 
 function renderAdminCoupons() {
   const list = document.getElementById('couponList'); if(!list) return;
   if(couponsCache.length === 0) { list.innerHTML = '<div style="color:var(--text-dim);font-size:12px;text-align:center">No active coupons.</div>'; return; }
-  list.innerHTML = couponsCache.map(c => `
-    <div class="coupon-item">
-      <div>
-        <div class="coupon-code">${c.code}</div>
-        <div class="coupon-disc">${c.discountPercent}% OFF</div>
-      </div>
-      <div>
-        <button style="background:none;border:none;color:var(--gold);font-size:16px;cursor:pointer;margin-right:10px" onclick="editCoupon('${c.code}', ${c.discountPercent})">✏️</button>
-        <button style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer" onclick="deleteCoupon('${c.id}')">✕</button>
-      </div>
-    </div>
-  `).join('');
+  list.innerHTML = couponsCache.map(c => `<div class="coupon-item"><div><div class="coupon-code">${c.code}</div><div class="coupon-disc">${c.discountPercent}% OFF</div></div><div><button style="background:none;border:none;color:var(--gold);font-size:16px;cursor:pointer;margin-right:10px" onclick="editCoupon('${c.code}', ${c.discountPercent})">✏️</button><button style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer" onclick="deleteCoupon('${c.id}')">✕</button></div></div>`).join('');
 }
-
-function editCoupon(code, disc) {
-  document.getElementById('newCouponCode').value = code;
-  document.getElementById('newCouponCode').readOnly = true; 
-  document.getElementById('newCouponDisc').value = disc;
-  document.getElementById('addCouponBtn').textContent = 'Update';
-  editingCouponCode = code;
-}
-
+function editCoupon(code, disc) { document.getElementById('newCouponCode').value = code; document.getElementById('newCouponCode').readOnly = true; document.getElementById('newCouponDisc').value = disc; document.getElementById('addCouponBtn').textContent = 'Update'; editingCouponCode = code; }
 async function saveCoupon() {
-  const code = document.getElementById('newCouponCode').value.trim().toUpperCase();
-  const disc = parseFloat(document.getElementById('newCouponDisc').value);
-  if(!code || !disc || disc <= 0 || disc > 100) { alert('Sahi code aur discount (1-100)% daalein'); return; }
-  
+  const code = document.getElementById('newCouponCode').value.trim().toUpperCase(), disc = parseFloat(document.getElementById('newCouponDisc').value);
+  if(!code || !disc || disc <= 0 || disc > 100) { alert('Sahi code aur discount daalein'); return; }
   try {
     await setDoc(doc(db, 'coupons', code), { code, discountPercent: disc, createdAt: serverTimestamp() });
-    document.getElementById('newCouponCode').value = '';
-    document.getElementById('newCouponCode').readOnly = false;
-    document.getElementById('newCouponDisc').value = '';
-    document.getElementById('addCouponBtn').textContent = 'Add';
-    editingCouponCode = null;
-    alert('✅ Coupon Saved!');
+    document.getElementById('newCouponCode').value = ''; document.getElementById('newCouponCode').readOnly = false; document.getElementById('newCouponDisc').value = ''; document.getElementById('addCouponBtn').textContent = 'Add'; editingCouponCode = null; alert('✅ Saved!');
   } catch(e) { alert('Error: ' + e.message); }
 }
-
-async function deleteCoupon(id) {
-  if(confirm('Delete coupon?')) await deleteDoc(doc(db, 'coupons', id));
-}
+async function deleteCoupon(id) { if(confirm('Delete?')) await deleteDoc(doc(db, 'coupons', id)); }
 
 async function changeAdminPassword() {
-  const cur = document.getElementById('currentPwd').value; const np = document.getElementById('newPwd').value; const cp = document.getElementById('confirmPwd').value;
-  if (np.length < 6) { alert('Naya password kam se kam 6 character ka ho'); return; }
-  if (np !== cp) { alert('Passwords match nahi kar rahe'); return; }
-  try {
-    const user = auth.currentUser; const cred = EmailAuthProvider.credential(ADMIN_EMAIL, cur);
-    await reauthenticateWithCredential(user, cred); await updatePassword(user, np);
-    alert('✅ Password change ho gaya'); ['currentPwd','newPwd','confirmPwd'].forEach(id => document.getElementById(id).value = '');
-  } catch(e) { alert('❌ ' + (e.code === 'auth/wrong-password' ? 'Current password galat hai' : e.message)); }
+  const cur = document.getElementById('currentPwd').value, np = document.getElementById('newPwd').value, cp = document.getElementById('confirmPwd').value;
+  if (np.length < 6) { alert('Min 6 chars'); return; } if (np !== cp) { alert('Mismatch'); return; }
+  try { const user = auth.currentUser; const cred = EmailAuthProvider.credential(ADMIN_EMAIL, cur); await reauthenticateWithCredential(user, cred); await updatePassword(user, np); alert('✅ Changed'); ['currentPwd','newPwd','confirmPwd'].forEach(id => document.getElementById(id).value = ''); } 
+  catch(e) { alert('❌ ' + (e.code === 'auth/wrong-password' ? 'Wrong password' : e.message)); }
 }
 
-async function changeSecurityCode() {
-  const cur = document.getElementById('currentSec').value; const ns = document.getElementById('newSec').value;
-  if (ns.length < 6) { alert('Naya security code kam se kam 6 character ka ho'); return; }
-  try {
-    const snap = await getDoc(doc(db, 'settings', 'config'));
-    if (await sha256(cur) !== snap.data().securityCodeHash) { alert('❌ Current security code galat hai'); return; }
-    await setDoc(doc(db, 'settings', 'config'), { securityCodeHash: await sha256(ns) }, { merge: true });
-    alert('✅ Security code change ho gaya'); ['currentSec','newSec'].forEach(id => document.getElementById(id).value = '');
-  } catch(e) { alert('Error: ' + e.message); }
+/* ADMIN ORDERS */
+function loadAdminOrders() {
+  const list = document.getElementById('adminOrdersList'); if(!list) return;
+  if(unsubAdminOrders) unsubAdminOrders();
+  unsubAdminOrders = onSnapshot(query(collection(db, 'orders'), orderBy('date', 'desc')), snap => {
+    if(snap.empty) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim)">No orders yet.</div>'; return; }
+    list.innerHTML = snap.docs.map(d => {
+      const o = d.data();
+      const date = o.date ? new Date(o.date.toMillis()).toLocaleString() : 'Recent';
+      let statusColor = o.status === 'Shipped' ? 'status-Shipped' : (o.status === 'Delivered' ? 'status-Delivered' : 'status-Pending');
+      return `
+      <div class="order-card">
+        <h4>${o.customerName} - ₹${o.total}</h4>
+        <p>📞 ${o.phone} | 📍 ${o.address}</p>
+        <p>📅 ${date}</p>
+        <ul class="order-items-list">${o.items.map(i => `<li>${i.name} - ₹${i.price}</li>`).join('')}</ul>
+        <span class="order-status ${statusColor}">${o.status || 'Pending'}</span>
+        <select style="background:var(--card2);color:#fff;border:1px solid #444;padding:5px;border-radius:5px;float:right" onchange="updateOrderStatus('${d.id}', this.value)">
+          <option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option>
+          <option value="Shipped" ${o.status==='Shipped'?'selected':''}>Shipped</option>
+          <option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option>
+        </select>
+      </div>`;
+    }).join('');
+  });
 }
+async function updateOrderStatus(id, status) { await setDoc(doc(db, 'orders', id), { status }, { merge: true }); alert('Status Updated!'); }
 
+/* CUSTOMER SHOP */
 function setMainCategory(cat) {
   mainCategory = cat;
   document.querySelectorAll('#mainTabs .tab').forEach(t => t.classList.toggle('active', t.textContent.includes(cat) || (cat==='All' && t.textContent==='All')));
   renderShop();
 }
 function filterProducts(q) { searchQuery = q.toLowerCase(); renderShop(); }
+function sortProducts(order) { sortOrder = order; renderShop(); }
 
 function renderShop() {
   const grid = document.getElementById('shopGrid'); if(!grid) return;
   let items = categoriesCache;
   
-  if(mainCategory === 'Watchlist') {
-    items = items.filter(c => watchlistIds.has(c.id));
-  } else if(mainCategory !== 'All') {
-    items = items.filter(c => c.mainCategory === mainCategory);
-  }
+  if(mainCategory === 'Watchlist') items = items.filter(c => watchlistIds.has(c.id));
+  else if(mainCategory !== 'All') items = items.filter(c => c.mainCategory === mainCategory);
   
   if(searchQuery) items = items.filter(c => c.name.toLowerCase().includes(searchQuery) || (c.description||'').toLowerCase().includes(searchQuery));
+
+  // SORTING
+  if(sortOrder === 'low-high') items.sort((a,b) => a.discountPrice - b.discountPrice);
+  if(sortOrder === 'high-low') items.sort((a,b) => b.discountPrice - a.discountPrice);
   
   if(items.length === 0) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim)">No products found.</div>'; return; }
   
   grid.innerHTML = items.map(c => {
-    const out = (c.times||0) <= 0;
-    const off = getDiscountPercent(c.originalPrice, c.discountPrice);
+    const out = (c.times||0) <= 0, off = getDiscountPercent(c.originalPrice, c.discountPrice);
     const liked = watchlistIds.has(c.id);
     const mainImg = (c.photoUrls && c.photoUrls.length > 0) ? c.photoUrls[0] : (c.photoUrl || '');
     return `
@@ -836,224 +761,182 @@ function renderShop() {
       <div class="img-wrap">
         <img src="${mainImg}">
         <button class="heart-btn ${liked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleWatchlist('${c.id}')">${liked ? '❤️' : '🤍'}</button>
-        ${out?'<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;color:var(--danger);font-weight:800;font-size:14px;z-index:2">OUT OF STOCK</div>':''}
+        ${out?'<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;color:var(--danger);font-weight:800;z-index:2">OUT OF STOCK</div>':''}
       </div>
       <div class="product-info">
         <div class="pname">${escapeHtml(c.name)}</div>
-        <div class="price-line">
-          <span class="disc">₹${c.discountPrice}</span>
-          <span class="orig" style="text-decoration:line-through;color:var(--text-dim);font-size:11px">₹${c.originalPrice}</span>
-          ${off > 0 ? `<span class="off">${off}% OFF</span>` : ''}
-        </div>
-        <div class="product-actions">
-          <button class="btn-cart" onclick="event.stopPropagation(); toggleCart('${c.id}')">${cartIds.has(c.id)?'✓ In Cart':'+ Cart'}</button>
-        </div>
+        <div class="price-line"><span class="disc">₹${c.discountPrice}</span><span class="orig" style="text-decoration:line-through;font-size:11px">₹${c.originalPrice}</span>${off > 0 ? `<span class="off">${off}% OFF</span>` : ''}</div>
+        <div class="product-actions"><button class="btn-cart" onclick="event.stopPropagation(); toggleCart('${c.id}')">${cartIds.has(c.id)?'✓ In Cart':'+ Cart'}</button></div>
       </div>
     </div>`;
   }).join('');
 }
 
+/* PRODUCT DETAILS */
 function openProductDetails(id) {
   currentDetailProduct = categoriesCache.find(c => c.id === id);
   if(!currentDetailProduct) return;
-  const c = currentDetailProduct;
-  const off = getDiscountPercent(c.originalPrice, c.discountPrice);
+  const c = currentDetailProduct, off = getDiscountPercent(c.originalPrice, c.discountPrice);
   
-  const gallery = document.getElementById('detailGallery');
-  let images = c.photoUrls || (c.photoUrl ? [c.photoUrl] : []);
-  if(images.length === 0) images = ['logo.png'];
-  
-  gallery.innerHTML = images.map(img => `<img src="${img}" alt="${c.name}">`).join('');
+  let images = c.photoUrls || (c.photoUrl ? [c.photoUrl] : []); if(images.length === 0) images = ['logo.png'];
+  document.getElementById('detailGallery').innerHTML = images.map(img => `<img src="${img}">`).join('');
 
   document.getElementById('detailName').textContent = c.name;
   document.getElementById('detailDisc').textContent = '₹'+c.discountPrice;
   document.getElementById('detailOrig').textContent = '₹'+c.originalPrice;
   document.getElementById('detailOff').textContent = off > 0 ? `${off}% OFF` : '';
-  document.getElementById('detailDesc').textContent = c.description || 'No description available for this product.';
+  document.getElementById('detailDesc').textContent = c.description || 'No description.';
   
-  const sizeSel = document.getElementById('detailSize');
-  sizeSel.innerHTML = '<option value="">Select Size</option>' + (c.sizes||[]).map(s => `<option value="${s}">${s}</option>`).join('');
+  document.getElementById('detailSize').innerHTML = '<option value="">Size</option>' + (c.sizes||[]).map(s => `<option value="${s}">${s}</option>`).join('');
+  document.getElementById('detailColor').innerHTML = '<option value="">Color</option>' + (c.colors||[]).map(col => `<option value="${col}">${col}</option>`).join('');
   
-  const colorSel = document.getElementById('detailColor');
-  colorSel.innerHTML = '<option value="">Select Color</option>' + (c.colors||[]).map(col => `<option value="${col}">${col}</option>`).join('');
+  document.getElementById('detailStockMsg').textContent = (c.times||0) <= 0 ? "OUT OF STOCK!" : "";
   
-  const outMsg = document.getElementById('detailStockMsg');
-  if((c.times||0) <= 0) outMsg.textContent = "OUT OF STOCK!";
-  else outMsg.textContent = "";
-
   updateDetailLikeBtn();
+  loadReviews(id);
+  loadRelatedProducts(c.mainCategory, id);
   showScreen('product-details');
 }
 
-function updateDetailLikeBtn() {
-  if(!currentDetailProduct) return;
-  const liked = watchlistIds.has(currentDetailProduct.id);
-  document.getElementById('detailLikeBtn').textContent = liked ? '❤️' : '🤍';
-  document.getElementById('detailLikeBtn').style.color = liked ? '#ff4d6d' : '#fff';
+/* REVIEWS */
+function loadReviews(productId) {
+  const list = document.getElementById('reviewList'); list.innerHTML = 'Loading reviews...';
+  if(unsubReviews) unsubReviews();
+  unsubReviews = onSnapshot(query(collection(db, 'reviews'), where('productId', '==', productId)), snap => {
+    if(snap.empty) { list.innerHTML = '<div style="color:var(--text-dim);font-size:13px">No reviews yet. Be the first!</div>'; return; }
+    list.innerHTML = snap.docs.map(d => {
+      const r = d.data(); let stars = ''; for(let i=0; i<5; i++) stars += i < r.rating ? '★' : '☆';
+      return `<div class="review-card"><div class="review-stars">${stars}</div><div class="review-text">${escapeHtml(r.text)}</div><div class="review-name">- ${escapeHtml(r.name)}</div></div>`;
+    }).join('');
+  });
+}
+function openReviewForm() { document.getElementById('reviewModal').style.display = 'flex'; }
+function closeReviewForm() { document.getElementById('reviewModal').style.display = 'none'; }
+async function submitReview() {
+  const name = document.getElementById('revName').value.trim(), rating = parseInt(document.getElementById('revRating').value), text = document.getElementById('revText').value.trim();
+  if(!name || !text) { alert('Name and comment required'); return; }
+  try {
+    await addDoc(collection(db, 'reviews'), { productId: currentDetailProduct.id, name, rating, text, date: serverTimestamp() });
+    alert('✅ Review submitted!'); closeReviewForm();
+    document.getElementById('revName').value=''; document.getElementById('revText').value='';
+  } catch(e) { alert('Error: ' + e.message); }
 }
 
-function shareProduct() {
-  const c = currentDetailProduct;
-  const text = `Check out this product on FAIZ FASHION: ${c.name} at ₹${c.discountPrice}\n${window.location.origin}${window.location.pathname}`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+/* RELATED PRODUCTS */
+function loadRelatedProducts(cat, currentId) {
+  const related = categoriesCache.filter(c => c.mainCategory === cat && c.id !== currentId).slice(0, 4);
+  const grid = document.getElementById('relatedProducts');
+  if(related.length === 0) { grid.innerHTML = '<div style="color:var(--text-dim);font-size:12px">No related products.</div>'; return; }
+  grid.innerHTML = related.map(c => {
+    const img = (c.photoUrls && c.photoUrls.length > 0) ? c.photoUrls[0] : c.photoUrl;
+    return `<div class="related-card" onclick="openProductDetails('${c.id}')"><img src="${img}"><p>${escapeHtml(c.name)}</p><p style="color:var(--gold)">₹${c.discountPrice}</p></div>`;
+  }).join('');
 }
 
-async function toggleWatchlist(id) {
-  if(!currentUid || isAdminUser) return;
-  const ref = doc(db, 'users', currentUid, 'watchlist', id);
-  if(watchlistIds.has(id)) await deleteDoc(ref); else await setDoc(ref, { addedAt: serverTimestamp() });
-}
-
-async function toggleWatchlistDetails() {
-  if(!currentDetailProduct) return;
-  await toggleWatchlist(currentDetailProduct.id);
-  updateDetailLikeBtn();
-}
-
-async function addToCartDetails() {
-  if((currentDetailProduct.times||0)<=0) { alert('Out of stock!'); return; }
-  if(!cartIds.has(currentDetailProduct.id)) {
-    await toggleCart(currentDetailProduct.id);
-  }
-  alert('Added to Cart!');
-}
-
-function buyNowDetails() {
-  if((currentDetailProduct.times||0)<=0) { alert('Out of stock!'); return; }
-  if(!cartIds.has(currentDetailProduct.id)) {
-    toggleCart(currentDetailProduct.id).then(() => { showScreen('cart'); });
-  } else {
-    showScreen('cart');
-  }
-}
-
-async function toggleCart(id) {
-  if(!currentUid) return;
-  const ref = doc(db, 'users', currentUid, 'cart', id);
-  if(cartIds.has(id)) await deleteDoc(ref); else await setDoc(ref, { addedAt: serverTimestamp() });
-}
+/* CART & CHECKOUT */
+async function toggleCart(id) { if(!currentUid) return; const ref = doc(db, 'users', currentUid, 'cart', id); if(cartIds.has(id)) await deleteDoc(ref); else await setDoc(ref, { addedAt: serverTimestamp() }); }
 function goCart() { showScreen('cart'); }
+async function toggleWatchlist(id) { if(!currentUid || isAdminUser) return; const ref = doc(db, 'users', currentUid, 'watchlist', id); if(watchlistIds.has(id)) await deleteDoc(ref); else await setDoc(ref, { addedAt: serverTimestamp() }); }
+function updateDetailLikeBtn() { if(!currentDetailProduct) return; const liked = watchlistIds.has(currentDetailProduct.id); document.getElementById('detailLikeBtn').textContent = liked ? '❤️' : '🤍'; }
+async function toggleWatchlistDetails() { if(!currentDetailProduct) return; await toggleWatchlist(currentDetailProduct.id); }
+function shareProduct() { const c = currentDetailProduct; window.open(`https://wa.me/?text=${encodeURIComponent(`Check out ${c.name} at ₹${c.discountPrice}\n${window.location.origin}${window.location.pathname}`)}`, '_blank'); }
+async function addToCartDetails() { if((currentDetailProduct.times||0)<=0) return alert('Out of stock!'); if(!cartIds.has(currentDetailProduct.id)) await toggleCart(currentDetailProduct.id); alert('Added to Cart!'); }
+function buyNowDetails() { if((currentDetailProduct.times||0)<=0) return alert('Out of stock!'); if(!cartIds.has(currentDetailProduct.id)) toggleCart(currentDetailProduct.id).then(() => showScreen('cart')); else showScreen('cart'); }
 
 function renderCart() {
   const list = document.getElementById('cartList'); if(!list) return;
   const items = categoriesCache.filter(c => cartIds.has(c.id));
-  if(items.length===0) { list.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-dim)">Cart is empty</div>'; document.getElementById('cartTotal').textContent='₹0'; return; }
+  if(items.length===0) { list.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-dim)">Cart is empty</div>'; document.getElementById('cartSubtotal').textContent='₹0'; document.getElementById('cartDelivery').textContent='₹0'; document.getElementById('cartTotal').textContent='₹0'; return; }
   list.innerHTML = items.map(c => {
     const mainImg = (c.photoUrls && c.photoUrls.length > 0) ? c.photoUrls[0] : (c.photoUrl || '');
-    return `
-    <div class="cart-item">
-      <img src="${mainImg}">
-      <div class="ci-info"><div class="ci-name">${c.name}</div><div class="ci-price">₹${c.discountPrice}</div></div>
-      <button class="ci-remove" onclick="toggleCart('${c.id}')">✕</button>
-    </div>`
+    return `<div class="cart-item"><img src="${mainImg}"><div class="ci-info"><div class="ci-name">${c.name}</div><div class="ci-price">₹${c.discountPrice}</div></div><button class="ci-remove" onclick="toggleCart('${c.id}')">✕</button></div>`;
   }).join('');
   calculateTotal();
 }
 
 function calculateTotal() {
   const items = categoriesCache.filter(c => cartIds.has(c.id));
-  let total = items.reduce((s,c) => s + c.discountPrice, 0);
-  if(discountPercent > 0) total = total - (total * discountPercent / 100);
-  document.getElementById('cartTotal').textContent = '₹' + Math.round(total);
-  document.getElementById('chkTotal').textContent = '₹' + Math.round(total);
+  let subtotal = items.reduce((s,c) => s + c.discountPrice, 0);
+  if(discountPercent > 0) subtotal = subtotal - (subtotal * discountPercent / 100);
+  
+  let delivery = 0;
+  if(subtotal > 0 && subtotal < freeDeliveryAbove) delivery = deliveryCharge;
+  let finalTotal = subtotal + delivery;
+
+  document.getElementById('cartSubtotal').textContent = '₹' + Math.round(subtotal);
+  document.getElementById('cartDelivery').textContent = delivery === 0 && subtotal > 0 ? 'FREE' : '₹' + delivery;
+  document.getElementById('cartTotal').textContent = '₹' + Math.round(finalTotal);
+  document.getElementById('chkTotal').textContent = '₹' + Math.round(finalTotal);
 }
 
 function applyCoupon() {
-  const enteredCode = document.getElementById('couponInput').value.trim().toUpperCase();
-  if(!enteredCode) { alert('Code daalein'); return; }
-  
-  const found = couponsCache.find(c => c.code === enteredCode);
-  
-  if(found) {
-    discountPercent = found.discountPercent;
-    appliedCoupon = found.code;
-    alert(`✅ ${discountPercent}% Discount Applied!`);
-  } else {
-    discountPercent = 0; appliedCoupon = '';
-    alert('❌ Invalid Coupon Code');
-  }
+  const code = document.getElementById('couponInput').value.trim().toUpperCase();
+  const found = couponsCache.find(c => c.code === code);
+  if(found) { discountPercent = found.discountPercent; appliedCoupon = found.code; alert(`✅ ${discountPercent}% Off!`); } 
+  else { discountPercent = 0; appliedCoupon = ''; alert('❌ Invalid Code'); }
   calculateTotal();
 }
-
-function openCheckout() {
-  if(cartIds.size === 0) { alert('Cart is empty'); return; }
-  showScreen('checkout');
-}
+function openCheckout() { if(cartIds.size === 0) return alert('Cart empty'); showScreen('checkout'); }
 
 function submitOrderWA() {
-  const name = document.getElementById('chkName').value;
-  const phone = document.getElementById('chkPhone').value;
-  const building = document.getElementById('chkBuilding').value;
-  const address = document.getElementById('chkAddress').value;
-  const landmark = document.getElementById('chkLandmark').value;
-
-  if(!name || !phone || !address) { document.getElementById('chkError').textContent = 'Name, Phone, Address zaroori hai!'; return; }
+  const name = document.getElementById('chkName').value, phone = document.getElementById('chkPhone').value, building = document.getElementById('chkBuilding').value, address = document.getElementById('chkAddress').value, landmark = document.getElementById('chkLandmark').value;
+  if(!name || !phone || !address) return alert('Name, Phone, Address zaroori hai!');
   
   const items = categoriesCache.filter(c => cartIds.has(c.id));
-  let total = items.reduce((s,c) => s + c.discountPrice, 0);
-  if(discountPercent > 0) total = total - (total * discountPercent / 100);
+  let subtotal = items.reduce((s,c) => s + c.discountPrice, 0);
+  if(discountPercent > 0) subtotal = subtotal - (subtotal * discountPercent / 100);
+  let delivery = (subtotal > 0 && subtotal < freeDeliveryAbove) ? deliveryCharge : 0;
+  let total = subtotal + delivery;
   
   let msg = `*NEW ORDER - FAIZ FASHION*\n\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n🏠 *Building:* ${building}\n📍 *Address:* ${address}\n🏢 *Landmark:* ${landmark}\n\n*ITEMS:*\n`;
-  items.forEach((c,i) => { 
-    const mainImg = (c.photoUrls && c.photoUrls.length > 0) ? c.photoUrls[0] : (c.photoUrl || '');
-    msg += `${i+1}. ${c.name} - ₹${c.discountPrice}\n📷 ${mainImg}\n`; 
-  });
-  msg += `\n💰 *Total Amount: ₹${Math.round(total)}*`;
+  items.forEach((c,i) => { const img = (c.photoUrls && c.photoUrls.length > 0) ? c.photoUrls[0] : (c.photoUrl || ''); msg += `${i+1}. ${c.name} - ₹${c.discountPrice}\n📷 ${img}\n`; });
+  msg += `\nDelivery: ₹${delivery}\n💰 *Total: ₹${Math.round(total)}*`;
   if(discountPercent > 0) msg += ` (Coupon: ${appliedCoupon} - ${discountPercent}% Off)`;
   
-  addDoc(collection(db, 'users', currentUid, 'orders'), {
-    customerName: name, phone, building, address, landmark, items: items.map(i=>({name:i.name, price:i.discountPrice})), total: Math.round(total), date: serverTimestamp()
+  addDoc(collection(db, 'orders'), {
+    userId: currentUid, customerName: name, phone, building, address, landmark, 
+    items: items.map(i=>({name:i.name, price:i.discountPrice})), 
+    total: Math.round(total), status: 'Pending', date: serverTimestamp()
   }).then(() => {
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank');
     items.forEach(async c => await deleteDoc(doc(db, 'users', currentUid, 'cart', c.id)));
-    discountPercent = 0; appliedCoupon = '';
-    showScreen('shop');
+    discountPercent = 0; appliedCoupon = ''; showScreen('shop');
   });
 }
 
-function loadOrders() {
+/* MY ORDERS */
+function loadCustomerOrders() {
   const list = document.getElementById('ordersList'); if(!list) return;
-  unsubOrders = onSnapshot(query(collection(db, 'users', currentUid, 'orders'), orderBy('date', 'desc')), snap => {
-    if(snap.empty) { list.innerHTML = '<div style="text-align:center;color:var(--text-dim)">No orders yet.</div>'; return; }
+  list.innerHTML = 'Loading...';
+  if(unsubOrders) unsubOrders();
+  unsubOrders = onSnapshot(query(collection(db, 'orders'), where('userId', '==', currentUid), orderBy('date', 'desc')), snap => {
+    if(snap.empty) { list.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:20px">No orders yet.</div>'; return; }
     list.innerHTML = snap.docs.map(d => {
       const o = d.data();
       const date = o.date ? new Date(o.date.toMillis()).toLocaleDateString() : 'Recent';
+      let statusColor = o.status === 'Shipped' ? 'status-Shipped' : (o.status === 'Delivered' ? 'status-Delivered' : 'status-Pending');
       return `
       <div class="category-card" style="padding:15px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
           <span style="font-size:12px;color:var(--text-dim)">${date}</span>
           <span style="color:var(--gold);font-weight:800">₹${o.total}</span>
         </div>
-        <div style="font-size:13px">${o.items.map(i => i.name).join(', ')}</div>
-        <div style="font-size:11px;color:var(--text-dim);margin-top:5px">Status: Sent to WhatsApp</div>
+        <div style="font-size:13px;margin-bottom:5px">${o.items.map(i => i.name).join(', ')}</div>
+        <div><span class="order-status ${statusColor}">${o.status || 'Pending'}</span></div>
       </div>`;
     }).join('');
   });
 }
 
-Object.assign(window, { showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, previewBanner, openCategoryForm, previewPhoto, removeExistingPhoto, removeNewPhoto, saveCategory, deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, changeSecurityCode, setMainCategory, filterProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrderWA, installPWA });
+Object.assign(window, { showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, previewBanner, openCategoryForm, previewPhoto, removeExistingPhoto, removeNewPhoto, saveCategory, deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, setMainCategory, filterProducts, sortProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrderWA, installPWA, loadAdminOrders, updateOrderStatus, openReviewForm, closeReviewForm, submitReview });
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(reg => {
       reg.update();
-      reg.onupdatefound = () => {
-        const installingWorker = reg.installing;
-        if (installingWorker) {
-          installingWorker.onstatechange = () => {
-            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              window.location.reload(true);
-            }
-          };
-        }
-      };
-    }).catch(err => console.log('SW reg error:', err));
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        navigator.serviceWorker.ready.then(reg => reg.update());
-      }
-    });
+      reg.onupdatefound = () => { const installingWorker = reg.installing; if (installingWorker) { installingWorker.onstatechange = () => { if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) window.location.reload(true); }; } };
+    }).catch(err => console.log(err));
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') navigator.serviceWorker.ready.then(reg => reg.update()); });
   });
 }
 </script>
