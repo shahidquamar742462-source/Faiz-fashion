@@ -6,7 +6,6 @@
 <meta name="theme-color" content="#0a0a0a">
 <title>FAIZ FASHION</title>
 <link rel="manifest" href="manifest.json">
-<!-- Naya Logo Yahan Set Kar Diya Hai -->
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
 <link rel="apple-touch-icon" sizes="192x192" href="logo.png">
@@ -67,7 +66,12 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .cat-actions{display:flex;gap:10px}
 .btn-small{flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px;font-size:13px;font-weight:600}
 .photo-upload{background:var(--card);border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer}
-.photo-preview{max-width:100%;max-height:200px;border-radius:8px;display:none}
+
+/* Admin Multiple Photo Previews */
+#photoPreviews{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.preview-box{position:relative;width:70px;height:70px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.preview-box img{width:100%;height:100%;object-fit:cover}
+.preview-box .remove-btn{position:absolute;top:2px;right:2px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
 /* Customer Shop */
 .install-banner{background:linear-gradient(135deg, var(--gold), var(--gold-dark)); color:#000; padding:12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-weight:700; font-size:14px; box-shadow:0 4px 15px rgba(212,175,55,0.3)}
@@ -105,7 +109,12 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 /* FULL SCREEN PRODUCT DETAILS */
 #screen-product-details{padding:0;padding-bottom:80px}
 .detail-header{position:fixed;top:0;left:0;right:0;padding:15px 20px;display:flex;justify-content:space-between;z-index:10;background:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)}
-.detail-img{width:100%;height:55vh;object-fit:cover;background:var(--card2)}
+
+/* Multiple Photos Slider */
+.detail-gallery{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;width:100%;height:55vh;background:var(--card2);scrollbar-width:none;}
+.detail-gallery::-webkit-scrollbar{display:none;}
+.detail-gallery img{width:100%;height:100%;object-fit:cover;flex-shrink:0;scroll-snap-align:center;}
+
 .detail-body{padding:20px;background:var(--bg);border-radius:24px 24px 0 0;margin-top:-20px;position:relative;z-index:2}
 .detail-title{font-size:24px;font-weight:800;margin-bottom:5px}
 .detail-price{display:flex;align-items:baseline;gap:10px;margin-bottom:15px;flex-wrap:wrap}
@@ -218,13 +227,17 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
         <option value="Beauty">Beauty</option>
       </select>
     </div>
-    <div class="input-group"><label>Photo</label>
+    
+    <!-- MULTIPLE PHOTOS UPLOAD -->
+    <div class="input-group">
+      <label>Photos (Select Multiple)</label>
       <div class="photo-upload" onclick="document.getElementById('catPhoto').click()">
-        <input type="file" id="catPhoto" accept="image/*" hidden onchange="previewPhoto(event)">
-        <img id="photoPreview" class="photo-preview">
-        <div id="photoPlaceholder">📷 Tap to upload</div>
+        <input type="file" id="catPhoto" accept="image/*" multiple hidden onchange="previewPhoto(event)">
+        <div style="color:var(--text-dim); font-size:14px;">📷 Tap to upload photos</div>
       </div>
+      <div id="photoPreviews"></div>
     </div>
+
     <div style="display:flex;gap:10px">
       <div class="input-group" style="flex:1"><label>Stock</label><input type="number" id="catTimes" placeholder="0" min="0"></div>
       <div class="input-group" style="flex:1"><label>Sizes (Comma)</label><input type="text" id="catSizes" placeholder="S, M, L"></div>
@@ -251,7 +264,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
       <div class="input-group"><label>Sale Banner Image</label>
         <div class="photo-upload" onclick="document.getElementById('bannerPhoto').click()">
           <input type="file" id="bannerPhoto" accept="image/*" hidden onchange="previewBanner(event)">
-          <img id="bannerPreview" class="photo-preview">
+          <img id="bannerPreview" style="max-width:100%; max-height:100px; border-radius:8px; display:none; margin-top:10px;">
           <div id="bannerPlaceholder">📷 Tap to upload banner</div>
         </div>
       </div>
@@ -326,7 +339,10 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
     </div>
   </div>
   
-  <img id="detailImg" class="detail-img">
+  <!-- Multiple Photos Slider -->
+  <div class="detail-gallery" id="detailGallery">
+    <!-- Images injected here by JS -->
+  </div>
   
   <div class="detail-body">
     <div class="detail-title" id="detailName"></div>
@@ -431,7 +447,12 @@ let currentDetailProduct = null;
 let bannerUrl = '';
 let editingCouponCode = null;
 
-let editingId = null, currentPhotoFile = null, currentPhotoUrl = null, currentBannerFile = null;
+// MULTI-PHOTO STATE
+let editingId = null; 
+let currentPhotoFiles = []; // Array for new files
+let existingPhotoUrls = []; // Array for existing photos during edit
+let currentBannerFile = null;
+
 let unsubCategories = null, unsubConfig = null, unsubCart = null, unsubOrders = null, unsubWatchlist = null, unsubCoupons = null;
 
 function escapeHtml(str) { return String(str ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -463,9 +484,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 function installPWA() {
   if (deferredPrompt) {
     deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult) => {
-      deferredPrompt = null;
-    });
+    deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
   } else {
     alert("📱 App Install Karne Ke Liye:\n\n1. Niche 'Share' (📤) button par click karein.\n2. List me 'Add to Home Screen' (🏠) select karein.\n3. App aapke phone me install ho jayega!");
   }
@@ -542,9 +561,10 @@ function renderAdminCategories() {
   
   list.innerHTML = categoriesCache.map(c => {
     const off = getDiscountPercent(c.originalPrice, c.discountPrice);
+    const mainImg = (c.photoUrls && c.photoUrls.length > 0) ? c.photoUrls[0] : (c.photoUrl || '');
     return `
     <div class="category-card">
-      <img src="${c.photoUrl}" class="cat-img">
+      <img src="${mainImg}" class="cat-img">
       <div class="cat-body">
         <div class="cat-tag">${c.mainCategory || 'Men'}</div>
         <div class="cat-name">${escapeHtml(c.name)} ${(c.times||0)<=0?'<span class="out-stock-badge">OUT OF STOCK</span>':''}</div>
@@ -558,12 +578,16 @@ function renderAdminCategories() {
     </div>`}).join('');
 }
 
+/* MULTI PHOTO LOGIC */
 function openCategoryForm(id) {
-  editingId = id || null; currentPhotoFile = null;
+  editingId = id || null; 
+  currentPhotoFiles = []; 
+  existingPhotoUrls = [];
+  document.getElementById('photoPreviews').innerHTML = '';
+  
   document.getElementById('formTitle').textContent = editingId ? 'Edit Product' : 'Add Product';
   document.getElementById('catError').textContent = '';
-  document.getElementById('photoPreview').style.display = 'none';
-  document.getElementById('photoPlaceholder').style.display = 'block';
+  document.getElementById('catPhoto').value = '';
   
   if (editingId) {
     const c = categoriesCache.find(x => x.id === editingId);
@@ -576,21 +600,64 @@ function openCategoryForm(id) {
       document.getElementById('catDescription').value = c.description || '';
       document.getElementById('catOriginalPrice').value = c.originalPrice;
       document.getElementById('catDiscountPrice').value = c.discountPrice;
-      if(c.photoUrl) { document.getElementById('photoPreview').src = c.photoUrl; document.getElementById('photoPreview').style.display='block'; document.getElementById('photoPlaceholder').style.display='none'; }
-      currentPhotoUrl = c.photoUrl;
+      
+      // Load existing photos
+      if(c.photoUrls && c.photoUrls.length > 0) {
+        existingPhotoUrls = [...c.photoUrls];
+      } else if(c.photoUrl) {
+        existingPhotoUrls = [c.photoUrl];
+      }
+      renderPhotoPreviews();
     }
   } else {
     ['catName','catTimes','catSizes','catColors','catDescription','catOriginalPrice','catDiscountPrice'].forEach(i => document.getElementById(i).value = '');
-    currentPhotoUrl = null;
   }
   showScreen('category-form');
 }
+
 function previewPhoto(e) {
-  const file = e.target.files[0]; if(!file) return; currentPhotoFile = file;
-  document.getElementById('photoPreview').src = URL.createObjectURL(file);
-  document.getElementById('photoPreview').style.display = 'block';
-  document.getElementById('photoPlaceholder').style.display = 'none';
+  const files = Array.from(e.target.files);
+  if(files.length === 0) return;
+  currentPhotoFiles = [...currentPhotoFiles, ...files];
+  renderPhotoPreviews();
+  document.getElementById('catPhoto').value = ''; // reset input so same file can be selected again if needed
 }
+
+function renderPhotoPreviews() {
+  const container = document.getElementById('photoPreviews');
+  container.innerHTML = '';
+  
+  // Show existing photos
+  existingPhotoUrls.forEach((url, index) => {
+    container.innerHTML += `
+      <div class="preview-box">
+        <img src="${url}">
+        <button class="remove-btn" onclick="removeExistingPhoto(${index})">✕</button>
+      </div>
+    `;
+  });
+  
+  // Show newly selected local photos
+  currentPhotoFiles.forEach((file, index) => {
+    const url = URL.createObjectURL(file);
+    container.innerHTML += `
+      <div class="preview-box">
+        <img src="${url}">
+        <button class="remove-btn" onclick="removeNewPhoto(${index})">✕</button>
+      </div>
+    `;
+  });
+}
+
+function removeExistingPhoto(index) {
+  existingPhotoUrls.splice(index, 1);
+  renderPhotoPreviews();
+}
+function removeNewPhoto(index) {
+  currentPhotoFiles.splice(index, 1);
+  renderPhotoPreviews();
+}
+
 async function saveCategory() {
   const name = document.getElementById('catName').value;
   const main = document.getElementById('catMainCat').value;
@@ -602,21 +669,49 @@ async function saveCategory() {
   const dp = parseFloat(document.getElementById('catDiscountPrice').value) || 0;
   
   if(!name || op <= 0) { document.getElementById('catError').textContent = 'Name & Price zaroori hai'; return; }
-  document.getElementById('saveCatBtn').disabled = true;
-
+  if(existingPhotoUrls.length === 0 && currentPhotoFiles.length === 0) { document.getElementById('catError').textContent = 'Kam se kam 1 photo upload karein'; return; }
+  
+  const btn = document.getElementById('saveCatBtn');
+  btn.disabled = true; btn.textContent = 'Saving...';
   const id = editingId || doc(collection(db,'categories')).id;
+
   try {
-    let url = currentPhotoUrl;
-    if(currentPhotoFile) {
-      const fd = new FormData(); fd.append('file', currentPhotoFile); fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    let finalPhotoUrls = [...existingPhotoUrls];
+    
+    // Upload new files to Cloudinary
+    for (let i = 0; i < currentPhotoFiles.length; i++) {
+      const file = currentPhotoFiles[i];
+      const fd = new FormData(); 
+      fd.append('file', file); 
+      fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      
       const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method:'POST', body: fd });
-      const data = await res.json(); if(!data.secure_url) throw new Error('Upload failed');
-      url = data.secure_url;
+      const data = await res.json(); 
+      if(!data.secure_url) throw new Error('Upload failed for image ' + (i+1));
+      
+      finalPhotoUrls.push(data.secure_url);
     }
-    await setDoc(doc(db,'categories',id), { name, mainCategory: main, times, sizes, colors, description: desc, originalPrice: op, discountPrice: dp, photoUrl: url, createdAt: serverTimestamp() }, { merge: true });
+
+    // Save to Firestore (photoUrl for backward compatibility, photoUrls for new logic)
+    await setDoc(doc(db,'categories',id), { 
+      name, 
+      mainCategory: main, 
+      times, 
+      sizes, 
+      colors, 
+      description: desc, 
+      originalPrice: op, 
+      discountPrice: dp, 
+      photoUrl: finalPhotoUrls[0], // First image is main
+      photoUrls: finalPhotoUrls,   // All images
+      createdAt: serverTimestamp() 
+    }, { merge: true });
+    
     showScreen('admin');
-  } catch(e) { document.getElementById('catError').textContent = e.message; }
-  document.getElementById('saveCatBtn').disabled = false;
+  } catch(e) { 
+    document.getElementById('catError').textContent = e.message; 
+  }
+  btn.disabled = false; btn.textContent = 'Save Product';
 }
 async function deleteCategory(id) { if(confirm('Delete?')) await deleteDoc(doc(db,'categories',id)); }
 
@@ -734,10 +829,11 @@ function renderShop() {
     const out = (c.times||0) <= 0;
     const off = getDiscountPercent(c.originalPrice, c.discountPrice);
     const liked = watchlistIds.has(c.id);
+    const mainImg = (c.photoUrls && c.photoUrls.length > 0) ? c.photoUrls[0] : (c.photoUrl || '');
     return `
     <div class="product-card" onclick="openProductDetails('${c.id}')">
       <div class="img-wrap">
-        <img src="${c.photoUrl}">
+        <img src="${mainImg}">
         <button class="heart-btn ${liked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleWatchlist('${c.id}')">${liked ? '❤️' : '🤍'}</button>
         ${out?'<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;color:var(--danger);font-weight:800;font-size:14px;z-index:2">OUT OF STOCK</div>':''}
       </div>
@@ -762,7 +858,13 @@ function openProductDetails(id) {
   const c = currentDetailProduct;
   const off = getDiscountPercent(c.originalPrice, c.discountPrice);
   
-  document.getElementById('detailImg').src = c.photoUrl;
+  // Image Gallery Setup
+  const gallery = document.getElementById('detailGallery');
+  let images = c.photoUrls || (c.photoUrl ? [c.photoUrl] : []);
+  if(images.length === 0) images = ['logo.png']; // fallback
+  
+  gallery.innerHTML = images.map(img => `<img src="${img}" alt="${c.name}">`).join('');
+
   document.getElementById('detailName').textContent = c.name;
   document.getElementById('detailDisc').textContent = '₹'+c.discountPrice;
   document.getElementById('detailOrig').textContent = '₹'+c.originalPrice;
@@ -819,9 +921,7 @@ async function addToCartDetails() {
 function buyNowDetails() {
   if((currentDetailProduct.times||0)<=0) { alert('Out of stock!'); return; }
   if(!cartIds.has(currentDetailProduct.id)) {
-    toggleCart(currentDetailProduct.id).then(() => {
-      showScreen('cart');
-    });
+    toggleCart(currentDetailProduct.id).then(() => { showScreen('cart'); });
   } else {
     showScreen('cart');
   }
@@ -838,12 +938,15 @@ function renderCart() {
   const list = document.getElementById('cartList'); if(!list) return;
   const items = categoriesCache.filter(c => cartIds.has(c.id));
   if(items.length===0) { list.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-dim)">Cart is empty</div>'; document.getElementById('cartTotal').textContent='₹0'; return; }
-  list.innerHTML = items.map(c => `
+  list.innerHTML = items.map(c => {
+    const mainImg = (c.photoUrls && c.photoUrls.length > 0) ? c.photoUrls[0] : (c.photoUrl || '');
+    return `
     <div class="cart-item">
-      <img src="${c.photoUrl}">
+      <img src="${mainImg}">
       <div class="ci-info"><div class="ci-name">${c.name}</div><div class="ci-price">₹${c.discountPrice}</div></div>
       <button class="ci-remove" onclick="toggleCart('${c.id}')">✕</button>
-    </div>`).join('');
+    </div>`
+  }).join('');
   calculateTotal();
 }
 
@@ -891,7 +994,10 @@ function submitOrderWA() {
   if(discountPercent > 0) total = total - (total * discountPercent / 100);
   
   let msg = `*NEW ORDER - FAIZ FASHION*\n\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n🏠 *Building:* ${building}\n📍 *Address:* ${address}\n🏢 *Landmark:* ${landmark}\n\n*ITEMS:*\n`;
-  items.forEach((c,i) => { msg += `${i+1}. ${c.name} - ₹${c.discountPrice}\n`; });
+  items.forEach((c,i) => { 
+    const mainImg = (c.photoUrls && c.photoUrls.length > 0) ? c.photoUrls[0] : (c.photoUrl || '');
+    msg += `${i+1}. ${c.name} - ₹${c.discountPrice}\n📷 ${mainImg}\n`; 
+  });
   msg += `\n💰 *Total Amount: ₹${Math.round(total)}*`;
   if(discountPercent > 0) msg += ` (Coupon: ${appliedCoupon} - ${discountPercent}% Off)`;
   
@@ -925,11 +1031,9 @@ function loadOrders() {
   });
 }
 
-Object.assign(window, { showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, previewBanner, openCategoryForm, previewPhoto, saveCategory, deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, changeSecurityCode, setMainCategory, filterProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrderWA, installPWA });
+Object.assign(window, { showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, previewBanner, openCategoryForm, previewPhoto, removeExistingPhoto, removeNewPhoto, saveCategory, deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, changeSecurityCode, setMainCategory, filterProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrderWA, installPWA });
 
-/* =========================================================
-   FORCE AUTO-UPDATE LOGIC (Network First)
-   ========================================================= */
+/* FORCE AUTO-UPDATE LOGIC */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(reg => {
