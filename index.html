@@ -233,7 +233,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
       <label>Photos (Select Multiple)</label>
       <div class="photo-upload" onclick="document.getElementById('catPhoto').click()">
         <input type="file" id="catPhoto" accept="image/*" multiple hidden onchange="previewPhoto(event)">
-        <div style="color:var(--text-dim); font-size:14px;">📷 Tap to upload photos</div>
+        <div style="color:var(--text-dim); font-size:14px;">📷 Tap to add photos</div>
       </div>
       <div id="photoPreviews"></div>
     </div>
@@ -339,10 +339,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
     </div>
   </div>
   
-  <!-- Multiple Photos Slider -->
-  <div class="detail-gallery" id="detailGallery">
-    <!-- Images injected here by JS -->
-  </div>
+  <div class="detail-gallery" id="detailGallery"></div>
   
   <div class="detail-body">
     <div class="detail-title" id="detailName"></div>
@@ -449,8 +446,8 @@ let editingCouponCode = null;
 
 // MULTI-PHOTO STATE
 let editingId = null; 
-let currentPhotoFiles = []; // Array for new files
-let existingPhotoUrls = []; // Array for existing photos during edit
+let currentPhotoFiles = []; // Array of {file, url}
+let existingPhotoUrls = []; 
 let currentBannerFile = null;
 
 let unsubCategories = null, unsubConfig = null, unsubCart = null, unsubOrders = null, unsubWatchlist = null, unsubCoupons = null;
@@ -601,7 +598,6 @@ function openCategoryForm(id) {
       document.getElementById('catOriginalPrice').value = c.originalPrice;
       document.getElementById('catDiscountPrice').value = c.discountPrice;
       
-      // Load existing photos
       if(c.photoUrls && c.photoUrls.length > 0) {
         existingPhotoUrls = [...c.photoUrls];
       } else if(c.photoUrl) {
@@ -618,35 +614,42 @@ function openCategoryForm(id) {
 function previewPhoto(e) {
   const files = Array.from(e.target.files);
   if(files.length === 0) return;
-  currentPhotoFiles = [...currentPhotoFiles, ...files];
+  
+  files.forEach(file => {
+    // Save the object URL once so it doesn't refresh or disappear
+    currentPhotoFiles.push({
+      file: file,
+      url: URL.createObjectURL(file) 
+    });
+  });
+  
   renderPhotoPreviews();
-  document.getElementById('catPhoto').value = ''; // reset input so same file can be selected again if needed
+  document.getElementById('catPhoto').value = ''; 
 }
 
 function renderPhotoPreviews() {
   const container = document.getElementById('photoPreviews');
-  container.innerHTML = '';
+  let html = '';
   
-  // Show existing photos
   existingPhotoUrls.forEach((url, index) => {
-    container.innerHTML += `
+    html += `
       <div class="preview-box">
         <img src="${url}">
-        <button class="remove-btn" onclick="removeExistingPhoto(${index})">✕</button>
+        <button type="button" class="remove-btn" onclick="removeExistingPhoto(${index})">✕</button>
       </div>
     `;
   });
   
-  // Show newly selected local photos
-  currentPhotoFiles.forEach((file, index) => {
-    const url = URL.createObjectURL(file);
-    container.innerHTML += `
+  currentPhotoFiles.forEach((item, index) => {
+    html += `
       <div class="preview-box">
-        <img src="${url}">
-        <button class="remove-btn" onclick="removeNewPhoto(${index})">✕</button>
+        <img src="${item.url}">
+        <button type="button" class="remove-btn" onclick="removeNewPhoto(${index})">✕</button>
       </div>
     `;
   });
+  
+  container.innerHTML = html;
 }
 
 function removeExistingPhoto(index) {
@@ -678,9 +681,8 @@ async function saveCategory() {
   try {
     let finalPhotoUrls = [...existingPhotoUrls];
     
-    // Upload new files to Cloudinary
     for (let i = 0; i < currentPhotoFiles.length; i++) {
-      const file = currentPhotoFiles[i];
+      const file = currentPhotoFiles[i].file;
       const fd = new FormData(); 
       fd.append('file', file); 
       fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
@@ -692,7 +694,6 @@ async function saveCategory() {
       finalPhotoUrls.push(data.secure_url);
     }
 
-    // Save to Firestore (photoUrl for backward compatibility, photoUrls for new logic)
     await setDoc(doc(db,'categories',id), { 
       name, 
       mainCategory: main, 
@@ -702,8 +703,8 @@ async function saveCategory() {
       description: desc, 
       originalPrice: op, 
       discountPrice: dp, 
-      photoUrl: finalPhotoUrls[0], // First image is main
-      photoUrls: finalPhotoUrls,   // All images
+      photoUrl: finalPhotoUrls[0], 
+      photoUrls: finalPhotoUrls,   
       createdAt: serverTimestamp() 
     }, { merge: true });
     
@@ -858,10 +859,9 @@ function openProductDetails(id) {
   const c = currentDetailProduct;
   const off = getDiscountPercent(c.originalPrice, c.discountPrice);
   
-  // Image Gallery Setup
   const gallery = document.getElementById('detailGallery');
   let images = c.photoUrls || (c.photoUrl ? [c.photoUrl] : []);
-  if(images.length === 0) images = ['logo.png']; // fallback
+  if(images.length === 0) images = ['logo.png'];
   
   gallery.innerHTML = images.map(img => `<img src="${img}" alt="${c.name}">`).join('');
 
@@ -1033,7 +1033,6 @@ function loadOrders() {
 
 Object.assign(window, { showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, previewBanner, openCategoryForm, previewPhoto, removeExistingPhoto, removeNewPhoto, saveCategory, deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, changeSecurityCode, setMainCategory, filterProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrderWA, installPWA });
 
-/* FORCE AUTO-UPDATE LOGIC */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(reg => {
