@@ -1,4 +1,4 @@
-const CACHE = 'faiz-fashion-v5'; // <-- Future mein update aane par isko v5, v6 karte rehna
+const CACHE = 'faiz-fashion-v10'; 
 const ASSETS = ['./', './index.html', './manifest.json', './photo.png'];
 
 self.addEventListener('install', e => {
@@ -16,12 +16,10 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = e.request.url;
-  // Firebase aur Cloudinary ko cache mat karo
   if (url.includes('firestore') || url.includes('googleapis') || url.includes('gstatic') || url.includes('firebase') || url.includes('cloudinary')) return;
   
   e.respondWith(
     caches.match(e.request).then(cached => {
-      // Hamesha internet se latest laane ki koshish karo, agar fail ho toh cache se do
       return fetch(e.request).then(res => {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, copy));
