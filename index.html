@@ -16,10 +16,10 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .screen.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* Landing */
+/* Fixed Logo CSS */
 .landing-container{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center}
-.logo-circle{width:170px;height:170px;border-radius:50%;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;border:3px solid var(--gold);box-shadow:0 0 40px rgba(212,175,55,.3);margin-bottom:24px}
-.logo-circle img{width:100%;height:100%;object-fit:cover}
+.logo-circle{width:180px;height:180px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:24px;position:relative}
+.logo-circle img{width:100%;height:100%;object-fit:contain;}
 .app-name{font-size:26px;font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,var(--gold-light),var(--gold),var(--gold-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
 .tagline{color:var(--text-dim);font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:50px}
 .box-grid{display:grid;grid-template-columns:1fr;gap:16px;width:100%;max-width:340px}
@@ -38,6 +38,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .input-group label{display:block;font-size:13px;font-weight:600;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase}
 .input-group input,.input-group textarea,.input-group select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;color:var(--text);font-size:15px;outline:none}
 .input-group input:focus,.input-group select:focus{border-color:var(--gold)}
+.input-group input:read-only{opacity:0.7;background:var(--card2)}
 .btn-primary{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#0a0a0a;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:700;cursor:pointer}
 .btn-link{display:block;width:100%;background:transparent;border:none;color:var(--gold);font-size:14px;padding:16px 0;cursor:pointer;text-decoration:underline}
 .error-msg{color:var(--danger);font-size:14px;text-align:center;margin-top:12px}
@@ -67,7 +68,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .photo-preview{max-width:100%;max-height:200px;border-radius:8px;display:none}
 
 /* Customer Shop */
-.install-banner{background:linear-gradient(135deg, var(--gold), var(--gold-dark)); color:#000; padding:12px; border-radius:12px; display:none; justify-content:space-between; align-items:center; margin-bottom:15px; font-weight:700; font-size:14px; box-shadow:0 4px 15px rgba(212,175,55,0.3)}
+.install-banner{background:linear-gradient(135deg, var(--gold), var(--gold-dark)); color:#000; padding:12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-weight:700; font-size:14px; box-shadow:0 4px 15px rgba(212,175,55,0.3)}
 .install-banner button{background:#000; color:var(--gold); border:none; padding:8px 15px; border-radius:8px; font-weight:800; font-size:12px; cursor:pointer}
 .top-bar{display:flex;flex-direction:column;gap:12px;padding:10px 0 16px;border-bottom:1px solid var(--border);margin-bottom:16px;position:sticky;top:0;background:var(--bg);z-index:10}
 .top-row{display:flex;justify-content:space-between;align-items:center}
@@ -134,6 +135,11 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .coupon-box input{flex:1;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);outline:none}
 .btn-wa{width:100%;background:#25D366;color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:800;cursor:pointer}
 .settings-section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}
+
+/* Coupon List UI in Admin */
+.coupon-item{display:flex;justify-content:space-between;align-items:center;background:var(--card2);padding:10px;border-radius:8px;margin-bottom:8px;border:1px dashed var(--gold)}
+.coupon-code{font-weight:800;color:var(--gold);font-size:16px}
+.coupon-disc{font-size:12px;color:var(--success);font-weight:700}
 </style>
 </head>
 <body>
@@ -154,7 +160,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
       <button class="box-btn" onclick="customerLogin()">
         <div class="box-icon">🛍️</div><div class="box-title">Customer Login</div><div class="box-sub">Browse & Shop</div>
       </button>
-      <button id="installBtn" class="box-btn" style="display:none; background:var(--gold); color:#000;" onclick="installPWA()">
+      <button class="box-btn" style="background:var(--gold); color:#000;" onclick="installPWA()">
         <div class="box-icon">📥</div><div class="box-title" style="color:#000">Install App</div><div class="box-sub" style="color:#333">Add to Home Screen</div>
       </button>
     </div>
@@ -185,7 +191,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <div id="screen-admin" class="screen">
   <div class="admin-header">
     <div><h2>FAIZ FASHION</h2><p style="font-size:12px;color:var(--text-dim)">Admin Panel</p></div>
-    <div style="display:flex;gap:8px"><button class="btn-small" onclick="openSettings()">⚙️</button><button class="logout-btn" onclick="handleLogout()">Logout</button></div>
+    <div style="display:flex;gap:8px"><button class="btn-small" onclick="openSettings()">⚙️ Settings</button><button class="logout-btn" onclick="handleLogout()">Logout</button></div>
   </div>
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-val" id="statTotal">0</div><div class="stat-label">Total Items</div></div>
@@ -236,6 +242,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <div id="screen-settings" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>Settings</h2></div>
   <div class="form-container">
+    
     <div class="settings-section">
       <h3>WhatsApp & Banner</h3>
       <div class="input-group"><label>WhatsApp Number</label><input type="tel" id="settingsWhatsapp" placeholder="917838647693"></div>
@@ -248,12 +255,41 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
       </div>
       <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
     </div>
+
+    <!-- COUPON MANAGER -->
+    <div class="settings-section">
+      <h3>Manage Coupons</h3>
+      <div style="display:flex;gap:10px;margin-bottom:15px">
+        <input type="text" id="newCouponCode" placeholder="Code (e.g. DIWALI20)" style="flex:2;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;text-transform:uppercase">
+        <input type="number" id="newCouponDisc" placeholder="% Off" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff">
+        <button id="addCouponBtn" class="btn-small" style="flex:0.5;background:var(--gold);color:#000;font-weight:800" onclick="saveCoupon()">Add</button>
+      </div>
+      <div id="couponList"></div>
+    </div>
+
+    <!-- PASSWORD CHANGE SECTION -->
+    <div class="settings-section" style="border: 1px solid var(--gold);">
+      <h3 style="color:var(--gold); margin-bottom:15px;">🔐 Change Admin Password</h3>
+      <div class="input-group"><input type="password" id="currentPwd" placeholder="Current Password"></div>
+      <div class="input-group"><input type="password" id="newPwd" placeholder="New Password (min 6 chars)"></div>
+      <div class="input-group"><input type="password" id="confirmPwd" placeholder="Confirm New Password"></div>
+      <button class="btn-primary" onclick="changeAdminPassword()">Update Password</button>
+    </div>
+    
+    <!-- SECURITY CODE SECTION -->
+    <div class="settings-section">
+      <h3>Change Security Code</h3>
+      <div class="input-group"><input type="password" id="currentSec" placeholder="Current security code"></div>
+      <div class="input-group"><input type="password" id="newSec" placeholder="New security code (min 6 chars)"></div>
+      <button class="btn-primary" onclick="changeSecurityCode()">Update Security Code</button>
+    </div>
+
   </div>
 </div>
 
 <!-- CUSTOMER SHOP -->
 <div id="screen-shop" class="screen">
-  <div class="install-banner" id="shopInstallBanner">
+  <div class="install-banner">
     <span>📥 Install FAIZ FASHION App</span>
     <button onclick="installPWA()">Install Now</button>
   </div>
@@ -323,7 +359,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
   <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Cart</h2></div>
   <div id="cartList"></div>
   <div class="coupon-box">
-    <input type="text" id="couponInput" placeholder="Coupon Code (e.g. FAIZ10)">
+    <input type="text" id="couponInput" placeholder="Enter Coupon Code">
     <button class="btn-small" style="flex:0;padding:0 20px" onclick="applyCoupon()">Apply</button>
   </div>
   <div class="cart-total"><span>Total</span><span id="cartTotal">₹0</span></div>
@@ -361,7 +397,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc, deleteDoc, onSnapshot, serverTimestamp, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -387,18 +423,22 @@ let isAdminUser = false;
 let categoriesCache = [];
 let cartIds = new Set();
 let watchlistIds = new Set();
+let couponsCache = [];
 let whatsappNumber = "917838647693";
 let mainCategory = 'All';
 let searchQuery = '';
-let currentCoupon = null;
 let discountPercent = 0;
+let appliedCoupon = '';
 let currentDetailProduct = null;
 let bannerUrl = '';
+let editingCouponCode = null;
 
 let editingId = null, currentPhotoFile = null, currentPhotoUrl = null, currentBannerFile = null;
-let unsubCategories = null, unsubConfig = null, unsubCart = null, unsubOrders = null, unsubWatchlist = null;
+let unsubCategories = null, unsubConfig = null, unsubCart = null, unsubOrders = null, unsubWatchlist = null, unsubCoupons = null;
 
 function escapeHtml(str) { return String(str ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+async function sha256(str) { const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)); return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join(''); }
+
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
@@ -408,33 +448,39 @@ function showScreen(name) {
   if (name === 'shop') renderShop();
   if (name === 'cart') renderCart();
   if (name === 'orders') loadOrders();
+  if (name === 'settings' && isAdminUser) renderAdminCoupons();
   window.scrollTo(0,0);
 }
 
-/* Calculation Helper */
 function getDiscountPercent(original, discount) {
   if(!original || original <= 0 || !discount || discount >= original) return 0;
   return Math.round(((original - discount) / original) * 100);
 }
 
-/* PWA Install */
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault(); deferredPrompt = e;
-  document.getElementById('installBtn').style.display = 'block';
-  document.getElementById('shopInstallBanner').style.display = 'flex';
 });
+
 function installPWA() {
-  if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; document.getElementById('installBtn').style.display = 'none'; document.getElementById('shopInstallBanner').style.display = 'none'; }
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      deferredPrompt = null;
+    });
+  } else {
+    alert("📱 App Install Karne Ke Liye:\n\n1. Niche 'Share' (📤) button par click karein.\n2. List me 'Add to Home Screen' (🏠) select karein.\n3. App aapke phone me install ho jayega!");
+  }
 }
 
-/* Auth */
 onAuthStateChanged(auth, async (user) => {
-  if(unsubCategories) unsubCategories(); if(unsubConfig) unsubConfig(); if(unsubCart) unsubCart(); if(unsubOrders) unsubOrders(); if(unsubWatchlist) unsubWatchlist();
-  watchlistIds = new Set(); cartIds = new Set();
+  if(unsubCategories) unsubCategories(); if(unsubConfig) unsubConfig(); if(unsubCart) unsubCart(); if(unsubOrders) unsubOrders(); if(unsubWatchlist) unsubWatchlist(); if(unsubCoupons) unsubCoupons();
+  watchlistIds = new Set(); cartIds = new Set(); couponsCache = [];
   if (!user) { currentUid = null; showScreen('landing'); return; }
   currentUid = user.uid; isAdminUser = user.email === ADMIN_EMAIL;
-  listenCategories(); listenConfig();
+  
+  listenCategories(); listenConfig(); listenCoupons();
+  
   if (isAdminUser) { showScreen('admin'); renderAdminCategories(); }
   else { listenCart(); listenWatchlist(); showScreen('shop'); }
 });
@@ -452,7 +498,6 @@ async function handleReset() {
   else { document.getElementById('resetError').textContent = '❌ Galat Code!'; }
 }
 
-/* Data Listeners */
 function listenConfig() {
   unsubConfig = onSnapshot(doc(db, 'settings', 'config'), snap => {
     if (snap.exists()) { 
@@ -483,8 +528,13 @@ function listenWatchlist() {
     if(document.getElementById('screen-product-details').classList.contains('active')) updateDetailLikeBtn();
   });
 }
+function listenCoupons() {
+  unsubCoupons = onSnapshot(collection(db, 'coupons'), snap => {
+    couponsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if(isAdminUser && document.getElementById('screen-settings').classList.contains('active')) renderAdminCoupons();
+  });
+}
 
-/* Admin Logic */
 function renderAdminCategories() {
   const list = document.getElementById('categoryList'); if (!list) return;
   let out = 0;
@@ -572,10 +622,10 @@ async function saveCategory() {
 }
 async function deleteCategory(id) { if(confirm('Delete?')) await deleteDoc(doc(db,'categories',id)); }
 
-/* Settings */
 async function openSettings() {
   const snap = await getDoc(doc(db,'settings','config'));
   if(snap.exists()) document.getElementById('settingsWhatsapp').value = snap.data().whatsappNumber || '';
+  renderAdminCoupons();
   showScreen('settings');
 }
 function previewBanner(e) {
@@ -591,10 +641,76 @@ async function saveSettings() {
     const data = await res.json(); bUrl = data.secure_url;
   }
   await setDoc(doc(db,'settings','config'), { whatsappNumber: num, bannerUrl: bUrl }, { merge: true });
-  alert('Saved!'); showScreen('admin');
+  alert('Saved!');
 }
 
-/* Shop Render */
+function renderAdminCoupons() {
+  const list = document.getElementById('couponList'); if(!list) return;
+  if(couponsCache.length === 0) { list.innerHTML = '<div style="color:var(--text-dim);font-size:12px;text-align:center">No active coupons.</div>'; return; }
+  list.innerHTML = couponsCache.map(c => `
+    <div class="coupon-item">
+      <div>
+        <div class="coupon-code">${c.code}</div>
+        <div class="coupon-disc">${c.discountPercent}% OFF</div>
+      </div>
+      <div>
+        <button style="background:none;border:none;color:var(--gold);font-size:16px;cursor:pointer;margin-right:10px" onclick="editCoupon('${c.code}', ${c.discountPercent})">✏️</button>
+        <button style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer" onclick="deleteCoupon('${c.id}')">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function editCoupon(code, disc) {
+  document.getElementById('newCouponCode').value = code;
+  document.getElementById('newCouponCode').readOnly = true; 
+  document.getElementById('newCouponDisc').value = disc;
+  document.getElementById('addCouponBtn').textContent = 'Update';
+  editingCouponCode = code;
+}
+
+async function saveCoupon() {
+  const code = document.getElementById('newCouponCode').value.trim().toUpperCase();
+  const disc = parseFloat(document.getElementById('newCouponDisc').value);
+  if(!code || !disc || disc <= 0 || disc > 100) { alert('Sahi code aur discount (1-100)% daalein'); return; }
+  
+  try {
+    await setDoc(doc(db, 'coupons', code), { code, discountPercent: disc, createdAt: serverTimestamp() });
+    document.getElementById('newCouponCode').value = '';
+    document.getElementById('newCouponCode').readOnly = false;
+    document.getElementById('newCouponDisc').value = '';
+    document.getElementById('addCouponBtn').textContent = 'Add';
+    editingCouponCode = null;
+    alert('✅ Coupon Saved!');
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteCoupon(id) {
+  if(confirm('Delete coupon?')) await deleteDoc(doc(db, 'coupons', id));
+}
+
+async function changeAdminPassword() {
+  const cur = document.getElementById('currentPwd').value; const np = document.getElementById('newPwd').value; const cp = document.getElementById('confirmPwd').value;
+  if (np.length < 6) { alert('Naya password kam se kam 6 character ka ho'); return; }
+  if (np !== cp) { alert('Passwords match nahi kar rahe'); return; }
+  try {
+    const user = auth.currentUser; const cred = EmailAuthProvider.credential(ADMIN_EMAIL, cur);
+    await reauthenticateWithCredential(user, cred); await updatePassword(user, np);
+    alert('✅ Password change ho gaya'); ['currentPwd','newPwd','confirmPwd'].forEach(id => document.getElementById(id).value = '');
+  } catch(e) { alert('❌ ' + (e.code === 'auth/wrong-password' ? 'Current password galat hai' : e.message)); }
+}
+
+async function changeSecurityCode() {
+  const cur = document.getElementById('currentSec').value; const ns = document.getElementById('newSec').value;
+  if (ns.length < 6) { alert('Naya security code kam se kam 6 character ka ho'); return; }
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'config'));
+    if (await sha256(cur) !== snap.data().securityCodeHash) { alert('❌ Current security code galat hai'); return; }
+    await setDoc(doc(db, 'settings', 'config'), { securityCodeHash: await sha256(ns) }, { merge: true });
+    alert('✅ Security code change ho gaya'); ['currentSec','newSec'].forEach(id => document.getElementById(id).value = '');
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
 function setMainCategory(cat) {
   mainCategory = cat;
   document.querySelectorAll('#mainTabs .tab').forEach(t => t.classList.toggle('active', t.textContent.includes(cat) || (cat==='All' && t.textContent==='All')));
@@ -642,7 +758,6 @@ function renderShop() {
   }).join('');
 }
 
-/* FULL SCREEN PRODUCT DETAILS LOGIC */
 function openProductDetails(id) {
   currentDetailProduct = categoriesCache.find(c => c.id === id);
   if(!currentDetailProduct) return;
@@ -714,7 +829,6 @@ function buyNowDetails() {
   }
 }
 
-/* Cart & Checkout */
 async function toggleCart(id) {
   if(!currentUid) return;
   const ref = doc(db, 'users', currentUid, 'cart', id);
@@ -744,9 +858,19 @@ function calculateTotal() {
 }
 
 function applyCoupon() {
-  const code = document.getElementById('couponInput').value.toUpperCase();
-  if(code === 'FAIZ10') { discountPercent = 10; alert('✅ 10% Discount Applied!'); }
-  else { discountPercent = 0; alert('❌ Invalid Coupon'); }
+  const enteredCode = document.getElementById('couponInput').value.trim().toUpperCase();
+  if(!enteredCode) { alert('Code daalein'); return; }
+  
+  const found = couponsCache.find(c => c.code === enteredCode);
+  
+  if(found) {
+    discountPercent = found.discountPercent;
+    appliedCoupon = found.code;
+    alert(`✅ ${discountPercent}% Discount Applied!`);
+  } else {
+    discountPercent = 0; appliedCoupon = '';
+    alert('❌ Invalid Coupon Code');
+  }
   calculateTotal();
 }
 
@@ -771,13 +895,14 @@ function submitOrderWA() {
   let msg = `*NEW ORDER - FAIZ FASHION*\n\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n🏠 *Building:* ${building}\n📍 *Address:* ${address}\n🏢 *Landmark:* ${landmark}\n\n*ITEMS:*\n`;
   items.forEach((c,i) => { msg += `${i+1}. ${c.name} - ₹${c.discountPrice}\n`; });
   msg += `\n💰 *Total Amount: ₹${Math.round(total)}*`;
-  if(discountPercent > 0) msg += ` (Coupon Applied: ${discountPercent}% Off)`;
+  if(discountPercent > 0) msg += ` (Coupon: ${appliedCoupon} - ${discountPercent}% Off)`;
   
   addDoc(collection(db, 'users', currentUid, 'orders'), {
     customerName: name, phone, building, address, landmark, items: items.map(i=>({name:i.name, price:i.discountPrice})), total: Math.round(total), date: serverTimestamp()
   }).then(() => {
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank');
     items.forEach(async c => await deleteDoc(doc(db, 'users', currentUid, 'cart', c.id)));
+    discountPercent = 0; appliedCoupon = '';
     showScreen('shop');
   });
 }
@@ -802,10 +927,8 @@ function loadOrders() {
   });
 }
 
-/* Init */
-Object.assign(window, { showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, previewBanner, openCategoryForm, previewPhoto, saveCategory, deleteCategory, setMainCategory, filterProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrderWA, installPWA });
+Object.assign(window, { showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, previewBanner, openCategoryForm, previewPhoto, saveCategory, deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, changeSecurityCode, setMainCategory, filterProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrderWA, installPWA });
 
-/* SERVICE WORKER WITH AUTO-UPDATE */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(reg => {
