@@ -444,7 +444,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
     <div class="input-group"><label>Phone Number</label><input type="tel" id="prePhone" placeholder="10 digit mobile"></div>
     <div class="input-group"><label>Address</label><textarea id="preAddress" rows="2" placeholder="Full delivery address"></textarea></div>
     
-    <button class="btn-primary" onclick="submitPreOrder()">Submit Pre-Order</button>
+    <button class="btn-primary" id="btnSubmitPreOrder" onclick="submitPreOrder(this)">Submit Pre-Order</button>
   </div>
 </div>
 
@@ -514,7 +514,8 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc, getDoc, deleteDoc, onSnapshot, serverTimestamp, addDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+// Yahan getDocs import kiya gaya hai
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc, onSnapshot, serverTimestamp, addDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = { apiKey: "AIzaSyCBLRe3QajETrVTuK-ljrOVndJO9ndZiuU", authDomain: "faiz-fashion.firebaseapp.com", databaseURL: "https://faiz-fashion-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "faiz-fashion", storageBucket: "faiz-fashion.firebasestorage.app", messagingSenderId: "188226858699", appId: "1:188226858699:web:328e68db2b95b366a1f54e" };
 
@@ -532,6 +533,7 @@ let discountPercent = 0, appliedCoupon = '', currentDetailProduct = null, banner
 let deliveryCharge = 50, freeDeliveryAbove = 1000, platformFee = 10, handlingCharge = 20; 
 let editingCouponCode = null, editingId = null, currentPhotoFiles = [], existingPhotoUrls = [], currentBannerFile = null;
 let currentPrePhotoFile = null, mediaRecorder = null, audioChunks = [], audioBlob = null;
+let savedAddressesCache = []; // Addresses save karne ke liye
 let unsubCategories, unsubConfig, unsubCart, unsubOrders, unsubWatchlist, unsubCoupons, unsubReviews, unsubAdminOrders, unsubPreOrders;
 
 function escapeHtml(str) { return String(str ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -912,253 +914,4 @@ function calculateTotal() {
   let finalTotal = subtotal + delivery + platF + handC;
 
   document.getElementById('cartSubtotal').textContent = '₹' + Math.round(subtotal);
-  document.getElementById('cartDelivery').textContent = delivery === 0 && subtotal > 0 ? 'FREE' : '₹' + delivery;
-  document.getElementById('cartPlatformFee').textContent = '₹' + platF;
-  document.getElementById('cartHandlingFee').textContent = '₹' + handC;
-  document.getElementById('cartTotal').textContent = '₹' + Math.round(finalTotal);
-  document.getElementById('chkTotal').textContent = '₹' + Math.round(finalTotal);
-}
-
-function applyCoupon() {
-  const code = document.getElementById('couponInput').value.trim().toUpperCase();
-  const found = couponsCache.find(c => c.code === code);
-  if(found) { discountPercent = found.discountPercent; appliedCoupon = found.code; alert(`✅ ${discountPercent}% Off!`); } 
-  else { discountPercent = 0; appliedCoupon = ''; alert('❌ Invalid Code'); }
-  calculateTotal();
-}
-function openCheckout() { if(cartIds.size === 0) return alert('Cart empty'); showScreen('checkout'); }
-
-function submitOrder() {
-  const name = document.getElementById('chkName').value, phone = document.getElementById('chkPhone').value, building = document.getElementById('chkBuilding').value, address = document.getElementById('chkAddress').value, landmark = document.getElementById('chkLandmark').value;
-  const saveAddr = document.getElementById('chkSaveAddress').checked;
-  if(!name || !phone || !address) return alert('Name, Phone, Address zaroori hai!');
-  
-  const btn = document.getElementById('btnPlaceOrder'); btn.disabled = true; btn.textContent = 'Placing...';
-  
-  const items = categoriesCache.filter(c => cartIds.has(c.id));
-  let subtotal = items.reduce((s,c) => s + c.discountPrice, 0);
-  if(discountPercent > 0) subtotal = subtotal - (subtotal * discountPercent / 100);
-  let delivery = (subtotal > 0 && subtotal < freeDeliveryAbove) ? deliveryCharge : 0;
-  let platF = subtotal > 0 ? platformFee : 0;
-  let handC = subtotal > 0 ? handlingCharge : 0;
-  let total = subtotal + delivery + platF + handC;
-  
-  addDoc(collection(db, 'orders'), {
-    userId: currentUid, customerName: name, phone, building, address, landmark, 
-    items: items.map(i=>({name:i.name, price:i.discountPrice, img: (i.photoUrls && i.photoUrls.length > 0) ? i.photoUrls[0] : i.photoUrl})), 
-    subtotal: Math.round(subtotal), deliveryCharge: delivery, platformFee: platF, handlingCharge: handC,
-    total: Math.round(total), status: 'Pending', date: serverTimestamp()
-  }).then(async () => {
-    
-    // Save Address if checked
-    if(saveAddr) {
-      await setDoc(doc(db, 'users', currentUid, 'addresses', Date.now().toString()), { name, phone, building, address, landmark });
-    }
-
-    for(let c of items) await deleteDoc(doc(db, 'users', currentUid, 'cart', c.id));
-    discountPercent = 0; appliedCoupon = ''; 
-    alert('✅ Order Placed Successfully!');
-    showScreen('shop');
-  }).finally(() => {
-    btn.disabled = false; btn.textContent = 'Place Order';
-  });
-}
-
-/* ADDRESS BOOK */
-async function loadSavedAddresses() {
-  const sel = document.getElementById('chkSavedAddress'); if(!sel) return;
-  sel.innerHTML = '<option value="">-- Select Address --</option>';
-  const snap = await getDocs(collection(db, 'users', currentUid, 'addresses'));
-  if(!snap.empty) {
-    document.getElementById('savedAddressGroup').style.display = 'block';
-    snap.forEach(d => {
-      const a = d.data();
-      sel.innerHTML += `<option value='${JSON.stringify(a)}'>${a.name} - ${a.address}</option>`;
-    });
-  } else {
-    document.getElementById('savedAddressGroup').style.display = 'none';
-  }
-}
-function fillSavedAddress(val) {
-  if(!val) return;
-  const a = JSON.parse(val);
-  document.getElementById('chkName').value = a.name;
-  document.getElementById('chkPhone').value = a.phone;
-  document.getElementById('chkBuilding').value = a.building;
-  document.getElementById('chkAddress').value = a.address;
-  document.getElementById('chkLandmark').value = a.landmark;
-}
-
-/* MY ORDERS */
-function loadCustomerOrders() {
-  const list = document.getElementById('ordersList'); if(!list) return;
-  list.innerHTML = 'Loading...';
-  if(unsubOrders) unsubOrders();
-  
-  unsubOrders = onSnapshot(query(collection(db, 'orders'), where('userId', '==', currentUid)), snap => {
-    if(snap.empty) { list.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:20px">No orders yet.</div>'; return; }
-    
-    let ordersData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    ordersData.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
-
-    list.innerHTML = ordersData.map(o => {
-      const date = o.date ? new Date(o.date.toMillis()).toLocaleDateString() : 'Recent';
-      let statusColor = o.status === 'Shipped' ? 'status-Shipped' : (o.status === 'Delivered' ? 'status-Delivered' : (o.status === 'Processing' ? 'status-Processing' : (o.status === 'Out for Delivery' ? 'status-Out-for-Delivery' : 'status-Pending')));
-      
-      let returnBtn = '';
-      if(o.status === 'Delivered') {
-        if(o.returnStatus) returnBtn = `<div style="font-size:12px;color:var(--gold);margin-top:5px">Return/Exchange Requested</div>`;
-        else returnBtn = `<button class="btn-small" style="margin-top:10px;background:var(--card);border:1px solid var(--gold);color:var(--gold)" onclick="requestReturn('${o.id}')">🔄 Request Return / Exchange</button>`;
-      }
-
-      return `
-      <div class="category-card" style="padding:15px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-          <span style="font-size:12px;color:var(--text-dim)">${date}</span>
-          <span style="color:var(--gold);font-weight:800">₹${o.total}</span>
-        </div>
-        <ul style="font-size:13px;margin-bottom:5px;padding-left:15px">
-          ${o.items.map(i => `<li>${i.name} - ₹${i.price} ${i.img ? `<img src="${i.img}" class="order-img-thumb">` : ''}</li>`).join('')}
-        </ul>
-        <div><span class="order-status ${statusColor}">${o.status || 'Pending'}</span></div>
-        ${returnBtn}
-      </div>`;
-    }).join('');
-  });
-}
-
-async function requestReturn(orderId) {
-  if(confirm('Kya aap is order ke liye Return/Exchange request karna chahte hain?')) {
-    await setDoc(doc(db, 'orders', orderId), { returnStatus: 'Requested' }, { merge: true });
-    alert('✅ Request submitted! Admin will contact you soon.');
-  }
-}
-
-/* REVIEWS */
-function loadReviews(productId) {
-  const list = document.getElementById('reviewList'); list.innerHTML = 'Loading...';
-  if(unsubReviews) unsubReviews();
-  unsubReviews = onSnapshot(query(collection(db, 'reviews'), where('productId', '==', productId)), snap => {
-    if(snap.empty) { list.innerHTML = '<div style="color:var(--text-dim);font-size:13px">No reviews yet. Be the first!</div>'; return; }
-    let revs = snap.docs.map(d => d.data());
-    revs.sort((a,b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
-    list.innerHTML = revs.map(r => {
-      let stars = ''; for(let i=0; i<5; i++) stars += i < r.rating ? '★' : '☆';
-      return `<div class="review-card"><div class="review-stars">${stars}</div><div class="review-text">${escapeHtml(r.text)}</div><div class="review-name">- ${escapeHtml(r.name)}</div></div>`;
-    }).join('');
-  });
-}
-function openReviewForm() { document.getElementById('reviewModal').style.display = 'flex'; }
-function closeReviewForm() { document.getElementById('reviewModal').style.display = 'none'; }
-async function submitReview() {
-  const name = document.getElementById('revName').value.trim(), rating = parseInt(document.getElementById('revRating').value), text = document.getElementById('revText').value.trim();
-  if(!name || !text) { alert('Name and comment required'); return; }
-  try {
-    await addDoc(collection(db, 'reviews'), { productId: currentDetailProduct.id, name, rating, text, date: serverTimestamp() });
-    alert('✅ Review submitted!'); closeReviewForm();
-    document.getElementById('revName').value=''; document.getElementById('revText').value='';
-  } catch(e) { alert('Error: ' + e.message); }
-}
-
-/* RELATED PRODUCTS */
-function loadRelatedProducts(cat, currentId) {
-  const related = categoriesCache.filter(c => c.mainCategory === cat && c.id !== currentId).slice(0, 4);
-  const grid = document.getElementById('relatedProducts');
-  if(related.length === 0) { grid.innerHTML = '<div style="color:var(--text-dim);font-size:12px">No related products.</div>'; return; }
-  grid.innerHTML = related.map(c => {
-    const img = (c.photoUrls && c.photoUrls.length > 0) ? c.photoUrls[0] : c.photoUrl;
-    return `<div class="related-card" onclick="openProductDetails('${c.id}')"><img src="${img}"><p>${escapeHtml(c.name)}</p><p style="color:var(--gold)">₹${c.discountPrice}</p></div>`;
-  }).join('');
-}
-
-/* PRE-ORDER LOGIC */
-function previewPrePhoto(e) {
-  const f = e.target.files[0]; if(!f) return; currentPrePhotoFile = f;
-  document.getElementById('prePhotoPreview').src = URL.createObjectURL(f);
-  document.getElementById('prePhotoPreview').style.display = 'block';
-  document.getElementById('prePhotoPlaceholder').style.display = 'none';
-}
-
-async function toggleVoiceRecord() {
-  const btn = document.getElementById('voiceRecordBtn');
-  if(mediaRecorder && mediaRecorder.state === 'recording') {
-    mediaRecorder.stop();
-    btn.textContent = '🎤 Start Recording';
-    btn.classList.remove('recording');
-    return;
-  }
-
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(stream);
-    audioChunks = [];
-    
-    mediaRecorder.ondataavailable = e => { audioChunks.push(e.data); };
-    mediaRecorder.onstop = () => {
-      audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-      const url = URL.createObjectURL(audioBlob);
-      document.getElementById('voicePlayback').src = url;
-      document.getElementById('voicePlayback').style.display = 'block';
-    };
-
-    mediaRecorder.start();
-    btn.textContent = '⏹️ Stop Recording';
-    btn.classList.add('recording');
-  } catch(e) { alert('Microphone access denied or not supported.'); }
-}
-
-async function submitPreOrder() {
-  const desc = document.getElementById('preDesc').value.trim();
-  const phone = document.getElementById('prePhone').value.trim();
-  const address = document.getElementById('preAddress').value.trim();
-  
-  if(!desc || !phone || !address) { alert('Description, Phone, and Address are compulsory.'); return; }
-
-  const btn = event.target; btn.disabled = true; btn.textContent = 'Submitting...';
-
-  try {
-    let photoUrl = '';
-    if(currentPrePhotoFile) {
-      const fd = new FormData(); fd.append('file', currentPrePhotoFile); fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method:'POST', body: fd });
-      const data = await res.json(); photoUrl = data.secure_url;
-    }
-
-    let audioUrl = '';
-    if(audioBlob) {
-      const fd = new FormData(); fd.append('file', audioBlob, 'voice.webm'); fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`, { method:'POST', body: fd });
-      const data = await res.json(); audioUrl = data.secure_url;
-    }
-
-    await addDoc(collection(db, 'pre_orders'), {
-      userId: currentUid, description: desc, phone, address, photoUrl, audioUrl, date: serverTimestamp()
-    });
-
-    alert('✅ Pre-Order Request Sent!');
-    document.getElementById('preDesc').value = ''; document.getElementById('prePhone').value = ''; document.getElementById('preAddress').value = '';
-    document.getElementById('prePhotoPreview').style.display = 'none'; document.getElementById('prePhotoPlaceholder').style.display = 'block';
-    document.getElementById('voicePlayback').style.display = 'none'; audioBlob = null; currentPrePhotoFile = null;
-    
-    showScreen('shop');
-  } catch(e) {
-    alert('Error: ' + e.message);
-  } finally {
-    btn.disabled = false; btn.textContent = 'Submit Pre-Order';
-  }
-}
-
-Object.assign(window, { showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, previewBanner, openCategoryForm, previewPhoto, removeExistingPhoto, removeNewPhoto, saveCategory, deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, setMainCategory, filterProducts, sortProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrder, loadAdminOrders, updateOrderStatus, openReviewForm, closeReviewForm, submitReview, previewPrePhoto, toggleVoiceRecord, submitPreOrder, requestReturn });
-
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      reg.update();
-      reg.onupdatefound = () => { const installingWorker = reg.installing; if (installingWorker) { installingWorker.onstatechange = () => { if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) window.location.reload(true); }; } };
-    }).catch(err => console.log(err));
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') navigator.serviceWorker.ready.then(reg => reg.update()); });
-  });
-}
-</script>
-</body>
-</html>
+  document.getElementById('cartDelivery').textContent = delivery === 0 && subtotal > 0 ? 'FREE' : '
