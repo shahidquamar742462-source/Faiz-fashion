@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0a0a0a">
 <title>FAIZ FASHION</title>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com">
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com">
+<link rel="preconnect" href="https://api.cloudinary.com">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
@@ -670,7 +674,7 @@ onAuthStateChanged(auth,async(user)=>{
   if(!user){currentUid=null;showScreen('landing');return}
   currentUid=user.uid;isAdminUser=user.email===ADMIN_EMAIL;
   listenCategories();listenConfig();listenCoupons();
-  if(isAdminUser){showScreen('admin');renderAdminCategories()}else{listenCart();listenWatchlist();await initUserRewards();showScreen('shop')}
+  if(isAdminUser){showScreen('admin');renderAdminCategories()}else{listenCart();listenWatchlist(); initUserRewards();showScreen('shop')}
 });
 
 async function customerLogin(){if(auth.currentUser)await signOut(auth);await signInAnonymously(auth)}
