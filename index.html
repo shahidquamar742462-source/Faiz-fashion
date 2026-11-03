@@ -510,23 +510,26 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
   <button class="nav-item" data-screen="cart" onclick="showScreen('cart')"><span class="nav-icon">🛒</span>Cart<span class="badge" id="navCartBadge" style="top:-2px">0</span></button>
 </div>
 
+<script>
+  // ERROR CATCHER: Agar koi bhi error aaye, toh screen par alert aayega
+  window.addEventListener('error', function(e) {
+    alert('⚠️ App Error: ' + e.message + '\nFile: ' + (e.filename || 'Unknown'));
+  });
+</script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc, onSnapshot, serverTimestamp, addDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// === YE LINE SABSE PEHLE HAI (Fixes Click Issue) ===
-Object.assign(window, { 
-  showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, 
-  previewBanner, openCategoryForm, previewPhoto, removeExistingPhoto, removeNewPhoto, saveCategory, 
-  deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, setMainCategory, 
-  filterProducts, sortProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, 
-  toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrder, 
-  loadAdminOrders, updateOrderStatus, openReviewForm, closeReviewForm, submitReview, previewPrePhoto, 
-  toggleVoiceRecord, submitPreOrder, requestReturn, fillSavedAddress, loadAdminPreOrders, installPWA 
-});
-
-const firebaseConfig = { apiKey: "AIzaSyCBLRe3QajETrVTuK-ljrOVndJO9ndZiuU", authDomain: "faiz-fashion.firebaseapp.com", databaseURL: "https://faiz-fashion-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "faiz-fashion", storageBucket: "faiz-fashion.firebasestorage.app", messagingSenderId: "188226858699", appId: "1:188226858699:web:328e68db2b95b366a1f54e" };
+const firebaseConfig = { 
+  apiKey: "AIzaSyCBLRe3QajETrVTuK-ljrOVndJO9ndZiuU", 
+  authDomain: "faiz-fashion.firebaseapp.com", 
+  projectId: "faiz-fashion", 
+  storageBucket: "faiz-fashion.firebasestorage.app", 
+  messagingSenderId: "188226858699", 
+  appId: "1:188226858699:web:328e68db2b95b366a1f54e" 
+};
 
 const ADMIN_EMAIL = "shahidquamar72@gmail.com"; 
 const CLOUDINARY_CLOUD_NAME = "vsp6mp0d";
@@ -1143,6 +1146,19 @@ async function submitPreOrder(btn) {
     btn.disabled = false; btn.textContent = 'Submit Pre-Order';
   }
 }
+
+// Bind all functions to window so inline onclick works perfectly
+Object.assign(window, { 
+  showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, 
+  previewBanner, openCategoryForm, previewPhoto, removeExistingPhoto, removeNewPhoto, saveCategory, 
+  deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, setMainCategory, 
+  filterProducts, sortProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, 
+  toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrder, 
+  loadAdminOrders, updateOrderStatus, openReviewForm, closeReviewForm, submitReview, previewPrePhoto, 
+  toggleVoiceRecord, submitPreOrder, requestReturn, fillSavedAddress, loadAdminPreOrders, installPWA 
+});
+
+console.log("App loaded successfully!");
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
