@@ -471,7 +471,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
   <div class="header"><button class="back-btn" onclick="showScreen('cart')">←</button><h2>Checkout</h2></div>
   <div class="form-container">
     
-    <!-- Saved Addresses -->
     <div class="input-group" id="savedAddressGroup" style="display:none">
       <label>Select Saved Address</label>
       <select id="chkSavedAddress" onchange="fillSavedAddress(this.value)">
@@ -515,6 +514,17 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc, onSnapshot, serverTimestamp, addDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// === YE LINE SABSE PEHLE HAI (Fixes Click Issue) ===
+Object.assign(window, { 
+  showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, 
+  previewBanner, openCategoryForm, previewPhoto, removeExistingPhoto, removeNewPhoto, saveCategory, 
+  deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, setMainCategory, 
+  filterProducts, sortProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, 
+  toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrder, 
+  loadAdminOrders, updateOrderStatus, openReviewForm, closeReviewForm, submitReview, previewPrePhoto, 
+  toggleVoiceRecord, submitPreOrder, requestReturn, fillSavedAddress, loadAdminPreOrders, installPWA 
+});
 
 const firebaseConfig = { apiKey: "AIzaSyCBLRe3QajETrVTuK-ljrOVndJO9ndZiuU", authDomain: "faiz-fashion.firebaseapp.com", databaseURL: "https://faiz-fashion-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "faiz-fashion", storageBucket: "faiz-fashion.firebasestorage.app", messagingSenderId: "188226858699", appId: "1:188226858699:web:328e68db2b95b366a1f54e" };
 
@@ -632,7 +642,6 @@ function listenCoupons() {
   });
 }
 
-/* ADMIN LOGIC */
 function renderAdminCategories() {
   const list = document.getElementById('categoryList'); if (!list) return;
   let out = 0; categoriesCache.forEach(c => { if((c.times||0) <= 0) out++; });
@@ -753,7 +762,6 @@ async function saveSettings() {
   alert('Saved!');
 }
 
-/* ADMIN ORDERS */
 function loadAdminOrders() {
   const list = document.getElementById('adminOrdersList'); if(!list) return;
   if(unsubAdminOrders) unsubAdminOrders();
@@ -788,7 +796,6 @@ function loadAdminOrders() {
 }
 async function updateOrderStatus(id, status) { await setDoc(doc(db, 'orders', id), { status }, { merge: true }); alert('Status Updated!'); }
 
-/* ADMIN PRE-ORDERS */
 function loadAdminPreOrders() {
   const list = document.getElementById('adminPreOrdersList'); if(!list) return;
   if(unsubPreOrders) unsubPreOrders();
@@ -808,7 +815,6 @@ function loadAdminPreOrders() {
   });
 }
 
-/* CUSTOMER SHOP */
 function setMainCategory(cat) {
   mainCategory = cat;
   document.querySelectorAll('#mainTabs .tab').forEach(t => t.classList.toggle('active', t.textContent.includes(cat) || (cat==='All' && t.textContent==='All')));
@@ -851,7 +857,6 @@ function renderShop() {
   }).join('');
 }
 
-/* PRODUCT DETAILS */
 function openProductDetails(id) {
   currentDetailProduct = categoriesCache.find(c => c.id === id);
   if(!currentDetailProduct) return;
@@ -878,7 +883,6 @@ function openProductDetails(id) {
   showScreen('product-details');
 }
 
-/* CART & CHECKOUT */
 async function toggleCart(id) { if(!currentUid) return; const ref = doc(db, 'users', currentUid, 'cart', id); if(cartIds.has(id)) await deleteDoc(ref); else await setDoc(ref, { addedAt: serverTimestamp() }); }
 function goCart() { showScreen('cart'); }
 async function toggleWatchlist(id) { if(!currentUid || isAdminUser) return; const ref = doc(db, 'users', currentUid, 'watchlist', id); if(watchlistIds.has(id)) await deleteDoc(ref); else await setDoc(ref, { addedAt: serverTimestamp() }); }
@@ -961,7 +965,6 @@ function submitOrder() {
   });
 }
 
-/* ADDRESS BOOK */
 async function loadSavedAddresses() {
   const sel = document.getElementById('chkSavedAddress'); if(!sel) return;
   sel.innerHTML = '<option value="">-- Select Address --</option>';
@@ -986,7 +989,6 @@ function fillSavedAddress(val) {
   document.getElementById('chkLandmark').value = a.landmark;
 }
 
-/* MY ORDERS */
 function loadCustomerOrders() {
   const list = document.getElementById('ordersList'); if(!list) return;
   list.innerHTML = 'Loading...';
@@ -1031,7 +1033,6 @@ async function requestReturn(orderId) {
   }
 }
 
-/* REVIEWS */
 function loadReviews(productId) {
   const list = document.getElementById('reviewList'); list.innerHTML = 'Loading...';
   if(unsubReviews) unsubReviews();
@@ -1057,7 +1058,6 @@ async function submitReview() {
   } catch(e) { alert('Error: ' + e.message); }
 }
 
-/* RELATED PRODUCTS */
 function loadRelatedProducts(cat, currentId) {
   const related = categoriesCache.filter(c => c.mainCategory === cat && c.id !== currentId).slice(0, 4);
   const grid = document.getElementById('relatedProducts');
@@ -1068,7 +1068,6 @@ function loadRelatedProducts(cat, currentId) {
   }).join('');
 }
 
-/* PRE-ORDER LOGIC */
 function previewPrePhoto(e) {
   const f = e.target.files[0]; if(!f) return; currentPrePhotoFile = f;
   document.getElementById('prePhotoPreview').src = URL.createObjectURL(f);
@@ -1144,9 +1143,6 @@ async function submitPreOrder(btn) {
     btn.disabled = false; btn.textContent = 'Submit Pre-Order';
   }
 }
-
-// === YE LINE SABSE ZAROORI HAI (Fixes Click Issue) ===
-Object.assign(window, { showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, previewBanner, openCategoryForm, previewPhoto, removeExistingPhoto, removeNewPhoto, saveCategory, deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, setMainCategory, filterProducts, sortProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrder, loadAdminOrders, updateOrderStatus, openReviewForm, closeReviewForm, submitReview, previewPrePhoto, toggleVoiceRecord, submitPreOrder, requestReturn, fillSavedAddress, loadAdminPreOrders, installPWA });
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
