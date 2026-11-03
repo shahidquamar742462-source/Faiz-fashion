@@ -710,6 +710,19 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     
     <div class="input-group"><label>Famous Place Near You</label><input type="text" id="chkLandmark"></div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px"><input type="checkbox" id="chkSaveAddress" style="width:20px;height:20px"><label for="chkSaveAddress" style="font-size:14px;color:var(--text-dim)">Save this address for future orders</label></div>
+    
+    <!-- 👇 NAYA LOCATION SHARE OPTION CHECKOUT ME 👇 -->
+    <div class="input-group" id="checkoutLocGroup" style="background:rgba(212,175,55,0.1);border:1px dashed var(--gold);padding:12px;border-radius:8px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--gold)">📍 Share Location for Fast Delivery</div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:3px" id="checkoutLocStatus">Location not shared yet</div>
+        </div>
+        <button class="btn-small" style="flex:0;background:var(--gold);color:#000;padding:6px 12px" onclick="requestCheckoutLocation()">Share</button>
+      </div>
+    </div>
+    <!-- 👆 NAYA LOCATION SHARE OPTION END 👆 -->
+
     <div class="input-group" id="pointsRedeemGroup" style="display:none">
       <label>⭐ Redeem Points (Balance: <span id="chkPointBalance" style="color:var(--gold)">0</span>)</label>
       <div style="display:flex;gap:8px;align-items:center">
@@ -836,6 +849,7 @@ function showScreen(name){
   if(name==='admin-reviews')loadAdminReviews();
   if(name==='settings'&&isAdminUser)renderAdminCoupons();
   if(name==='customer-settings') updateGlobalLocStatus();
+  if(name==='checkout') updateCheckoutLocStatus();
   window.scrollTo(0,0)
 }
 
@@ -955,6 +969,18 @@ function updateGlobalLocStatus() {
   }
 }
 
+function updateCheckoutLocStatus() {
+  const el = document.getElementById('checkoutLocStatus');
+  if(!el) return;
+  if(userSavedLat && userSavedLng) {
+    el.textContent = '✅ Location already shared!';
+    el.style.color = 'var(--success)';
+  } else {
+    el.textContent = 'Location not shared yet (Recommended)';
+    el.style.color = 'var(--danger)';
+  }
+}
+
 async function requestGlobalLocation() {
   showLoading();
   try {
@@ -964,15 +990,31 @@ async function requestGlobalLocation() {
     userSavedLat = pos.coords.latitude;
     userSavedLng = pos.coords.longitude;
     await setDoc(doc(db, 'users', currentUid), { savedLatitude: userSavedLat, savedLongitude: userSavedLng }, { merge: true });
-    document.getElementById('globalLocStatus').textContent = '✅ Location Shared successfully!';
-    document.getElementById('globalLocStatus').style.color = 'var(--success)';
+    updateGlobalLocStatus();
     alert('✅ Location saved! Delivery boy will find you faster.');
   } catch (e) {
     alert('❌ Location denied or failed. Please enable GPS.');
-    document.getElementById('globalLocStatus').textContent = '❌ Location not shared';
-    document.getElementById('globalLocStatus').style.color = 'var(--danger)';
   }
   hideLoading();
+}
+
+async function requestCheckoutLocation() {
+  const el = document.getElementById('checkoutLocStatus');
+  el.textContent = 'Fetching...';
+  try {
+    const pos = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000, enableHighAccuracy: true });
+    });
+    userSavedLat = pos.coords.latitude;
+    userSavedLng = pos.coords.longitude;
+    await setDoc(doc(db, 'users', currentUid), { savedLatitude: userSavedLat, savedLongitude: userSavedLng }, { merge: true });
+    el.textContent = '✅ Location Shared Successfully!';
+    el.style.color = 'var(--success)';
+  } catch (e) {
+    el.textContent = '❌ Failed. Please allow GPS.';
+    el.style.color = 'var(--danger)';
+    alert('Location share nahi ho payi. Kripya GPS on karein aur Allow karein.');
+  }
 }
 
 function renderAdminCategories(){const list=document.getElementById('categoryList');if(!list)return;let out=0,low=0;categoriesCache.forEach(c=>{const t=c.times||0;if(t<=0)out++;else if(t<=3)low++});document.getElementById('statTotal').textContent=categoriesCache.length;document.getElementById('statOut').textContent=out;document.getElementById('statLow').textContent=low;const lw=document.getElementById('lowStockWarning');if(low>0){const li=categoriesCache.filter(c=>(c.times||0)>0&&(c.times||0)<=3);lw.innerHTML=`<div class="low-stock-warning">⚠️ ${low} product(s) low stock: ${li.map(i=>escapeHtml(i.name)+` (${i.times})`).join(', ')}</div>`}else lw.innerHTML='';list.innerHTML=categoriesCache.map(c=>{const off=getDiscountPercent(c.originalPrice,c.discountPrice);const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const bundleTag=(c.bundleQty>0&&c.bundlePrice>0)?`<span style="background:var(--gold);color:#000;padding:2px 6px;border-radius:4px;font-size:10px;margin-left:5px">BUNDLE ${c.bundleQty}@₹${c.bundlePrice}</span>`:'';return`<div class="category-card"><img src="${optImg(img,400)}" class="cat-img"><div class="cat-body"><div class="cat-tag">${escapeHtml(c.mainCategory||'Men')}</div><div class="cat-name">${escapeHtml(c.name)} ${(c.times||0)<=0?'<span style="background:var(--danger);color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;margin-left:5px">OUT</span>':((c.times||0)<=3?'<span style="background:#f39c12;color:#000;padding:2px 6px;border-radius:4px;font-size:10px;margin-left:5px">LOW</span>':'')}${bundleTag}</div><div class="cat-price-row"><span class="cat-discount">₹${c.discountPrice}</span><span class="cat-original">₹${c.originalPrice}</span>${off>0?`<span class="cat-off">${off}% OFF</span>`:''}</div><div style="font-size:11px;color:var(--text-dim);margin-bottom:10px">Stock: ${c.times||0} | Sizes: ${(c.sizes||[]).join(', ')||'-'} | Colors: ${(c.colors||[]).join(', ')||'-'}</div><div class="cat-actions"><button class="btn-small" onclick="openCategoryForm('${c.id}')">Edit</button><button class="btn-small" style="color:var(--danger)" onclick="deleteCategory('${c.id}')">Delete</button></div></div></div>`}).join('')}
@@ -1134,6 +1176,8 @@ function openCheckout(){
   
   const pincodeGroup = document.getElementById('chkPincodeGroup');
   if(allowedAreas.length > 0) { pincodeGroup.style.display = 'block'; } else { pincodeGroup.style.display = 'none'; }
+
+  updateCheckoutLocStatus();
 
   const g=document.getElementById('pointsRedeemGroup');if(userPoints>0){g.style.display='block';document.getElementById('chkPointBalance').textContent=userPoints}else g.style.display='none';showScreen('checkout')
 }
@@ -1359,7 +1403,7 @@ function contactCall() { window.location.href = 'tel:+917838647693'; }
 function contactWhatsApp() { window.open('https://wa.me/917838647693?text=' + encodeURIComponent('Hello FAIZ FASHION, mujhe app se madad chahiye.'), '_blank'); }
 function contactEmail() { window.open('mailto:shahidquamar72@gmail.com?subject=Enquiry%20from%20FAIZ%20FASHION%20App', '_blank'); }
 
-const EXPORTS=['showScreen','customerLogin','handleLogin','handleReset','handleLogout','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','previewSizeGuide','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','saveCoupon','editCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','filterProducts','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','requestReturn','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation'];
+const EXPORTS=['showScreen','customerLogin','handleLogin','handleReset','handleLogout','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','previewSizeGuide','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','saveCoupon','editCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','filterProducts','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','requestReturn','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
