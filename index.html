@@ -816,10 +816,36 @@ function installPWA(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.
 onAuthStateChanged(auth,async(user)=>{
   [unsubCategories,unsubConfig,unsubCart,unsubOrders,unsubWatchlist,unsubCoupons,unsubAdminOrders,unsubPreOrders,unsubMyPreOrders,unsubAdminReviews,unsubReviews].forEach(u=>{if(u)u()});
   watchlistIds=new Set();cartItems=[];cartProductIds=new Set();couponsCache=[];
-  if(!user){currentUid=null;showScreen('landing');return}
-  currentUid=user.uid;isAdminUser=user.email===ADMIN_EMAIL;
-  listenCategories();listenConfig();listenCoupons();
-  if(isAdminUser){showScreen('admin');renderAdminCategories()}else{listenCart();listenWatchlist();await initUserRewards();showScreen('shop')}
+  
+  if(!user){
+    currentUid=null;
+    showScreen('landing');
+    return;
+  }
+  
+  currentUid=user.uid;
+  isAdminUser=user.email===ADMIN_EMAIL;
+  
+  listenCategories();
+  listenConfig();
+  listenCoupons();
+  
+  if(isAdminUser){
+    showScreen('admin');
+    renderAdminCategories();
+  } else {
+    listenCart();
+    listenWatchlist();
+    // 1. Turant Shop Screen dikhao taaki loading na dikhe
+    showScreen('shop');
+    
+    // 2. Background me points load karo. Agar error aaye toh app crash na ho
+    try {
+      await initUserRewards();
+    } catch(e) {
+      console.log("Points load failed:", e);
+    }
+  }
 });
 
 async function customerLogin(){if(auth.currentUser)await signOut(auth);await signInAnonymously(auth)}
@@ -1056,7 +1082,7 @@ function openCheckout(){
 
 function buildOrderWhatsAppMsg(name,phone,building,address,landmark,items,total,orderId){let m=`🛍️ *NEW ORDER - FAIZ FASHION*\n\n*Order ID:* ${orderId.slice(-8).toUpperCase()}\n\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Address:*\n${building?building+', ':''}${address}${landmark?'\nLandmark: '+landmark:''}\n\n📦 *Items:*\n`;items.forEach((i,idx)=>{m+=`${idx+1}. ${i.name}`;if(i.size)m+=` | Size: ${i.size}`;if(i.color)m+=` | Color: ${i.color}`;m+=`\n   Qty: ${i.qty} × ₹${i.price} = ₹${i.qty*i.price}\n`});m+=`\n💰 *Total: ₹${Math.round(total)}*\n\n_Payment: Cash on Delivery_`;return m}
 
-async submitOrder(){
+async function submitOrder(){
   if(!isShopOpen) return alert('🛑 Shop is closed. Please visit early morning!');
   
   const name=document.getElementById('chkName').value.trim(),phone=document.getElementById('chkPhone').value.trim();
@@ -1081,7 +1107,6 @@ async submitOrder(){
   let orderLng = null;
   let locationShared = false;
 
-  // Ask for location
   try {
     const pos = await new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000, enableHighAccuracy: true });
