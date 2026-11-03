@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0a0a0a">
 <title>FAIZ FASHION</title>
-  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://firestore.googleapis.com">
 <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
 <link rel="preconnect" href="https://api.cloudinary.com">
+
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
@@ -205,8 +207,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <div style="width:50px;height:50px;border:4px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite"></div>
 </div>
 
-<!-- LANDING -->
-<!-- SPLASH SCREEN (Fixed) -->
+<!-- SPLASH SCREEN -->
 <div id="screen-splash" class="screen active">
   <div class="landing-container">
     <div class="logo-circle" style="margin:0 auto 20px"><img src="logo.png" alt="FAIZ FASHION" onerror="this.style.display='none'"></div>
@@ -217,7 +218,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- LANDING (Active hata diya) -->
+<!-- LANDING -->
 <div id="screen-landing" class="screen">
   <div class="landing-container">
     <div class="logo-circle"><img src="logo.png" alt="FAIZ FASHION" onerror="this.style.display='none'"></div>
@@ -490,6 +491,38 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
+<!-- RETURN / EXCHANGE MODAL -->
+<div id="returnRequestModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);padding:20px;border-radius:16px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto">
+    <h3 style="margin-bottom:15px;color:var(--gold)">🔄 Return / Exchange</h3>
+    
+    <div class="input-group"><label>Select Product</label><select id="retItemSelect" onchange="updateReturnItemDetails()"></select></div>
+    
+    <div class="input-group"><label>Request Type</label><select id="retType" onchange="toggleExchangeFields()">
+      <option value="Return">Return (Refund)</option>
+      <option value="Exchange">Exchange (Replace)</option>
+    </select></div>
+
+    <div class="input-group" id="exchangeSizeGroup" style="display:none"><label>New Size (For Exchange)</label><select id="retNewSize"></select></div>
+    <div class="input-group" id="exchangeColorGroup" style="display:none"><label>New Color (For Exchange)</label><select id="retNewColor"></select></div>
+
+    <div class="input-group"><label>Issue / Condition</label><select id="retCondition">
+      <option value="Size Issue">Size Issue (Chhota/Bada hai)</option>
+      <option value="Color Issue">Color Issue (Alag color aaya)</option>
+      <option value="Product Defect">Product Defect (Kharab hai)</option>
+      <option value="Wrong Item">Wrong Item (Galat saman aaya)</option>
+      <option value="Other">Other (Dusra koi karan)</option>
+    </select></div>
+
+    <div class="input-group"><label>Reason (Compulsory)</label><textarea id="retReason" rows="2" placeholder="Thoda detail me likhein..."></textarea></div>
+
+    <div style="display:flex;gap:10px;margin-top:15px">
+      <button class="btn-small" onclick="closeReturnModal()">Cancel</button>
+      <button class="btn-primary" style="flex:1;padding:10px" onclick="submitReturnRequest()">Submit Request</button>
+    </div>
+  </div>
+</div>
+
 <!-- PRE-ORDER -->
 <div id="screen-preorder" class="screen" style="padding-bottom:100px">
   <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Custom Pre-Order</h2></div>
@@ -674,7 +707,7 @@ onAuthStateChanged(auth,async(user)=>{
   if(!user){currentUid=null;showScreen('landing');return}
   currentUid=user.uid;isAdminUser=user.email===ADMIN_EMAIL;
   listenCategories();listenConfig();listenCoupons();
-  if(isAdminUser){showScreen('admin');renderAdminCategories()}else{listenCart();listenWatchlist(); initUserRewards();showScreen('shop')}
+  if(isAdminUser){showScreen('admin');renderAdminCategories()}else{listenCart();listenWatchlist();await initUserRewards();showScreen('shop')}
 });
 
 async function customerLogin(){if(auth.currentUser)await signOut(auth);await signInAnonymously(auth)}
@@ -722,12 +755,54 @@ function previewSizeGuide(e){const f=e.target.files[0];if(!f)return;currentSizeG
 
 async function saveSettings(){const num=document.getElementById('settingsWhatsapp').value.replace(/\D/g,'');const delC=parseFloat(document.getElementById('settingsDelCharge').value)||0;const freeAbv=parseFloat(document.getElementById('settingsFreeAbove').value)||0;const platF=parseFloat(document.getElementById('settingsPlatformFee').value)||0;const handC=parseFloat(document.getElementById('settingsHandlingCharge').value)||0;const saleEndVal=document.getElementById('settingsSaleEnd').value;showLoading();try{let finalBanners=[...existingBannersCache];for(const f of pendingBannerFiles){const fd=new FormData();fd.append('file',f);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();if(data.secure_url)finalBanners.push(data.secure_url)}let sgUrl=sizeGuideUrl;if(currentSizeGuideFile){const fd=new FormData();fd.append('file',currentSizeGuideFile);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();if(data.secure_url)sgUrl=data.secure_url}const payload={whatsappNumber:num,bannerUrls:finalBanners,bannerUrl:finalBanners[0]||'',sizeGuideUrl:sgUrl,deliveryCharge:delC,freeDeliveryAbove:freeAbv,platformFee:platF,handlingCharge:handC};if(saleEndVal)payload.saleEnd=new Date(saleEndVal);else payload.saleEnd=null;await setDoc(doc(db,'settings','config'),payload,{merge:true});pendingBannerFiles=[];currentSizeGuideFile=null;document.getElementById('bannerPhoto').value='';document.getElementById('sizeGuidePhoto').value='';alert('✅ Settings Saved!')}catch(e){alert('Error: '+e.message)}hideLoading()}
 
-function loadAdminOrders(){const list=document.getElementById('adminOrdersList');if(!list)return;if(unsubAdminOrders)unsubAdminOrders();unsubAdminOrders=onSnapshot(collection(db,'orders'),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders yet.</div>';return}let arr=snap.docs.map(d=>({id:d.id,...d.data()}));arr.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));allAdminOrdersCache=arr;updateAdminNotifBadge();const rc=arr.filter(o=>o.returnStatus==='Requested').length;document.getElementById('statReturns').textContent=rc;list.innerHTML=arr.map(o=>{const date=o.date?new Date(o.date.toMillis()).toLocaleString():'Recent';let sc=o.status==='Shipped'?'status-Shipped':(o.status==='Delivered'?'status-Delivered':(o.status==='Processing'?'status-Processing':(o.status==='Out for Delivery'?'status-Out-for-Delivery':'status-Pending')));const itemsHtml=o.items.map(i=>{const v=[i.size?`Size: ${i.size}`:'',i.color?`Color: ${i.color}`:''].filter(Boolean).join(' | ');return`<li>${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price} ${i.img?`<img src="${optImg(i.img,60)}" class="order-img-thumb">`:''}</li>`}).join('');const retHtml=o.returnStatus?`<div style="background:rgba(243,156,18,0.15);border:1px dashed #f39c12;padding:8px;border-radius:6px;margin:8px 0"><div style="color:#f39c12;font-weight:700;font-size:12px">🔄 Return: ${escapeHtml(o.returnStatus)}</div>${o.returnStatus==='Requested'?`<div style="display:flex;gap:5px;margin-top:6px"><button class="btn-small" style="background:var(--success);color:#000" onclick="updateReturnStatus('${o.id}','Approved')">✅ Approve</button><button class="btn-small" style="background:var(--danger);color:#fff" onclick="updateReturnStatus('${o.id}','Rejected')">❌ Reject</button></div>`:''}</div>`:'';const dbHtml=o.deliveryBoy?`<p style="font-size:12px;color:var(--success);margin-top:5px">🚴 Delivery: ${escapeHtml(o.deliveryBoy.name)} (${escapeHtml(o.deliveryBoy.phone)})</p>`:'';return`<div class="order-card"><div style="display:flex;justify-content:space-between;align-items:start"><h4>${escapeHtml(o.customerName)} - ₹${o.total}</h4><div style="display:flex;gap:5px"><button onclick="printInvoice('${o.id}')" style="background:none;border:none;color:var(--gold);font-size:16px;cursor:pointer">🖨️</button><button onclick="deleteOrder('${o.id}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">🗑️</button></div></div><p>📞 ${escapeHtml(o.phone)} | 📍 ${escapeHtml((o.building?o.building+', ':'')+o.address+(o.landmark?' (Near '+o.landmark+')':''))}</p><p>📅 ${date}</p><ul class="order-items-list">${itemsHtml}</ul><p style="font-size:12px;margin-top:5px">Del: ₹${o.deliveryCharge} | Plat: ₹${o.platformFee} | Hand: ₹${o.handlingCharge}${o.pointsRedeemed?' | Redeemed: '+o.pointsRedeemed+' pts':''}${o.pointsEarned?' | Earned: '+o.pointsEarned+' pts':''}</p>${dbHtml}${retHtml}<div style="display:flex;gap:5px;margin-top:10px"><input type="text" placeholder="Delivery Boy Name" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.name):''}" id="db-name-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><input type="tel" placeholder="Phone" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.phone):''}" id="db-phone-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><button class="btn-small" style="flex:0;padding:6px 10px" onclick="saveDeliveryBoy('${o.id}')">Save</button></div><span class="order-status ${sc}">${o.status||'Pending'}</span><select style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;float:right;margin-top:10px" onchange="updateOrderStatus('${o.id}',this.value)"><option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option><option value="Processing" ${o.status==='Processing'?'selected':''}>Processing</option><option value="Shipped" ${o.status==='Shipped'?'selected':''}>Shipped</option><option value="Out for Delivery" ${o.status==='Out for Delivery'?'selected':''}>Out for Delivery</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option></select></div>`}).join('')})}
+function loadAdminOrders(){const list=document.getElementById('adminOrdersList');if(!list)return;if(unsubAdminOrders)unsubAdminOrders();unsubAdminOrders=onSnapshot(collection(db,'orders'),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders yet.</div>';return}let arr=snap.docs.map(d=>({id:d.id,...d.data()}));arr.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));allAdminOrdersCache=arr;updateAdminNotifBadge();const rc=arr.filter(o=>o.returnStatus==='Requested').length;document.getElementById('statReturns').textContent=rc;list.innerHTML=arr.map(o=>{const date=o.date?new Date(o.date.toMillis()).toLocaleString():'Recent';let sc=o.status==='Shipped'?'status-Shipped':(o.status==='Delivered'?'status-Delivered':(o.status==='Processing'?'status-Processing':(o.status==='Out for Delivery'?'status-Out-for-Delivery':'status-Pending')));const itemsHtml=o.items.map(i=>{const v=[i.size?`Size: ${i.size}`:'',i.color?`Color: ${i.color}`:''].filter(Boolean).join(' | ');return`<li>${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price} ${i.img?`<img src="${optImg(i.img,60)}" class="order-img-thumb">`:''}</li>`}).join('');
+const retHtml = o.returnStatus ? `
+  <div style="background:rgba(243,156,18,0.15);border:1px dashed #f39c12;padding:10px;border-radius:8px;margin:10px 0">
+    <div style="color:#f39c12;font-weight:800;font-size:13px;margin-bottom:5px">🔄 Return/Exchange: ${o.returnStatus}</div>
+    ${o.returnDetails ? `
+      <div style="font-size:12px;color:var(--text);margin-bottom:5px;line-height:1.5">
+        <b>Item:</b> ${escapeHtml(o.returnDetails.productName)}<br>
+        <b>Type:</b> ${o.returnDetails.type} | <b>Issue:</b> ${o.returnDetails.condition}<br>
+        <b>Reason:</b> ${escapeHtml(o.returnDetails.reason)}
+        ${o.returnDetails.type === 'Exchange' ? `<br><b>Requested:</b> Size: ${o.returnDetails.newSize || '-'}, Color: ${o.returnDetails.newColor || '-'}` : ''}
+      </div>
+    ` : ''}
+    ${o.returnTimeline ? `<div style="font-size:11px;color:var(--text-dim);margin-top:8px;border-top:1px solid #555;padding-top:5px">${o.returnTimeline.map(t=>`✅ ${t.status}`).join('<br>')}</div>` : ''}
+    
+    ${o.returnStatus === 'Requested' ? `
+      <div style="display:flex;gap:5px;margin-top:10px">
+        <button class="btn-small" style="background:var(--success);color:#000" onclick="updateReturnTracking('${o.id}','Approved')">✅ Approve</button>
+        <button class="btn-small" style="background:var(--danger);color:#fff" onclick="updateReturnTracking('${o.id}','Rejected')">❌ Reject</button>
+      </div>
+    ` : `
+      <select style="margin-top:10px;background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;width:100%" onchange="updateReturnTracking('${o.id}',this.value)">
+        <option value="" disabled selected>Update Tracking...</option>
+        <option value="Approved">Approved</option>
+        <option value="Pickup Scheduled">Pickup Scheduled</option>
+        <option value="Item Picked Up">Item Picked Up</option>
+        <option value="Processing in Warehouse">Processing</option>
+        <option value="Exchange Shipped">Exchange Shipped</option>
+        <option value="Completed">Completed (Done)</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+    `}
+  </div>
+` : '';
+const dbHtml=o.deliveryBoy?`<p style="font-size:12px;color:var(--success);margin-top:5px">🚴 Delivery: ${escapeHtml(o.deliveryBoy.name)} (${escapeHtml(o.deliveryBoy.phone)})</p>`:'';return`<div class="order-card"><div style="display:flex;justify-content:space-between;align-items:start"><h4>${escapeHtml(o.customerName)} - ₹${o.total}</h4><div style="display:flex;gap:5px"><button onclick="printInvoice('${o.id}')" style="background:none;border:none;color:var(--gold);font-size:16px;cursor:pointer">🖨️</button><button onclick="deleteOrder('${o.id}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">🗑️</button></div></div><p>📞 ${escapeHtml(o.phone)} | 📍 ${escapeHtml((o.building?o.building+', ':'')+o.address+(o.landmark?' (Near '+o.landmark+')':''))}</p><p>📅 ${date}</p><ul class="order-items-list">${itemsHtml}</ul><p style="font-size:12px;margin-top:5px">Del: ₹${o.deliveryCharge} | Plat: ₹${o.platformFee} | Hand: ₹${o.handlingCharge}${o.pointsRedeemed?' | Redeemed: '+o.pointsRedeemed+' pts':''}${o.pointsEarned?' | Earned: '+o.pointsEarned+' pts':''}</p>${dbHtml}${retHtml}<div style="display:flex;gap:5px;margin-top:10px"><input type="text" placeholder="Delivery Boy Name" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.name):''}" id="db-name-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><input type="tel" placeholder="Phone" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.phone):''}" id="db-phone-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><button class="btn-small" style="flex:0;padding:6px 10px" onclick="saveDeliveryBoy('${o.id}')">Save</button></div><span class="order-status ${sc}">${o.status||'Pending'}</span><select style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;float:right;margin-top:10px" onchange="updateOrderStatus('${o.id}',this.value)"><option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option><option value="Processing" ${o.status==='Processing'?'selected':''}>Processing</option><option value="Shipped" ${o.status==='Shipped'?'selected':''}>Shipped</option><option value="Out for Delivery" ${o.status==='Out for Delivery'?'selected':''}>Out for Delivery</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option></select></div>`}).join('')})}
 
 async function updateOrderStatus(id,s){await setDoc(doc(db,'orders',id),{status:s},{merge:true})}
 async function deleteOrder(id){if(confirm('Delete this order permanently?')){await deleteDoc(doc(db,'orders',id))}}
-async function updateReturnStatus(id,s){await setDoc(doc(db,'orders',id),{returnStatus:s},{merge:true});alert('✅ Return '+s)}
 async function saveDeliveryBoy(id){const n=document.getElementById('db-name-'+id).value.trim();const p=document.getElementById('db-phone-'+id).value.trim();await setDoc(doc(db,'orders',id),{deliveryBoy:{name:n,phone:p}},{merge:true});alert('✅ Delivery boy saved')}
+
+async function updateReturnTracking(orderId, newStatus) {
+  if (!newStatus) return;
+  const order = allAdminOrdersCache.find(o => o.id === orderId);
+  if (!order) return;
+  const timeline = order.returnTimeline || [];
+  timeline.push({ status: newStatus });
+  await updateDoc(doc(db, 'orders', orderId), { returnStatus: newStatus, returnTimeline: timeline });
+  alert('✅ Return tracking updated!');
+}
 
 function printInvoice(id){const o=allAdminOrdersCache.find(x=>x.id===id);if(!o)return;const date=o.date?new Date(o.date.toMillis()).toLocaleString():'';const items=o.items.map(i=>`<tr><td style="padding:8px;border:1px solid #ccc">${escapeHtml(i.name)}${i.size?' ('+i.size+')':''}${i.color?' '+i.color:''}</td><td style="padding:8px;border:1px solid #ccc;text-align:center">${i.qty||1}</td><td style="padding:8px;border:1px solid #ccc;text-align:right">₹${i.price}</td><td style="padding:8px;border:1px solid #ccc;text-align:right">₹${(i.qty||1)*i.price}</td></tr>`).join('');const pa=document.getElementById('printArea');pa.style.display='block';pa.innerHTML=`<div style="font-family:Arial;padding:20px;max-width:600px;margin:0 auto"><h1 style="text-align:center;color:#d4af37;border-bottom:2px solid #d4af37;padding-bottom:10px">FAIZ FASHION</h1><p style="text-align:center;font-size:12px;margin-bottom:20px">Wear Your Style | Invoice</p><div style="display:flex;justify-content:space-between;margin-bottom:15px"><div><b>Order ID:</b> ${o.id.slice(-8).toUpperCase()}<br><b>Date:</b> ${date}</div><div style="text-align:right"><b>Customer:</b> ${escapeHtml(o.customerName)}<br><b>Phone:</b> ${escapeHtml(o.phone)}</div></div><div style="margin-bottom:15px;padding:10px;border:1px solid #ccc"><b>Address:</b><br>${escapeHtml((o.building||'')+(o.building?', ':'')+o.address)}${o.landmark?'<br>Near: '+escapeHtml(o.landmark):''}</div><table style="width:100%;border-collapse:collapse;margin-bottom:15px"><thead><tr style="background:#f0f0f0"><th style="padding:8px;border:1px solid #ccc;text-align:left">Item</th><th style="padding:8px;border:1px solid #ccc">Qty</th><th style="padding:8px;border:1px solid #ccc">Price</th><th style="padding:8px;border:1px solid #ccc">Total</th></tr></thead><tbody>${items}</tbody></table><div style="text-align:right;font-size:14px"><div>Subtotal: ₹${o.subtotal}</div>${o.couponDiscount?'<div style="color:green">Coupon: -₹'+o.couponDiscount+'</div>':''}<div>Delivery: ₹${o.deliveryCharge}</div><div>Platform Fee: ₹${o.platformFee}</div><div>Handling: ₹${o.handlingCharge}</div>${o.pointsRedeemed?'<div style="color:green">Points Redeemed: -₹'+o.pointsRedeemed+'</div>':''}<div style="font-size:18px;font-weight:bold;border-top:2px solid #d4af37;padding-top:8px;margin-top:8px">TOTAL: ₹${o.total}</div></div><p style="text-align:center;margin-top:30px;font-size:11px;color:#666">Thank you for shopping with FAIZ FASHION!</p></div>`;setTimeout(()=>{window.print();setTimeout(()=>{pa.style.display='none';pa.innerHTML=''},500)},100)}
 
@@ -802,15 +877,35 @@ async function saveNewAddress(){const name=document.getElementById('addrName').v
 async function deleteAddress(id){if(!confirm('Delete this address?'))return;await deleteDoc(doc(db,'users',currentUid,'addresses',id));renderAddressesScreen()}
 
 function setOrderFilter(f){orderFilter=f;document.querySelectorAll('#orderFilterTabs .tab').forEach(t=>t.classList.toggle('active',t.textContent.toLowerCase()===f));renderCustomerOrders()}
-function renderCustomerOrders(){const list=document.getElementById('ordersList');let filtered=allOrdersCache;if(orderFilter==='active')filtered=allOrdersCache.filter(o=>['Pending','Processing','Shipped','Out for Delivery'].includes(o.status));else if(orderFilter==='delivered')filtered=allOrdersCache.filter(o=>o.status==='Delivered');else if(orderFilter==='cancelled')filtered=allOrdersCache.filter(o=>o.status==='Cancelled');if(filtered.length===0){list.innerHTML='<div class="loading-row">No orders in this category.</div>';return}list.innerHTML=filtered.map(o=>{const date=o.date?new Date(o.date.toMillis()).toLocaleDateString():'Recent';let sc=o.status==='Shipped'?'status-Shipped':(o.status==='Delivered'?'status-Delivered':(o.status==='Processing'?'status-Processing':(o.status==='Out for Delivery'?'status-Out-for-Delivery':(o.status==='Cancelled'?'status-Cancelled':'status-Pending'))));const itemsHtml=o.items.map(i=>{const v=[i.size?`Size: ${i.size}`:'',i.color?`Color: ${i.color}`:''].filter(Boolean).join(' | ');return`<li>${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price*(i.qty||1)} ${i.img?`<img src="${optImg(i.img,60)}" class="order-img-thumb">`:''}</li>`}).join('');let retBtn='';if(o.status==='Delivered'){if(o.returnStatus==='Requested')retBtn=`<div style="font-size:12px;color:var(--gold);margin-top:5px">🔄 Return Requested (Pending)</div>`;else if(o.returnStatus==='Approved')retBtn=`<div style="font-size:12px;color:var(--success);margin-top:5px">✅ Return Approved</div>`;else if(o.returnStatus==='Rejected')retBtn=`<div style="font-size:12px;color:var(--danger);margin-top:5px">❌ Return Rejected</div>`;else retBtn=`<button class="btn-small" style="margin-top:10px;background:var(--card);border:1px solid var(--gold);color:var(--gold)" onclick="requestReturn('${o.id}')">🔄 Request Return / Exchange</button>`}const dbHtml=o.deliveryBoy?`<p style="font-size:12px;color:var(--success);margin-top:5px">🚴 Delivery: ${escapeHtml(o.deliveryBoy.name)} - ${escapeHtml(o.deliveryBoy.phone)}</p>`:'';return`<div class="category-card" style="padding:15px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12px;color:var(--text-dim)">${date}</span><span style="color:var(--gold);font-weight:800">₹${o.total}</span></div><ul style="font-size:13px;margin-bottom:5px;padding-left:15px">${itemsHtml}</ul>${dbHtml}<div><span class="order-status ${sc}">${o.status||'Pending'}</span></div>${retBtn}</div>`}).join('')}
+function renderCustomerOrders(){const list=document.getElementById('ordersList');let filtered=allOrdersCache;if(orderFilter==='active')filtered=allOrdersCache.filter(o=>['Pending','Processing','Shipped','Out for Delivery'].includes(o.status));else if(orderFilter==='delivered')filtered=allOrdersCache.filter(o=>o.status==='Delivered');else if(orderFilter==='cancelled')filtered=allOrdersCache.filter(o=>o.status==='Cancelled');if(filtered.length===0){list.innerHTML='<div class="loading-row">No orders in this category.</div>';return}list.innerHTML=filtered.map(o=>{const date=o.date?new Date(o.date.toMillis()).toLocaleDateString():'Recent';let sc=o.status==='Shipped'?'status-Shipped':(o.status==='Delivered'?'status-Delivered':(o.status==='Processing'?'status-Processing':(o.status==='Out for Delivery'?'status-Out-for-Delivery':(o.status==='Cancelled'?'status-Cancelled':'status-Pending'))));const itemsHtml=o.items.map(i=>{const v=[i.size?`Size: ${i.size}`:'',i.color?`Color: ${i.color}`:''].filter(Boolean).join(' | ');return`<li>${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price*(i.qty||1)} ${i.img?`<img src="${optImg(i.img,60)}" class="order-img-thumb">`:''}</li>`}).join('');
+let retBtn='';
+if(o.status==='Delivered'){
+  if(o.returnStatus){
+    retBtn = `<div style="font-size:12px;color:var(--gold);margin-top:10px;padding:8px;background:var(--card2);border-radius:6px"><b>Return Status: ${o.returnStatus}</b>`;
+    if(o.returnTimeline) {
+       retBtn += `<div style="font-size:10px;color:var(--text-dim);margin-top:5px;border-top:1px solid #444;padding-top:5px">${o.returnTimeline.map(t=>`• ${t.status}`).join('<br>')}</div>`;
+    }
+    retBtn += `</div>`;
+  } else {
+    const returnableItems = o.items.filter(i => { 
+      const p = categoriesCache.find(c=>c.id===i.productId); 
+      return p && p.returnPolicy !== 'No Return Policy'; 
+    });
+    if(returnableItems.length > 0){
+      retBtn = `<button class="btn-small" style="margin-top:10px;background:var(--card);border:1px solid var(--gold);color:var(--gold)" onclick="openReturnModal('${o.id}')">🔄 Return / Exchange Request</button>`;
+    } else {
+      retBtn = `<div style="font-size:11px;color:var(--danger);margin-top:10px;font-weight:700">❌ Is order me No Return Policy wale items hain.</div>`;
+    }
+  }
+}
+const dbHtml=o.deliveryBoy?`<p style="font-size:12px;color:var(--success);margin-top:5px">🚴 Delivery: ${escapeHtml(o.deliveryBoy.name)} - ${escapeHtml(o.deliveryBoy.phone)}</p>`:'';return`<div class="category-card" style="padding:15px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12px;color:var(--text-dim)">${date}</span><span style="color:var(--gold);font-weight:800">₹${o.total}</span></div><ul style="font-size:13px;margin-bottom:5px;padding-left:15px">${itemsHtml}</ul>${dbHtml}<div><span class="order-status ${sc}">${o.status||'Pending'}</span></div>${retBtn}</div>`}).join('')}
 
 function loadCustomerOrders(){const list=document.getElementById('ordersList');if(!list)return;list.innerHTML='<div class="loading-row">Loading...</div>';if(unsubOrders)unsubOrders();unsubOrders=onSnapshot(query(collection(db,'orders'),where('userId','==',currentUid)),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders yet.</div>';return}allOrdersCache=snap.docs.map(d=>({id:d.id,...d.data()}));allOrdersCache.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));renderCustomerOrders()})}
-async function requestReturn(id){if(confirm('Kya aap is order ke liye Return/Exchange request karna chahte hain?')){await setDoc(doc(db,'orders',id),{returnStatus:'Requested'},{merge:true});alert('✅ Request submitted! Admin will contact you soon.')}}
 
 function loadReviews(pid){const list=document.getElementById('reviewList');list.innerHTML='<div class="loading-row">Loading...</div>';if(unsubReviews)unsubReviews();unsubReviews=onSnapshot(query(collection(db,'reviews'),where('productId','==',pid)),snap=>{if(snap.empty){list.innerHTML='<div style="color:var(--text-dim);font-size:13px">No reviews yet. Be the first!</div>';return}let revs=snap.docs.map(d=>d.data());revs.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));list.innerHTML=revs.map(r=>{let stars='';for(let i=0;i<5;i++)stars+=i<r.rating?'★':'☆';const photosHtml=(r.photos&&r.photos.length>0)?`<div class="review-photos">${r.photos.map(p=>`<img src="${p}" onclick="window.open('${p}','_blank')">`).join('')}</div>`:'';return`<div class="review-card"><div class="review-stars">${stars}</div><div class="review-text">${escapeHtml(r.text)}</div>${photosHtml}<div class="review-name">- ${escapeHtml(r.name)}</div></div>`}).join('')})}
 function openReviewForm(){document.getElementById('reviewModal').style.display='flex'}
 function closeReviewForm(){document.getElementById('reviewModal').style.display='none'}
-async function submitReview(){const name=document.getElementById('revName').value.trim(),rating=parseInt(document.getElementById('revRating').value),text=document.getElementById('revText').value.trim();if(!name||!text){alert('Name and comment required');return}if(rating<1||rating>5){alert('Rating 1-5 ke beech');return}showLoading();try{const photos=[];const fI=document.getElementById('revPhotos');if(fI&&fI.files.length>0){for(const f of[...fI.files].slice(0,3)){const fd=new FormData();fd.append('file',f);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();if(data.secure_url)photos.push(data.secure_url)}}await addDoc(collection(db,'reviews'),{productId:currentDetailProduct.id,name,rating,text,photos,date:serverTimestamp()});alert('✅ Review submitted!');closeReviewForm();['revName','revText'].forEach(id=>document.getElementById(id).value='');if(fI)fI.value=''}catch(e){alert('Error: '+e.message)}hideLoading()}
+async function submitReview(){const name=document.getElementById('revName').value.trim(),rating=parseInt(document.getElementById('revRating').value),text=document.getElementById('revText').value.trim();if(!name||!text){alert('Name and comment required');return}if(rating<1||rating>5){alert('Rating 1-5 ke beech');return}showLoading();try{/* Duplicate check: ek user ek product pe sirf ek review */const existing=await getDocs(query(collection(db,'reviews'),where('productId','==',currentDetailProduct.id),where('userId','==',currentUid)));if(!existing.empty){hideLoading();alert('❌ Aap is product pe pehle hi review de chuke hain!');return}const photos=[];const fI=document.getElementById('revPhotos');if(fI&&fI.files.length>0){for(const f of[...fI.files].slice(0,3)){const fd=new FormData();fd.append('file',f);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();if(data.secure_url)photos.push(data.secure_url)}}await addDoc(collection(db,'reviews'),{productId:currentDetailProduct.id,userId:currentUid,name,rating,text,photos,date:serverTimestamp()});alert('✅ Review submitted!');closeReviewForm();['revName','revText'].forEach(id=>document.getElementById(id).value='');if(fI)fI.value=''}catch(e){alert('Error: '+e.message)}hideLoading()}
 
 function loadRelatedProducts(cat,cid){const cur=categoriesCache.find(x=>x.id===cid);if(!cur)return;const scored=categoriesCache.filter(c=>c.id!==cid).map(c=>{let s=0;if(c.mainCategory===cat)s+=3;if(cur.colors&&c.colors){const ov=c.colors.filter(col=>cur.colors.includes(col));s+=ov.length*2}if(cur.discountPrice){const diff=Math.abs(c.discountPrice-cur.discountPrice);if(diff<cur.discountPrice*0.3)s+=2}return{c,score:s}}).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,6).map(x=>x.c);const grid=document.getElementById('relatedProducts');if(scored.length===0){grid.innerHTML='<div style="color:var(--text-dim);font-size:12px">No related products.</div>';return}grid.innerHTML=scored.map(c=>{const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:c.photoUrl;return`<div class="related-card" onclick="openProductDetails('${c.id}')"><img src="${optImg(img,200)}"><p>${escapeHtml(c.name)}</p><p style="color:var(--gold)">₹${c.discountPrice}</p></div>`}).join('')}
 
@@ -825,7 +920,96 @@ async function deleteCoupon(id){if(confirm('Delete?'))await deleteDoc(doc(db,'co
 
 async function changeAdminPassword(){const cur=document.getElementById('currentPwd').value,np=document.getElementById('newPwd').value,cp=document.getElementById('confirmPwd').value;if(np.length<6){alert('Min 6 chars');return}if(np!==cp){alert('Mismatch');return}try{const user=auth.currentUser;const cred=EmailAuthProvider.credential(ADMIN_EMAIL,cur);await reauthenticateWithCredential(user,cred);await updatePassword(user,np);alert('✅ Password Changed');['currentPwd','newPwd','confirmPwd'].forEach(id=>document.getElementById(id).value='')}catch(e){alert('❌ '+(e.code==='auth/wrong-password'?'Wrong password':e.message))}}
 
-const EXPORTS=['showScreen','customerLogin','handleLogin','handleReset','handleLogout','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','previewSizeGuide','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','saveCoupon','editCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','filterProducts','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnStatus','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','requestReturn','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter'];
+let currentReturnOrderId = null;
+
+function openReturnModal(orderId) {
+  const order = allOrdersCache.find(o => o.id === orderId);
+  if (!order) return;
+  currentReturnOrderId = orderId;
+
+  const returnableItems = order.items.filter(i => {
+    const p = categoriesCache.find(c => c.id === i.productId);
+    return p && p.returnPolicy !== 'No Return Policy';
+  });
+
+  const sel = document.getElementById('retItemSelect');
+  sel.innerHTML = returnableItems.map((i, idx) => `<option value="${idx}">${i.name} (Size: ${i.size||'-'}, Color: ${i.color||'-'})</option>`).join('');
+  sel.dataset.items = JSON.stringify(returnableItems);
+
+  updateReturnItemDetails();
+  document.getElementById('returnRequestModal').style.display = 'flex';
+}
+
+function updateReturnItemDetails() {
+  const sel = document.getElementById('retItemSelect');
+  const items = JSON.parse(sel.dataset.items || '[]');
+  const item = items[sel.value];
+  if (!item) return;
+
+  const product = categoriesCache.find(c => c.id === item.productId);
+  const typeSel = document.getElementById('retType');
+  
+  if (product.returnPolicy === 'Only Exchange Policy' || product.returnPolicy === 'Only Exchange No Return') {
+    typeSel.innerHTML = '<option value="Exchange">Exchange (Replace)</option>';
+    typeSel.disabled = true;
+  } else {
+    typeSel.innerHTML = '<option value="Return">Return (Refund)</option><option value="Exchange">Exchange (Replace)</option>';
+    typeSel.disabled = false;
+  }
+
+  document.getElementById('retNewSize').innerHTML = '<option value="">-- Select Size --</option>' + (product.sizes || []).map(s => `<option value="${s}">${s}</option>`).join('');
+  document.getElementById('retNewColor').innerHTML = '<option value="">-- Select Color --</option>' + (product.colors || []).map(c => `<option value="${c}">${c}</option>`).join('');
+
+  toggleExchangeFields();
+}
+
+function toggleExchangeFields() {
+  const isExchange = document.getElementById('retType').value === 'Exchange';
+  document.getElementById('exchangeSizeGroup').style.display = isExchange ? 'block' : 'none';
+  document.getElementById('exchangeColorGroup').style.display = isExchange ? 'block' : 'none';
+}
+
+function closeReturnModal() {
+  document.getElementById('returnRequestModal').style.display = 'none';
+  document.getElementById('retReason').value = '';
+}
+
+async function submitReturnRequest() {
+  const reason = document.getElementById('retReason').value.trim();
+  if (!reason) return alert('⚠️ Reason likhna zaroori hai!');
+
+  const sel = document.getElementById('retItemSelect');
+  const items = JSON.parse(sel.dataset.items || '[]');
+  const item = items[sel.value];
+
+  const type = document.getElementById('retType').value;
+  const condition = document.getElementById('retCondition').value;
+  const newSize = document.getElementById('retNewSize').value;
+  const newColor = document.getElementById('retNewColor').value;
+
+  if (type === 'Exchange' && (!newSize && !newColor)) {
+    return alert('⚠️ Exchange ke liye naya Size ya Color select karein!');
+  }
+
+  const returnDetails = { productId: item.productId, productName: item.name, type, condition, reason, newSize, newColor };
+  const timeline = [{ status: 'Requested' }];
+
+  showLoading();
+  try {
+    await updateDoc(doc(db, 'orders', currentReturnOrderId), {
+      returnStatus: 'Requested',
+      returnDetails: returnDetails,
+      returnTimeline: timeline
+    });
+    alert('✅ Return/Exchange Request Submit ho gayi! Admin jald contact karega.');
+    closeReturnModal();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+  hideLoading();
+}
+
+const EXPORTS=['showScreen','customerLogin','handleLogin','handleReset','handleLogout','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','previewSizeGuide','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','saveCoupon','editCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','filterProducts','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','requestReturn','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
