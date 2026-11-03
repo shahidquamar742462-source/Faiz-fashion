@@ -1,9 +1,16 @@
-const CACHE_NAME = 'faiz-fashion-v25'; 
+const CACHE_NAME = 'faiz-fashion-v26'; 
 const ASSETS = ['./', './index.html', './manifest.json', './logo.png'];
 
-self.addEventListener('install', (event) => { self.skipWaiting(); });
+self.addEventListener('install', (event) => {
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS).catch(()=>{})));
+  self.skipWaiting();
+});
+
 self.addEventListener('activate', (event) => {
-  event.waitUntil(caches.keys().then(cacheNames => Promise.all(cacheNames.map(c => { if (c !== CACHE_NAME) return caches.delete(c); }))).then(() => self.clients.claim()));
+  event.waitUntil(
+    caches.keys().then(names => Promise.all(names.map(c => { if (c !== CACHE_NAME) return caches.delete(c); })))
+    .then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener('fetch', (event) => {
