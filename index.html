@@ -89,26 +89,37 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .search-row{display:flex;gap:8px;position:relative}
 .search-bar{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 15px;color:var(--text);font-size:14px}
 .sort-select{background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:0 10px;font-size:13px;outline:none}
-.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;scrollbar-width:none}
-.tab{background:var(--card2);border:1px solid var(--border);padding:8px 16px;border-radius:20px;font-size:13px;white-space:nowrap;color:var(--text-dim);cursor:pointer}
-.tab.active{background:var(--gold);color:#000;border-color:var(--gold);font-weight:700}
 .icon-btn{background:var(--card);border:1px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:10px;font-size:16px;position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .mode-toggle{background:var(--card);border:1px solid var(--border);color:var(--gold);width:36px;height:36px;border-radius:10px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .badge{position:absolute;top:-5px;right:-5px;background:var(--gold);color:#000;font-size:10px;font-weight:800;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center}
 .notif-bell{position:relative}
 .notif-badge{position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;font-size:10px;padding:1px 6px;border-radius:8px;font-weight:800;display:none}
-.banner-container{width:100%;border-radius:12px;overflow:hidden;margin-bottom:15px;background:var(--card2);height:150px;display:flex;align-items:center;justify-content:center;position:relative}
-.banner-container img{width:100%;height:100%;object-fit:cover}
-.banner-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5}
-.banner-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.5);transition:all .3s}
-.banner-dot.active{background:var(--gold);width:20px;border-radius:4px}
-.countdown-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.85);color:var(--gold);padding:6px 12px;border-radius:20px;font-size:12px;font-weight:800;border:1px solid var(--gold)}
+
+/* AMAZON STYLE CATEGORY SCROLL */
+.horizontal-scroll-row{display:flex;overflow-x:auto;gap:15px;padding:10px 0;scrollbar-width:none;-ms-overflow-style:none}
+.horizontal-scroll-row::-webkit-scrollbar{display:none}
+.cat-icon-item{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:65px;cursor:pointer;transition:transform .2s ease}
+.cat-icon-item:active{transform:scale(.9)}
+.cat-icon-box{width:55px;height:55px;border-radius:16px;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+.cat-icon-item.active .cat-icon-box{border:2px solid var(--gold);background:var(--card)}
+.cat-icon-text{font-size:11px;font-weight:700;color:var(--text)}
+
+/* AMAZON STYLE SWIPE BANNER */
+.banner-container{width:100%;height:160px;margin-bottom:15px;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;scrollbar-width:none;border-radius:12px;position:relative}
+.banner-container::-webkit-scrollbar{display:none}
+.banner-slide{min-width:100%;height:100%;scroll-snap-align:center;border-radius:12px;overflow:hidden;position:relative}
+.banner-slide img{width:100%;height:100%;object-fit:cover}
+
+.countdown-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.85);color:var(--gold);padding:6px 12px;border-radius:20px;font-size:12px;font-weight:800;border:1px solid var(--gold);z-index:10}
 .low-stock-warning{background:rgba(231,76,60,.15);border:1px dashed var(--danger);padding:10px;border-radius:8px;margin-bottom:15px;font-size:13px;color:var(--danger);font-weight:700}
 .filter-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;margin-top:8px;scrollbar-width:none}
 .filter-chip{background:var(--card2);border:1px solid var(--border);color:var(--text);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
 .filter-chip.active{background:var(--gold);color:#000;border-color:var(--gold)}
+
+/* PRODUCT CARD WITH ANIMATION */
 .product-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-bottom:90px}
-.product-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;position:relative;cursor:pointer}
+.product-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;position:relative;cursor:pointer;transition:transform .1s ease}
+.product-card:active{transform:scale(.96)}
 .img-wrap{width:100%;aspect-ratio:1/1;background:var(--card2);position:relative}
 .img-wrap img{width:100%;height:100%;object-fit:cover}
 .heart-btn{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.5);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5}
@@ -122,6 +133,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .product-actions{display:flex;gap:6px;margin-top:auto}
 .product-actions button{flex:1;padding:8px 0;border-radius:8px;font-size:11px;font-weight:700;border:none;cursor:pointer}
 .btn-cart{background:var(--card2);color:var(--text);border:1px solid var(--border)!important}
+
 #screen-product-details{padding:0;padding-bottom:80px}
 .detail-header{position:fixed;top:0;left:0;right:0;padding:15px 20px;display:flex;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,0.8),transparent)}
 .detail-gallery{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;width:100%;height:55vh;background:var(--card2);scrollbar-width:none}
@@ -141,6 +153,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .size-color-row select.required-empty{border-color:var(--danger)}
 .detail-bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);padding:15px 20px;display:flex;gap:10px;border-top:1px solid var(--border);z-index:20}
 .detail-bottom-bar button{padding:15px;border-radius:12px;font-size:16px;font-weight:800;border:none;flex:1;cursor:pointer}
+
 .review-section{margin-top:30px;border-top:1px solid var(--border);padding-top:20px}
 .review-card{background:var(--card2);padding:12px;border-radius:10px;margin-bottom:10px}
 .review-stars{color:var(--star);font-size:14px;margin-bottom:5px}
@@ -157,10 +170,14 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .recent-card{min-width:100px;background:var(--card);border-radius:10px;overflow:hidden;cursor:pointer;border:1px solid var(--border)}
 .recent-card img{width:100%;height:100px;object-fit:cover}
 .recent-card p{font-size:11px;padding:5px;font-weight:700}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:none;justify-content:space-around;padding:10px 0;z-index:20}
-.nav-item{background:none;border:none;color:var(--text-dim);font-size:10px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;cursor:pointer}
+
+/* BOTTOM NAV ANIMATION */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:none;justify-content:space-around;padding:12px 0 15px;z-index:20;box-shadow:0 -2px 10px rgba(0,0,0,.1)}
+.nav-item{background:none;border:none;color:var(--text-dim);font-size:10px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;cursor:pointer;transition:transform .2s ease}
+.nav-item:active{transform:scale(.9)}
 .nav-item.active{color:var(--gold)}
-.nav-icon{font-size:18px}
+.nav-icon{font-size:20px}
+
 .cart-item{display:flex;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:10px;align-items:center}
 .cart-item img{width:70px;height:70px;object-fit:cover;border-radius:8px}
 .ci-info{flex:1}
@@ -417,27 +434,53 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <div class="autocomplete-box" id="autocompleteBox"></div>
       <select class="sort-select" onchange="sortProducts(this.value)"><option value="default">Sort</option><option value="low-high">Low to High</option><option value="high-low">High to Low</option></select>
     </div>
-    <div class="tabs" id="mainTabs">
-      <div class="tab active" onclick="setMainCategory('All')">All</div>
-      <div class="tab" onclick="setMainCategory('Men')">Men</div>
-      <div class="tab" onclick="setMainCategory('Women')">Women</div>
-      <div class="tab" onclick="setMainCategory('Kids')">Kids</div>
-      <div class="tab" onclick="setMainCategory('Grocery')">Grocery</div>
-      <div class="tab" onclick="setMainCategory('Beauty')">Beauty</div>
-      <div class="tab" onclick="setMainCategory('Stationery')">Stationery</div>
-      <div class="tab" onclick="setMainCategory('Watchlist')" style="color:#ff4d6d;border-color:#ff4d6d">❤️ Watchlist</div>
+    
+    <!-- AMAZON STYLE CATEGORY ICONS -->
+    <div class="horizontal-scroll-row" id="mainTabs">
+      <div class="cat-icon-item active" onclick="setMainCategory('All')">
+        <div class="cat-icon-box" style="background:var(--gold);color:#000;">✨</div>
+        <span class="cat-icon-text">All</span>
+      </div>
+      <div class="cat-icon-item" onclick="setMainCategory('Men')">
+        <div class="cat-icon-box">👔</div>
+        <span class="cat-icon-text">Men</span>
+      </div>
+      <div class="cat-icon-item" onclick="setMainCategory('Women')">
+        <div class="cat-icon-box">👗</div>
+        <span class="cat-icon-text">Women</span>
+      </div>
+      <div class="cat-icon-item" onclick="setMainCategory('Kids')">
+        <div class="cat-icon-box">🧸</div>
+        <span class="cat-icon-text">Kids</span>
+      </div>
+      <div class="cat-icon-item" onclick="setMainCategory('Grocery')">
+        <div class="cat-icon-box">🥦</div>
+        <span class="cat-icon-text">Grocery</span>
+      </div>
+      <div class="cat-icon-item" onclick="setMainCategory('Beauty')">
+        <div class="cat-icon-box">💄</div>
+        <span class="cat-icon-text">Beauty</span>
+      </div>
+      <div class="cat-icon-item" onclick="setMainCategory('Stationery')">
+        <div class="cat-icon-box">✏️</div>
+        <span class="cat-icon-text">Stationery</span>
+      </div>
+      <div class="cat-icon-item" onclick="setMainCategory('Watchlist')">
+        <div class="cat-icon-box" style="color:#ff4d6d;">❤️</div>
+        <span class="cat-icon-text">Watchlist</span>
+      </div>
     </div>
+
     <div class="filter-tabs">
       <div class="filter-chip" id="inStockFilterBtn" onclick="toggleInStockFilter()">✅ In Stock</div>
       <div class="filter-chip" onclick="openPriceRange()" id="priceFilterBtn">💰 Price</div>
       <div class="filter-chip" onclick="clearAllFilters()" id="clearFilterBtn" style="display:none;color:var(--danger);border-color:var(--danger)">❌ Clear</div>
     </div>
   </div>
-  <div class="banner-container" id="shopBanner" style="display:none">
-    <img src="" id="bannerImg">
-    <div class="banner-dots" id="bannerDots"></div>
-    <div class="countdown-badge" id="countdownBadge" style="display:none">⏰ <span id="countdownText">--:--:--</span></div>
-  </div>
+
+  <!-- AMAZON STYLE SWIPE BANNER -->
+  <div class="banner-container" id="shopBanner" style="display:none"></div>
+
   <div id="recentlyViewedSection" style="display:none;margin-bottom:15px">
     <div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:8px">👀 Recently Viewed</div>
     <div class="recent-grid" id="recentlyViewedGrid"></div>
@@ -633,13 +676,12 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <div class="input-group"><label>Building / House No.</label><input type="text" id="chkBuilding"></div>
     <div class="input-group"><label>Full Address</label><textarea id="chkAddress" rows="2"></textarea></div>
     
-    <!-- 👇 PINCODE / AREA BOX 👇 -->
+    <!-- PINCODE / AREA BOX -->
     <div class="input-group" id="chkPincodeGroup" style="display:none">
       <label>Pincode / Area (Delivery Check)</label>
       <input type="text" id="chkPincode" placeholder="Enter your Pincode or Area">
     </div>
-    <!-- 👆 PINCODE / AREA BOX 👆 -->
-
+    
     <div class="input-group"><label>Famous Place Near You</label><input type="text" id="chkLandmark"></div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px"><input type="checkbox" id="chkSaveAddress" style="width:20px;height:20px"><label for="chkSaveAddress" style="font-size:14px;color:var(--text-dim)">Save this address for future orders</label></div>
     <div class="input-group" id="pointsRedeemGroup" style="display:none">
@@ -817,16 +859,31 @@ async function toggleShopStatus(){
   hideLoading();
 }
 
-function renderBannerCarousel(){const container=document.getElementById('shopBanner');if(!container)return;if(bannerUrls.length===0){container.style.display='none';return}container.style.display='block';document.getElementById('bannerImg').src=bannerUrls[0];const dotsEl=document.getElementById('bannerDots');if(bannerUrls.length>1){dotsEl.innerHTML=bannerUrls.map((_,i)=>`<div class="banner-dot${i===0?' active':''}"></div>`).join('');if(bannerCarouselTimer)clearInterval(bannerCarouselTimer);let idx=0;bannerCarouselTimer=setInterval(()=>{idx=(idx+1)%bannerUrls.length;document.getElementById('bannerImg').src=bannerUrls[idx];dotsEl.querySelectorAll('.banner-dot').forEach((d,i)=>d.classList.toggle('active',i===idx))},4000)}else dotsEl.innerHTML=''}
+function renderBannerCarousel(){
+  const container = document.getElementById('shopBanner');
+  if(!container) return;
+  if(bannerUrls.length === 0) { container.style.display = 'none'; return; }
+  
+  container.style.display = 'flex';
+  container.innerHTML = bannerUrls.map(url => `
+    <div class="banner-slide">
+      <img src="${url}">
+    </div>
+  `).join('');
+  
+  if(saleEndTime) {
+    container.innerHTML += `<div class="countdown-badge" id="countdownBadge">⏰ <span id="countdownText">--:--:--</span></div>`;
+  }
+}
 
-function startCountdown(){if(countdownInterval)clearInterval(countdownInterval);if(!saleEndTime){document.getElementById('countdownBadge').style.display='none';return}const endMs=saleEndTime.seconds?saleEndTime.seconds*1000:new Date(saleEndTime).getTime();const update=()=>{const diff=endMs-Date.now();if(diff<=0){document.getElementById('countdownBadge').style.display='none';clearInterval(countdownInterval);return}const d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);const t=d>0?`${d}d ${h}h`:`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;document.getElementById('countdownText').textContent=t;document.getElementById('countdownBadge').style.display='block'};update();countdownInterval=setInterval(update,1000)}
+function startCountdown(){if(countdownInterval)clearInterval(countdownInterval);if(!saleEndTime){const b=document.getElementById('countdownBadge');if(b)b.style.display='none';return}const endMs=saleEndTime.seconds?saleEndTime.seconds*1000:new Date(saleEndTime).getTime();const update=()=>{const diff=endMs-Date.now();const b=document.getElementById('countdownBadge');const tEl=document.getElementById('countdownText');if(!b||!tEl)return;if(diff<=0){b.style.display='none';clearInterval(countdownInterval);return}const d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);const t=d>0?`${d}d ${h}h`:`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;tEl.textContent=t;b.style.display='block'};update();countdownInterval=setInterval(update,1000)}
 
 function listenCategories(){unsubCategories=onSnapshot(collection(db,'categories'),snap=>{categoriesCache=snap.docs.map(d=>({id:d.id,...d.data()}));renderAdminCategories();renderShop();if(document.getElementById('screen-cart').classList.contains('active'))renderCart()})}
 function listenCart(){unsubCart=onSnapshot(collection(db,'users',currentUid,'cart'),snap=>{cartItems=snap.docs.map(d=>({cartId:d.id,...d.data()}));cartProductIds=new Set(cartItems.map(i=>i.productId));renderShop();renderCart();const c=cartItems.reduce((s,i)=>s+(i.qty||1),0);document.getElementById('shopCartBadge').textContent=c;document.getElementById('navCartBadge').textContent=c})}
 function listenWatchlist(){unsubWatchlist=onSnapshot(collection(db,'users',currentUid,'watchlist'),snap=>{watchlistIds=new Set(snap.docs.map(d=>d.id));renderShop();if(document.getElementById('screen-product-details').classList.contains('active'))updateDetailLikeBtn()})}
 function listenCoupons(){unsubCoupons=onSnapshot(collection(db,'coupons'),snap=>{couponsCache=snap.docs.map(d=>({id:d.id,...d.data()}));if(isAdminUser&&document.getElementById('screen-settings').classList.contains('active'))renderAdminCoupons()})}
 
-async function initUserRewards(){if(!currentUid||isAdminUser)return;const ref=doc(db,'users',currentUid);const snap=await getDoc(ref);const urlRef=new URLSearchParams(window.location.search).get('ref');if(!snap.exists()){const refCode=currentUid.slice(0,6).toUpperCase();const payload={points:0,refCode,createdAt:serverTimestamp()};if(urlRef&&urlRef.toUpperCase()!==refCode){payload.referredBy=urlRef.toUpperCase();payload.points=50}await setDoc(ref,payload);userPoints=payload.points;userRefCode=refCode;if(payload.referredBy){try{await addDoc(collection(db,'referralClaims'),{referrerCode:payload.referredBy,newUserId:currentUid,credited:false,date:serverTimestamp()})}catch(e){console.log(e)}}}else{const d=snap.data();userPoints=d.points||0;userRefCode=d.refCode||currentUid.slice(0,6).toUpperCase();if(!d.refCode)await updateDoc(ref,{refCode:userRefCode}).catch(()=>{});/* SECURITY: Referral auto-credit removed. Admin Firebase Console se manually credit karega. */}updateRewardsDisplay()}
+async function initUserRewards(){if(!currentUid||isAdminUser)return;const ref=doc(db,'users',currentUid);const snap=await getDoc(ref);const urlRef=new URLSearchParams(window.location.search).get('ref');if(!snap.exists()){const refCode=currentUid.slice(0,6).toUpperCase();const payload={points:0,refCode,createdAt:serverTimestamp()};if(urlRef&&urlRef.toUpperCase()!==refCode){payload.referredBy=urlRef.toUpperCase();payload.points=50}await setDoc(ref,payload);userPoints=payload.points;userRefCode=refCode;if(payload.referredBy){try{await addDoc(collection(db,'referralClaims'),{referrerCode:payload.referredBy,newUserId:currentUid,credited:false,date:serverTimestamp()})}catch(e){console.log(e)}}}else{const d=snap.data();userPoints=d.points||0;userRefCode=d.refCode||currentUid.slice(0,6).toUpperCase();if(!d.refCode)await updateDoc(ref,{refCode:userRefCode}).catch(()=>{});}updateRewardsDisplay()}
 
 function updateRewardsDisplay(){const p=document.getElementById('userPointsDisplay');const r=document.getElementById('userRefCodeDisplay');if(p)p.textContent=userPoints;if(r)r.textContent=userRefCode||'------';const b=document.getElementById('chkPointBalance');if(b)b.textContent=userPoints}
 
@@ -919,7 +976,13 @@ function loadMyPreOrders(){const list=document.getElementById('myPreOrdersList')
 function loadAdminReviews(){const list=document.getElementById('adminReviewsList');if(!list)return;if(unsubAdminReviews)unsubAdminReviews();unsubAdminReviews=onSnapshot(collection(db,'reviews'),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No reviews yet.</div>';return}let arr=snap.docs.map(d=>({id:d.id,...d.data()}));arr.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));list.innerHTML=arr.map(r=>{let stars='';for(let i=0;i<5;i++)stars+=i<r.rating?'★':'☆';const prod=categoriesCache.find(c=>c.id===r.productId);const photosHtml=(r.photos&&r.photos.length>0)?`<div class="review-photos">${r.photos.map(p=>`<img src="${p}" onclick="window.open('${p}','_blank')">`).join('')}</div>`:'';return`<div class="order-card"><div style="display:flex;justify-content:space-between;align-items:start"><div style="color:var(--star);font-size:14px">${stars}</div><button onclick="deleteReview('${r.id}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">🗑️</button></div><p style="color:var(--text);margin:8px 0">${escapeHtml(r.text)}</p>${photosHtml}<p style="font-size:11px">- ${escapeHtml(r.name)} | Product: ${prod?escapeHtml(prod.name):'(deleted)'}</p></div>`}).join('')})}
 async function deleteReview(id){if(confirm('Delete this review?'))await deleteDoc(doc(db,'reviews',id))}
 
-function setMainCategory(cat){mainCategory=cat;document.querySelectorAll('#mainTabs .tab').forEach(t=>t.classList.toggle('active',t.textContent.trim().includes(cat)||(cat==='All'&&t.textContent==='All')));renderShop()}
+function setMainCategory(cat){
+  mainCategory = cat;
+  document.querySelectorAll('.cat-icon-item').forEach(item => {
+    item.classList.toggle('active', item.getAttribute('onclick').includes(`'${cat}'`));
+  });
+  renderShop();
+}
 function onSearchInput(q){searchQuery=q.toLowerCase();const box=document.getElementById('autocompleteBox');if(!q||q.length<2){box.style.display='none';renderShop();return}const matches=categoriesCache.filter(c=>c.name.toLowerCase().includes(q.toLowerCase())).slice(0,6);if(matches.length===0){box.style.display='none'}else{box.innerHTML=matches.map(m=>`<div class="autocomplete-item" onmousedown="selectAutocomplete('${escapeHtml(m.name)}')">${escapeHtml(m.name)} — <span style="color:var(--gold)">₹${m.discountPrice}</span></div>`).join('');box.style.display='block'}renderShop()}
 function selectAutocomplete(name){document.getElementById('shopSearch').value=name;searchQuery=name.toLowerCase();document.getElementById('autocompleteBox').style.display='none';renderShop()}
 function filterProducts(q){searchQuery=q.toLowerCase();renderShop()}
@@ -1040,7 +1103,7 @@ function loadCustomerOrders(){const list=document.getElementById('ordersList');i
 function loadReviews(pid){const list=document.getElementById('reviewList');list.innerHTML='<div class="loading-row">Loading...</div>';if(unsubReviews)unsubReviews();unsubReviews=onSnapshot(query(collection(db,'reviews'),where('productId','==',pid)),snap=>{if(snap.empty){list.innerHTML='<div style="color:var(--text-dim);font-size:13px">No reviews yet. Be the first!</div>';return}let revs=snap.docs.map(d=>d.data());revs.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));list.innerHTML=revs.map(r=>{let stars='';for(let i=0;i<5;i++)stars+=i<r.rating?'★':'☆';const photosHtml=(r.photos&&r.photos.length>0)?`<div class="review-photos">${r.photos.map(p=>`<img src="${p}" onclick="window.open('${p}','_blank')">`).join('')}</div>`:'';return`<div class="review-card"><div class="review-stars">${stars}</div><div class="review-text">${escapeHtml(r.text)}</div>${photosHtml}<div class="review-name">- ${escapeHtml(r.name)}</div></div>`}).join('')})}
 function openReviewForm(){document.getElementById('reviewModal').style.display='flex'}
 function closeReviewForm(){document.getElementById('reviewModal').style.display='none'}
-async function submitReview(){const name=document.getElementById('revName').value.trim(),rating=parseInt(document.getElementById('revRating').value),text=document.getElementById('revText').value.trim();if(!name||!text){alert('Name and comment required');return}if(rating<1||rating>5){alert('Rating 1-5 ke beech');return}showLoading();try{/* Duplicate check: ek user ek product pe sirf ek review */const existing=await getDocs(query(collection(db,'reviews'),where('productId','==',currentDetailProduct.id),where('userId','==',currentUid)));if(!existing.empty){hideLoading();alert('❌ Aap is product pe pehle hi review de chuke hain!');return}const photos=[];const fI=document.getElementById('revPhotos');if(fI&&fI.files.length>0){for(const f of[...fI.files].slice(0,3)){const fd=new FormData();fd.append('file',f);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();if(data.secure_url)photos.push(data.secure_url)}}await addDoc(collection(db,'reviews'),{productId:currentDetailProduct.id,userId:currentUid,name,rating,text,photos,date:serverTimestamp()});alert('✅ Review submitted!');closeReviewForm();['revName','revText'].forEach(id=>document.getElementById(id).value='');if(fI)fI.value=''}catch(e){alert('Error: '+e.message)}hideLoading()}
+async function submitReview(){const name=document.getElementById('revName').value.trim(),rating=parseInt(document.getElementById('revRating').value),text=document.getElementById('revText').value.trim();if(!name||!text){alert('Name and comment required');return}if(rating<1||rating>5){alert('Rating 1-5 ke beech');return}showLoading();try{const existing=await getDocs(query(collection(db,'reviews'),where('productId','==',currentDetailProduct.id),where('userId','==',currentUid)));if(!existing.empty){hideLoading();alert('❌ Aap is product pe pehle hi review de chuke hain!');return}const photos=[];const fI=document.getElementById('revPhotos');if(fI&&fI.files.length>0){for(const f of[...fI.files].slice(0,3)){const fd=new FormData();fd.append('file',f);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();if(data.secure_url)photos.push(data.secure_url)}}await addDoc(collection(db,'reviews'),{productId:currentDetailProduct.id,userId:currentUid,name,rating,text,photos,date:serverTimestamp()});alert('✅ Review submitted!');closeReviewForm();['revName','revText'].forEach(id=>document.getElementById(id).value='');if(fI)fI.value=''}catch(e){alert('Error: '+e.message)}hideLoading()}
 
 function loadRelatedProducts(cat,cid){const cur=categoriesCache.find(x=>x.id===cid);if(!cur)return;const scored=categoriesCache.filter(c=>c.id!==cid).map(c=>{let s=0;if(c.mainCategory===cat)s+=3;if(cur.colors&&c.colors){const ov=c.colors.filter(col=>cur.colors.includes(col));s+=ov.length*2}if(cur.discountPrice){const diff=Math.abs(c.discountPrice-cur.discountPrice);if(diff<cur.discountPrice*0.3)s+=2}return{c,score:s}}).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,6).map(x=>x.c);const grid=document.getElementById('relatedProducts');if(scored.length===0){grid.innerHTML='<div style="color:var(--text-dim);font-size:12px">No related products.</div>';return}grid.innerHTML=scored.map(c=>{const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:c.photoUrl;return`<div class="related-card" onclick="openProductDetails('${c.id}')"><img src="${optImg(img,200)}"><p>${escapeHtml(c.name)}</p><p style="color:var(--gold)">₹${c.discountPrice}</p></div>`}).join('')}
 
@@ -1056,34 +1119,24 @@ async function deleteCoupon(id){if(confirm('Delete?'))await deleteDoc(doc(db,'co
 async function changeAdminPassword(){const cur=document.getElementById('currentPwd').value,np=document.getElementById('newPwd').value,cp=document.getElementById('confirmPwd').value;if(np.length<6){alert('Min 6 chars');return}if(np!==cp){alert('Mismatch');return}try{const user=auth.currentUser;const cred=EmailAuthProvider.credential(ADMIN_EMAIL,cur);await reauthenticateWithCredential(user,cred);await updatePassword(user,np);alert('✅ Password Changed');['currentPwd','newPwd','confirmPwd'].forEach(id=>document.getElementById(id).value='')}catch(e){alert('❌ '+(e.code==='auth/wrong-password'?'Wrong password':e.message))}}
 
 let currentReturnOrderId = null;
-
 function openReturnModal(orderId) {
   const order = allOrdersCache.find(o => o.id === orderId);
   if (!order) return;
   currentReturnOrderId = orderId;
-
-  const returnableItems = order.items.filter(i => {
-    const p = categoriesCache.find(c => c.id === i.productId);
-    return p && p.returnPolicy !== 'No Return Policy';
-  });
-
+  const returnableItems = order.items.filter(i => { const p = categoriesCache.find(c => c.id === i.productId); return p && p.returnPolicy !== 'No Return Policy'; });
   const sel = document.getElementById('retItemSelect');
   sel.innerHTML = returnableItems.map((i, idx) => `<option value="${idx}">${i.name} (Size: ${i.size||'-'}, Color: ${i.color||'-'})</option>`).join('');
   sel.dataset.items = JSON.stringify(returnableItems);
-
   updateReturnItemDetails();
   document.getElementById('returnRequestModal').style.display = 'flex';
 }
-
 function updateReturnItemDetails() {
   const sel = document.getElementById('retItemSelect');
   const items = JSON.parse(sel.dataset.items || '[]');
   const item = items[sel.value];
   if (!item) return;
-
   const product = categoriesCache.find(c => c.id === item.productId);
   const typeSel = document.getElementById('retType');
-  
   if (product.returnPolicy === 'Only Exchange Policy' || product.returnPolicy === 'Only Exchange No Return') {
     typeSel.innerHTML = '<option value="Exchange">Exchange (Replace)</option>';
     typeSel.disabled = true;
@@ -1091,56 +1144,35 @@ function updateReturnItemDetails() {
     typeSel.innerHTML = '<option value="Return">Return (Refund)</option><option value="Exchange">Exchange (Replace)</option>';
     typeSel.disabled = false;
   }
-
   document.getElementById('retNewSize').innerHTML = '<option value="">-- Select Size --</option>' + (product.sizes || []).map(s => `<option value="${s}">${s}</option>`).join('');
   document.getElementById('retNewColor').innerHTML = '<option value="">-- Select Color --</option>' + (product.colors || []).map(c => `<option value="${c}">${c}</option>`).join('');
-
   toggleExchangeFields();
 }
-
 function toggleExchangeFields() {
   const isExchange = document.getElementById('retType').value === 'Exchange';
   document.getElementById('exchangeSizeGroup').style.display = isExchange ? 'block' : 'none';
   document.getElementById('exchangeColorGroup').style.display = isExchange ? 'block' : 'none';
 }
-
-function closeReturnModal() {
-  document.getElementById('returnRequestModal').style.display = 'none';
-  document.getElementById('retReason').value = '';
-}
-
+function closeReturnModal() { document.getElementById('returnRequestModal').style.display = 'none'; document.getElementById('retReason').value = ''; }
 async function submitReturnRequest() {
   const reason = document.getElementById('retReason').value.trim();
   if (!reason) return alert('⚠️ Reason likhna zaroori hai!');
-
   const sel = document.getElementById('retItemSelect');
   const items = JSON.parse(sel.dataset.items || '[]');
   const item = items[sel.value];
-
   const type = document.getElementById('retType').value;
   const condition = document.getElementById('retCondition').value;
   const newSize = document.getElementById('retNewSize').value;
   const newColor = document.getElementById('retNewColor').value;
-
-  if (type === 'Exchange' && (!newSize && !newColor)) {
-    return alert('⚠️ Exchange ke liye naya Size ya Color select karein!');
-  }
-
+  if (type === 'Exchange' && (!newSize && !newColor)) { return alert('⚠️ Exchange ke liye naya Size ya Color select karein!'); }
   const returnDetails = { productId: item.productId, productName: item.name, type, condition, reason, newSize, newColor };
   const timeline = [{ status: 'Requested' }];
-
   showLoading();
   try {
-    await updateDoc(doc(db, 'orders', currentReturnOrderId), {
-      returnStatus: 'Requested',
-      returnDetails: returnDetails,
-      returnTimeline: timeline
-    });
+    await updateDoc(doc(db, 'orders', currentReturnOrderId), { returnStatus: 'Requested', returnDetails: returnDetails, returnTimeline: timeline });
     alert('✅ Return/Exchange Request Submit ho gayi! Admin jald contact karega.');
     closeReturnModal();
-  } catch (e) {
-    alert('Error: ' + e.message);
-  }
+  } catch (e) { alert('Error: ' + e.message); }
   hideLoading();
 }
 
