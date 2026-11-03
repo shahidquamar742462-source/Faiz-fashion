@@ -1,4 +1,4 @@
-const CACHE_NAME = 'faiz-fashion-v29'; 
+const CACHE_NAME = 'faiz-fashion-v30';
 const ASSETS = ['./', './index.html', './manifest.json', './logo.png'];
 
 self.addEventListener('install', (event) => {
@@ -16,18 +16,31 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = event.request.url;
+  
   if (url.includes('firestore') || url.includes('googleapis') || url.includes('gstatic') || url.includes('firebase') || url.includes('cloudinary')) return;
 
-  if (event.request.mode === 'navigate' || url.endsWith('.html') || url.endsWith('/')) {
-    event.respondWith(fetch(event.request).then((response) => {
-      const copy = response.clone(); caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy)); return response;
-    }).catch(() => caches.match(event.request)));
+  // NAVIGATION - network-first with 3s timeout (stale HTML se bachao)
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      Promise.race([
+        fetch(event.request).then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          return response;
+        }),
+        new Promise((_, reject) => setTimeout(() => reject('timeout'), 3000))
+      ]).catch(() => caches.match(event.request).then(r => r || caches.match('./index.html')))
+    );
     return;
   }
+
+  // STATIC - cache-first
   event.respondWith(caches.match(event.request).then((cachedResponse) => {
     if (cachedResponse) return cachedResponse;
     return fetch(event.request).then((response) => {
-      const copy = response.clone(); caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy)); return response;
+      const copy = response.clone();
+      caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+      return response;
     });
   }));
 });
