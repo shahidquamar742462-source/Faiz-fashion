@@ -510,13 +510,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
   <button class="nav-item" data-screen="cart" onclick="showScreen('cart')"><span class="nav-icon">🛒</span>Cart<span class="badge" id="navCartBadge" style="top:-2px">0</span></button>
 </div>
 
-<script>
-  // ERROR CATCHER: Agar koi bhi error aaye, toh screen par alert aayega
-  window.addEventListener('error', function(e) {
-    alert('⚠️ App Error: ' + e.message + '\nFile: ' + (e.filename || 'Unknown'));
-  });
-</script>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -1147,18 +1140,75 @@ async function submitPreOrder(btn) {
   }
 }
 
-// Bind all functions to window so inline onclick works perfectly
-Object.assign(window, { 
-  showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, 
-  previewBanner, openCategoryForm, previewPhoto, removeExistingPhoto, removeNewPhoto, saveCategory, 
-  deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, setMainCategory, 
-  filterProducts, sortProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, 
-  toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrder, 
-  loadAdminOrders, updateOrderStatus, openReviewForm, closeReviewForm, submitReview, previewPrePhoto, 
-  toggleVoiceRecord, submitPreOrder, requestReturn, fillSavedAddress, loadAdminPreOrders, installPWA 
-});
+// Coupon functions
+function renderAdminCoupons() {
+  const list = document.getElementById('couponList'); if(!list) return;
+  if(couponsCache.length === 0) { list.innerHTML = '<div style="color:var(--text-dim);font-size:12px;text-align:center">No active coupons.</div>'; return; }
+  list.innerHTML = couponsCache.map(c => `<div class="coupon-item"><div><div class="coupon-code">${c.code}</div><div class="coupon-disc">${c.discountPercent}% OFF</div></div><div><button style="background:none;border:none;color:var(--gold);font-size:16px;cursor:pointer;margin-right:10px" onclick="editCoupon('${c.code}', ${c.discountPercent})">✏️</button><button style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer" onclick="deleteCoupon('${c.id}')">✕</button></div></div>`).join('');
+}
+function editCoupon(code, disc) { document.getElementById('newCouponCode').value = code; document.getElementById('newCouponCode').readOnly = true; document.getElementById('newCouponDisc').value = disc; document.getElementById('addCouponBtn').textContent = 'Update'; editingCouponCode = code; }
+async function saveCoupon() {
+  const code = document.getElementById('newCouponCode').value.trim().toUpperCase(), disc = parseFloat(document.getElementById('newCouponDisc').value);
+  if(!code || !disc || disc <= 0 || disc > 100) { alert('Sahi code aur discount daalein'); return; }
+  try {
+    await setDoc(doc(db, 'coupons', code), { code, discountPercent: disc, createdAt: serverTimestamp() });
+    document.getElementById('newCouponCode').value = ''; document.getElementById('newCouponCode').readOnly = false; document.getElementById('newCouponDisc').value = ''; document.getElementById('addCouponBtn').textContent = 'Add'; editingCouponCode = null; alert('✅ Saved!');
+  } catch(e) { alert('Error: ' + e.message); }
+}
+async function deleteCoupon(id) { if(confirm('Delete?')) await deleteDoc(doc(db, 'coupons', id)); }
 
-console.log("App loaded successfully!");
+async function changeAdminPassword() {
+  const cur = document.getElementById('currentPwd').value, np = document.getElementById('newPwd').value, cp = document.getElementById('confirmPwd').value;
+  if (np.length < 6) { alert('Min 6 chars'); return; } if (np !== cp) { alert('Mismatch'); return; }
+  try { const user = auth.currentUser; const cred = EmailAuthProvider.credential(ADMIN_EMAIL, cur); await reauthenticateWithCredential(user, cred); await updatePassword(user, np); alert('✅ Changed'); ['currentPwd','newPwd','confirmPwd'].forEach(id => document.getElementById(id).value = ''); } 
+  catch(e) { alert('❌ ' + (e.code === 'auth/wrong-password' ? 'Wrong password' : e.message)); }
+}
+
+// Attach all functions to window to ensure onclick works perfectly
+window.showScreen = showScreen;
+window.customerLogin = customerLogin;
+window.handleLogin = handleLogin;
+window.handleReset = handleReset;
+window.handleLogout = handleLogout;
+window.openSettings = openSettings;
+window.saveSettings = saveSettings;
+window.previewBanner = previewBanner;
+window.openCategoryForm = openCategoryForm;
+window.previewPhoto = previewPhoto;
+window.removeExistingPhoto = removeExistingPhoto;
+window.removeNewPhoto = removeNewPhoto;
+window.saveCategory = saveCategory;
+window.deleteCategory = deleteCategory;
+window.saveCoupon = saveCoupon;
+window.editCoupon = editCoupon;
+window.deleteCoupon = deleteCoupon;
+window.changeAdminPassword = changeAdminPassword;
+window.setMainCategory = setMainCategory;
+window.filterProducts = filterProducts;
+window.sortProducts = sortProducts;
+window.openProductDetails = openProductDetails;
+window.shareProduct = shareProduct;
+window.addToCartDetails = addToCartDetails;
+window.buyNowDetails = buyNowDetails;
+window.toggleCart = toggleCart;
+window.toggleWatchlist = toggleWatchlist;
+window.toggleWatchlistDetails = toggleWatchlistDetails;
+window.goCart = goCart;
+window.applyCoupon = applyCoupon;
+window.openCheckout = openCheckout;
+window.submitOrder = submitOrder;
+window.loadAdminOrders = loadAdminOrders;
+window.updateOrderStatus = updateOrderStatus;
+window.openReviewForm = openReviewForm;
+window.closeReviewForm = closeReviewForm;
+window.submitReview = submitReview;
+window.previewPrePhoto = previewPrePhoto;
+window.toggleVoiceRecord = toggleVoiceRecord;
+window.submitPreOrder = submitPreOrder;
+window.requestReturn = requestReturn;
+window.fillSavedAddress = fillSavedAddress;
+window.loadAdminPreOrders = loadAdminPreOrders;
+window.installPWA = installPWA;
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
