@@ -247,7 +247,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <button class="btn-small" style="padding:6px;flex:0" onclick="showScreen('admin-reviews')">⭐ Reviews</button>
       <button class="btn-small notif-bell" style="padding:6px;flex:0" onclick="showAdminNotifs()">🔔<span class="notif-badge" id="adminNotifBadge">0</span></button>
       <button class="btn-small" style="padding:6px;flex:0" onclick="openSettings()">⚙️</button>
-      <button class="logout-btn" style="margin-left:25px;padding:10px 18px" onclick="handleLogout()">Logout</button>
     </div>
   </div>
   <div class="stats-grid">
@@ -356,6 +355,11 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <div class="input-group"><input type="password" id="newPwd" placeholder="New Password"></div>
       <div class="input-group"><input type="password" id="confirmPwd" placeholder="Confirm New Password"></div>
       <button class="btn-primary" onclick="changeAdminPassword()">Update Password</button>
+    </div>
+    <div class="settings-section" style="border:1px solid var(--danger);margin-top:25px">
+      <h3 style="color:var(--danger);margin-bottom:12px">🚪 Logout</h3>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Admin account se sign out karein</p>
+      <button class="btn-primary" style="background:linear-gradient(135deg,var(--danger),#c0392b);color:#fff" onclick="handleLogout()">Logout</button>
     </div>
   </div>
 </div>
