@@ -1,4 +1,4 @@
-const CACHE_NAME = 'faiz-fashion-v26'; 
+const CACHE_NAME = 'faiz-fashion-v27'; 
 const ASSETS = ['./', './index.html', './manifest.json', './logo.png'];
 
 self.addEventListener('install', (event) => {
