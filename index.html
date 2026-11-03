@@ -1056,7 +1056,7 @@ function openCheckout(){
 
 function buildOrderWhatsAppMsg(name,phone,building,address,landmark,items,total,orderId){let m=`🛍️ *NEW ORDER - FAIZ FASHION*\n\n*Order ID:* ${orderId.slice(-8).toUpperCase()}\n\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Address:*\n${building?building+', ':''}${address}${landmark?'\nLandmark: '+landmark:''}\n\n📦 *Items:*\n`;items.forEach((i,idx)=>{m+=`${idx+1}. ${i.name}`;if(i.size)m+=` | Size: ${i.size}`;if(i.color)m+=` | Color: ${i.color}`;m+=`\n   Qty: ${i.qty} × ₹${i.price} = ₹${i.qty*i.price}\n`});m+=`\n💰 *Total: ₹${Math.round(total)}*\n\n_Payment: Cash on Delivery_`;return m}
 
-function submitOrder(){
+async submitOrder(){
   if(!isShopOpen) return alert('🛑 Shop is closed. Please visit early morning!');
   
   const name=document.getElementById('chkName').value.trim(),phone=document.getElementById('chkPhone').value.trim();
