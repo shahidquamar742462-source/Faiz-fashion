@@ -50,13 +50,10 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px;text-align:center}
 .stat-val{font-size:24px;font-weight:800;color:var(--gold)}
 .stat-label{font-size:12px;color:var(--text-dim);margin-top:4px}
-
-/* Analytics Grid */
 .analytics-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;margin-bottom:20px}
 .analytics-card{background:var(--card2);border:1px solid var(--gold);border-radius:12px;padding:12px;text-align:center}
 .analytics-val{font-size:20px;font-weight:800;color:var(--gold)}
 .analytics-label{font-size:10px;color:var(--text-dim);margin-top:4px;text-transform:uppercase}
-
 .category-list{display:grid;grid-template-columns:1fr;gap:16px;padding-bottom:40px}
 .category-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
 .cat-img{width:100%;height:180px;object-fit:cover}
@@ -88,8 +85,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .status-Contacted{background:#3498db;color:#fff}
 .status-Completed{background:var(--success);color:#000}
 .status-Cancelled{background:var(--danger);color:#fff}
-
-/* Order Timeline */
 .timeline{display:flex;align-items:center;justify-content:space-between;margin:20px 0;position:relative;padding:0 10px}
 .timeline::before{content:'';position:absolute;top:10px;left:20px;right:20px;height:2px;background:var(--border);z-index:1}
 .timeline-step{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px;width:50px}
@@ -99,7 +94,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .timeline-text{font-size:9px;color:var(--text-dim);text-align:center;font-weight:600}
 .timeline-step.active .timeline-text{color:var(--gold)}
 .timeline-step.completed .timeline-text{color:var(--success)}
-
 .install-banner{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#000;padding:12px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;font-weight:700;font-size:14px}
 .install-banner button{background:#000;color:var(--gold);border:none;padding:8px 15px;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer}
 .top-bar{display:flex;flex-direction:column;gap:12px;padding:10px 0 16px;border-bottom:1px solid var(--border);margin-bottom:16px;position:sticky;top:0;background:var(--bg);z-index:10}
@@ -295,7 +289,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     </div>
   </div>
   
-  <!-- ANALYTICS DASHBOARD -->
   <div class="analytics-grid">
     <div class="analytics-card"><div class="analytics-val" id="statRevenue">₹0</div><div class="analytics-label">Revenue</div></div>
     <div class="analytics-card"><div class="analytics-val" id="statOrders">0</div><div class="analytics-label">Orders</div></div>
@@ -315,6 +308,9 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 
 <div id="screen-admin-orders" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>All Orders</h2></div>
+  <div style="margin-bottom:15px">
+    <input type="text" id="adminOrderSearch" placeholder="Search by Order ID, Name or Phone..." oninput="filterAdminOrders()" style="width:100%;background:var(--card);border:1px solid var(--gold);border-radius:10px;padding:12px 15px;color:var(--text);font-size:14px;outline:none">
+  </div>
   <div id="adminOrdersList"><div class="loading-row">Loading...</div></div>
 </div>
 
@@ -547,7 +543,10 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <button class="back-btn" style="background:rgba(0,0,0,0.5);border:none;color:#fff" onclick="goBackFromDetails()">←</button>
     <div style="display:flex;gap:10px">
       <button class="back-btn" id="detailLikeBtn" style="background:rgba(0,0,0,0.5);border:none;color:#fff" onclick="toggleWatchlistDetails()">🤍</button>
-      <button class="back-btn" style="background:rgba(0,0,0,0.5);border:none;color:#fff" onclick="shareProduct()">🔗</button>
+      <!-- WHATSAPP SHARE ICON IN DETAILS -->
+      <button class="back-btn" style="background:#25D366;border:none;color:#fff" onclick="shareProduct()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      </button>
     </div>
   </div>
   <div class="detail-gallery" id="detailGallery" onclick="openImageZoom(event)"></div>
@@ -577,7 +576,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- IMAGE ZOOM MODAL -->
 <div id="imageZoomModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);z-index:9999;align-items:center;justify-content:center" onclick="closeImageZoom()">
   <img id="zoomedImage" style="max-width:100%;max-height:100vh;object-fit:contain" onclick="event.stopPropagation()">
   <button onclick="closeImageZoom()" style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.2);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer">✕</button>
@@ -634,7 +632,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- SPIN WHEEL MODAL -->
 <div id="spinWheelModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)">
   <div style="background:var(--card);padding:25px;border-radius:20px;width:100%;max-width:350px;text-align:center;border:2px solid var(--gold);position:relative">
     <button onclick="closeSpinWheel()" style="position:absolute;top:10px;right:15px;background:none;border:none;color:var(--text-dim);font-size:24px;cursor:pointer">✕</button>
@@ -642,7 +639,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <p style="font-size:13px;color:var(--text-dim);margin-bottom:20px">Ghumayein aur jeetein exciting discount!</p>
     
     <div style="position:relative;width:200px;height:200px;margin:0 auto 25px">
-      <!-- Simple CSS Wheel -->
       <div id="wheelCanvas" style="width:100%;height:100%;border-radius:50%;border:8px solid var(--gold);background:conic-gradient(var(--gold) 0deg 45deg, var(--card2) 45deg 90deg, var(--gold) 90deg 135deg, var(--card2) 135deg 180deg, var(--gold) 180deg 225deg, var(--card2) 225deg 270deg, var(--gold) 270deg 315deg, var(--card2) 315deg 360deg);transition:transform 3s cubic-bezier(0.17,0.67,0.12,0.99);display:flex;align-items:center;justify-content:center">
         <div style="width:40px;height:40px;background:var(--bg);border-radius:50%;border:4px solid var(--gold);z-index:2"></div>
       </div>
@@ -803,6 +799,7 @@ let isShopOpen = true;
 let allowedAreas = [];
 let userSavedLat = null, userSavedLng = null;
 let currentSpinAngle = 0;
+let adminOrderSearchTerm = ''; 
 
 const ADMIN_SCREENS=['admin','admin-orders','admin-preorders','admin-reviews','category-form','settings'];
 
@@ -1067,48 +1064,95 @@ function previewSizeGuide(e){const f=e.target.files[0];if(!f)return;currentSizeG
 
 async function saveSettings(){const num=document.getElementById('settingsWhatsapp').value.replace(/\D/g,'');const delC=parseFloat(document.getElementById('settingsDelCharge').value)||0;const freeAbv=parseFloat(document.getElementById('settingsFreeAbove').value)||0;const platF=parseFloat(document.getElementById('settingsPlatformFee').value)||0;const handC=parseFloat(document.getElementById('settingsHandlingCharge').value)||0;const saleEndVal=document.getElementById('settingsSaleEnd').value;const allowedAreasVal=document.getElementById('settingsAllowedAreas').value.trim();showLoading();try{let finalBanners=[...existingBannersCache];for(const f of pendingBannerFiles){const fd=new FormData();fd.append('file',f);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();if(data.secure_url)finalBanners.push(data.secure_url)}let sgUrl=sizeGuideUrl;if(currentSizeGuideFile){const fd=new FormData();fd.append('file',currentSizeGuideFile);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();if(data.secure_url)sgUrl=data.secure_url}const payload={whatsappNumber:num,bannerUrls:finalBanners,bannerUrl:finalBanners[0]||'',sizeGuideUrl:sgUrl,deliveryCharge:delC,freeDeliveryAbove:freeAbv,platformFee:platF,handlingCharge:handC,allowedAreas:allowedAreasVal};if(saleEndVal)payload.saleEnd=new Date(saleEndVal);else payload.saleEnd=null;await setDoc(doc(db,'settings','config'),payload,{merge:true});pendingBannerFiles=[];currentSizeGuideFile=null;document.getElementById('bannerPhoto').value='';document.getElementById('sizeGuidePhoto').value='';alert('✅ Settings Saved!')}catch(e){alert('Error: '+e.message)}hideLoading()}
 
-function loadAdminOrders(){const list=document.getElementById('adminOrdersList');if(!list)return;if(unsubAdminOrders)unsubAdminOrders();unsubAdminOrders=onSnapshot(collection(db,'orders'),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders yet.</div>';return}let arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.deletedByAdmin!==true);arr.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));allAdminOrdersCache=arr;updateAdminNotifBadge();const rc=arr.filter(o=>o.returnStatus==='Requested').length;document.getElementById('statReturns').textContent=rc;list.innerHTML=arr.map(o=>{const date=o.date?new Date(o.date.toMillis()).toLocaleString():'Recent';let sc=o.status==='Shipped'?'status-Shipped':(o.status==='Delivered'?'status-Delivered':(o.status==='Processing'?'status-Processing':(o.status==='Out for Delivery'?'status-Out-for-Delivery':'status-Pending')));const itemsHtml=o.items.map(i=>{const v=[i.size?`Size: ${i.size}`:'',i.color?`Color: ${i.color}`:''].filter(Boolean).join(' | ');return`<li>${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price} ${i.img?`<img src="${optImg(i.img,60)}" class="order-img-thumb">`:''}</li>`}).join('');
-const retHtml = o.returnStatus ? `
-  <div style="background:rgba(243,156,18,0.15);border:1px dashed #f39c12;padding:10px;border-radius:8px;margin:10px 0">
-    <div style="color:#f39c12;font-weight:800;font-size:13px;margin-bottom:5px">🔄 Return/Exchange: ${o.returnStatus}</div>
-    ${o.returnDetails ? `
-      <div style="font-size:12px;color:var(--text);margin-bottom:5px;line-height:1.5">
-        <b>Item:</b> ${escapeHtml(o.returnDetails.productName)}<br>
-        <b>Type:</b> ${o.returnDetails.type} | <b>Issue:</b> ${o.returnDetails.condition}<br>
-        <b>Reason:</b> ${escapeHtml(o.returnDetails.reason)}
-        ${o.returnDetails.type === 'Exchange' ? `<br><b>Requested:</b> Size: ${o.returnDetails.newSize || '-'}, Color: ${o.returnDetails.newColor || '-'}` : ''}
+function loadAdminOrders(){const list=document.getElementById('adminOrdersList');if(!list)return;if(unsubAdminOrders)unsubAdminOrders();unsubAdminOrders=onSnapshot(collection(db,'orders'),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders yet.</div>';return}let arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.deletedByAdmin!==true);arr.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));allAdminOrdersCache=arr;updateAdminNotifBadge();const rc=arr.filter(o=>o.returnStatus==='Requested').length;document.getElementById('statReturns').textContent=rc;renderAdminOrdersList();})}
+
+function renderAdminOrdersList() {
+  const list = document.getElementById('adminOrdersList');
+  let filtered = allAdminOrdersCache;
+  
+  if (adminOrderSearchTerm) {
+    const term = adminOrderSearchTerm.toLowerCase();
+    filtered = filtered.filter(o => 
+      (o.orderCode && o.orderCode.toLowerCase().includes(term)) ||
+      (o.customerName && o.customerName.toLowerCase().includes(term)) ||
+      (o.phone && o.phone.includes(term))
+    );
+  }
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="loading-row">No orders found.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(o => {
+    const date=o.date?new Date(o.date.toMillis()).toLocaleString():'Recent';
+    let sc=o.status==='Shipped'?'status-Shipped':(o.status==='Delivered'?'status-Delivered':(o.status==='Processing'?'status-Processing':(o.status==='Out for Delivery'?'status-Out-for-Delivery':'status-Pending')));
+    const itemsHtml=o.items.map(i=>{const v=[i.size?`Size: ${i.size}`:'',i.color?`Color: ${i.color}`:''].filter(Boolean).join(' | ');return`<li>${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price} ${i.img?`<img src="${optImg(i.img,60)}" class="order-img-thumb">`:''}</li>`}).join('');
+    const retHtml = o.returnStatus ? `
+      <div style="background:rgba(243,156,18,0.15);border:1px dashed #f39c12;padding:10px;border-radius:8px;margin:10px 0">
+        <div style="color:#f39c12;font-weight:800;font-size:13px;margin-bottom:5px">🔄 Return/Exchange: ${o.returnStatus}</div>
+        ${o.returnDetails ? `
+          <div style="font-size:12px;color:var(--text);margin-bottom:5px;line-height:1.5">
+            <b>Item:</b> ${escapeHtml(o.returnDetails.productName)}<br>
+            <b>Type:</b> ${o.returnDetails.type} | <b>Issue:</b> ${o.returnDetails.condition}<br>
+            <b>Reason:</b> ${escapeHtml(o.returnDetails.reason)}
+            ${o.returnDetails.type === 'Exchange' ? `<br><b>Requested:</b> Size: ${o.returnDetails.newSize || '-'}, Color: ${o.returnDetails.newColor || '-'}` : ''}
+          </div>
+        ` : ''}
+        ${o.returnTimeline ? `<div style="font-size:11px;color:var(--text-dim);margin-top:8px;border-top:1px solid #555;padding-top:5px">${o.returnTimeline.map(t=>`✅ ${t.status}`).join('<br>')}</div>` : ''}
+        
+        ${o.returnStatus === 'Requested' ? `
+          <div style="display:flex;gap:5px;margin-top:10px">
+            <button class="btn-small" style="background:var(--success);color:#000" onclick="updateReturnTracking('${o.id}','Approved')">✅ Approve</button>
+            <button class="btn-small" style="background:var(--danger);color:#fff" onclick="updateReturnTracking('${o.id}','Rejected')">❌ Reject</button>
+          </div>
+        ` : `
+          <select style="margin-top:10px;background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;width:100%" onchange="updateReturnTracking('${o.id}',this.value)">
+            <option value="" disabled selected>Update Tracking...</option>
+            <option value="Approved">Approved</option>
+            <option value="Pickup Scheduled">Pickup Scheduled</option>
+            <option value="Item Picked Up">Item Picked Up</option>
+            <option value="Processing in Warehouse">Processing</option>
+            <option value="Exchange Shipped">Exchange Shipped</option>
+            <option value="Completed">Completed (Done)</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        `}
       </div>
-    ` : ''}
-    ${o.returnTimeline ? `<div style="font-size:11px;color:var(--text-dim);margin-top:8px;border-top:1px solid #555;padding-top:5px">${o.returnTimeline.map(t=>`✅ ${t.status}`).join('<br>')}</div>` : ''}
+    ` : '';
+    const dbHtml=o.deliveryBoy?`<p style="font-size:12px;color:var(--success);margin-top:5px">🚴 Delivery: ${escapeHtml(o.deliveryBoy.name)} (${escapeHtml(o.deliveryBoy.phone)})</p>`:'';
     
-    ${o.returnStatus === 'Requested' ? `
-      <div style="display:flex;gap:5px;margin-top:10px">
-        <button class="btn-small" style="background:var(--success);color:#000" onclick="updateReturnTracking('${o.id}','Approved')">✅ Approve</button>
-        <button class="btn-small" style="background:var(--danger);color:#fff" onclick="updateReturnTracking('${o.id}','Rejected')">❌ Reject</button>
+    const orderIdBadge = `<div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;margin-bottom:5px">#${o.orderCode || o.id.slice(-8).toUpperCase()}</div>`;
+
+    return`<div class="order-card">
+      <div style="display:flex;justify-content:space-between;align-items:start">
+        <div>
+          ${orderIdBadge}
+          <h4>${escapeHtml(o.customerName)} - ₹${o.total}</h4>
+        </div>
+        <div style="display:flex;gap:5px"><button onclick="printInvoice('${o.id}')" style="background:none;border:none;color:var(--gold);font-size:16px;cursor:pointer">🖨️</button><button onclick="deleteOrder('${o.id}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">🗑️</button></div>
       </div>
-    ` : `
-      <select style="margin-top:10px;background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;width:100%" onchange="updateReturnTracking('${o.id}',this.value)">
-        <option value="" disabled selected>Update Tracking...</option>
-        <option value="Approved">Approved</option>
-        <option value="Pickup Scheduled">Pickup Scheduled</option>
-        <option value="Item Picked Up">Item Picked Up</option>
-        <option value="Processing in Warehouse">Processing</option>
-        <option value="Exchange Shipped">Exchange Shipped</option>
-        <option value="Completed">Completed (Done)</option>
-        <option value="Rejected">Rejected</option>
-      </select>
-    `}
-  </div>
-` : '';
-const dbHtml=o.deliveryBoy?`<p style="font-size:12px;color:var(--success);margin-top:5px">🚴 Delivery: ${escapeHtml(o.deliveryBoy.name)} (${escapeHtml(o.deliveryBoy.phone)})</p>`:'';return`<div class="order-card"><div style="display:flex;justify-content:space-between;align-items:start"><h4>${escapeHtml(o.customerName)} - ₹${o.total}</h4><div style="display:flex;gap:5px"><button onclick="printInvoice('${o.id}')" style="background:none;border:none;color:var(--gold);font-size:16px;cursor:pointer">🖨️</button><button onclick="deleteOrder('${o.id}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">🗑️</button></div></div><p>📞 ${escapeHtml(o.phone)} | 📍 ${escapeHtml((o.building?o.building+', ':'')+o.address+(o.landmark?' (Near '+o.landmark+')':''))}</p><p>📅 ${date}</p>
+      <p>📞 ${escapeHtml(o.phone)} | 📍 ${escapeHtml((o.building?o.building+', ':'')+o.address+(o.landmark?' (Near '+o.landmark+')':''))}</p>
+      <p>📅 ${date}</p>
+      ${(o.latitude && o.longitude) ? `
+        <button onclick="window.open('https://www.google.com/maps?q=${o.latitude},${o.longitude}', '_blank')" style="background:var(--success);color:#000;border:none;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-top:5px;display:inline-flex;align-items:center;gap:5px">
+          📍 View Delivery Location (Map)
+        </button>
+      ` : `<p style="font-size:11px;color:var(--danger);margin-top:5px;font-weight:700">📍 Location not shared by customer</p>`}
+      <ul class="order-items-list">${itemsHtml}</ul>
+      <p style="font-size:12px;margin-top:5px">Del: ₹${o.deliveryCharge} | Plat: ₹${o.platformFee} | Hand: ₹${o.handlingCharge}${o.pointsRedeemed?' | Redeemed: '+o.pointsRedeemed+' pts':''}${o.pointsEarned?' | Earned: '+o.pointsEarned+' pts':''}</p>
+      ${dbHtml}${retHtml}
+      <div style="display:flex;gap:5px;margin-top:10px"><input type="text" placeholder="Delivery Boy Name" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.name):''}" id="db-name-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><input type="tel" placeholder="Phone" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.phone):''}" id="db-phone-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><button class="btn-small" style="flex:0;padding:6px 10px" onclick="saveDeliveryBoy('${o.id}')">Save</button></div>
+      <span class="order-status ${sc}">${o.status||'Pending'}</span>
+      <select style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;float:right;margin-top:10px" onchange="updateOrderStatus('${o.id}',this.value)"><option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option><option value="Processing" ${o.status==='Processing'?'selected':''}>Processing</option><option value="Shipped" ${o.status==='Shipped'?'selected':''}>Shipped</option><option value="Out for Delivery" ${o.status==='Out for Delivery'?'selected':''}>Out for Delivery</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option></select>
+    </div>`
+  }).join('');
+}
 
-${(o.latitude && o.longitude) ? `
-  <button onclick="window.open('https://www.google.com/maps?q=${o.latitude},${o.longitude}', '_blank')" style="background:var(--success);color:#000;border:none;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-top:5px;display:inline-flex;align-items:center;gap:5px">
-    📍 View Delivery Location (Map)
-  </button>
-` : `<p style="font-size:11px;color:var(--danger);margin-top:5px;font-weight:700">📍 Location not shared by customer</p>`}
-
-<ul class="order-items-list">${itemsHtml}</ul><p style="font-size:12px;margin-top:5px">Del: ₹${o.deliveryCharge} | Plat: ₹${o.platformFee} | Hand: ₹${o.handlingCharge}${o.pointsRedeemed?' | Redeemed: '+o.pointsRedeemed+' pts':''}${o.pointsEarned?' | Earned: '+o.pointsEarned+' pts':''}</p>${dbHtml}${retHtml}<div style="display:flex;gap:5px;margin-top:10px"><input type="text" placeholder="Delivery Boy Name" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.name):''}" id="db-name-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><input type="tel" placeholder="Phone" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.phone):''}" id="db-phone-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><button class="btn-small" style="flex:0;padding:6px 10px" onclick="saveDeliveryBoy('${o.id}')">Save</button></div><span class="order-status ${sc}">${o.status||'Pending'}</span><select style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;float:right;margin-top:10px" onchange="updateOrderStatus('${o.id}',this.value)"><option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option><option value="Processing" ${o.status==='Processing'?'selected':''}>Processing</option><option value="Shipped" ${o.status==='Shipped'?'selected':''}>Shipped</option><option value="Out for Delivery" ${o.status==='Out for Delivery'?'selected':''}>Out for Delivery</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option></select></div>`}).join('')})}
+function filterAdminOrders() {
+  adminOrderSearchTerm = document.getElementById('adminOrderSearch').value.trim();
+  renderAdminOrdersList();
+}
 
 async function updateOrderStatus(id,s){await setDoc(doc(db,'orders',id),{status:s},{merge:true})}
 
@@ -1131,7 +1175,7 @@ async function updateReturnTracking(orderId, newStatus) {
   alert('✅ Return tracking updated!');
 }
 
-function printInvoice(id){const o=allAdminOrdersCache.find(x=>x.id===id);if(!o)return;const date=o.date?new Date(o.date.toMillis()).toLocaleString():'';const items=o.items.map(i=>`<tr><td style="padding:8px;border:1px solid #ccc">${escapeHtml(i.name)}${i.size?' ('+i.size+')':''}${i.color?' '+i.color:''}</td><td style="padding:8px;border:1px solid #ccc;text-align:center">${i.qty||1}</td><td style="padding:8px;border:1px solid #ccc;text-align:right">₹${i.price}</td><td style="padding:8px;border:1px solid #ccc;text-align:right">₹${(i.qty||1)*i.price}</td></tr>`).join('');const pa=document.getElementById('printArea');pa.style.display='block';pa.innerHTML=`<div style="font-family:Arial;padding:20px;max-width:600px;margin:0 auto"><h1 style="text-align:center;color:#d4af37;border-bottom:2px solid #d4af37;padding-bottom:10px">FAIZ FASHION</h1><p style="text-align:center;font-size:12px;margin-bottom:20px">Wear Your Style | Invoice</p><div style="display:flex;justify-content:space-between;margin-bottom:15px"><div><b>Order ID:</b> ${o.id.slice(-8).toUpperCase()}<br><b>Date:</b> ${date}</div><div style="text-align:right"><b>Customer:</b> ${escapeHtml(o.customerName)}<br><b>Phone:</b> ${escapeHtml(o.phone)}</div></div><div style="margin-bottom:15px;padding:10px;border:1px solid #ccc"><b>Address:</b><br>${escapeHtml((o.building||'')+(o.building?', ':'')+o.address)}${o.landmark?'<br>Near: '+escapeHtml(o.landmark):''}</div><table style="width:100%;border-collapse:collapse;margin-bottom:15px"><thead><tr style="background:#f0f0f0"><th style="padding:8px;border:1px solid #ccc;text-align:left">Item</th><th style="padding:8px;border:1px solid #ccc">Qty</th><th style="padding:8px;border:1px solid #ccc">Price</th><th style="padding:8px;border:1px solid #ccc">Total</th></tr></thead><tbody>${items}</tbody></table><div style="text-align:right;font-size:14px"><div>Subtotal: ₹${o.subtotal}</div>${o.couponDiscount?'<div style="color:green">Coupon: -₹'+o.couponDiscount+'</div>':''}<div>Delivery: ₹${o.deliveryCharge}</div><div>Platform Fee: ₹${o.platformFee}</div><div>Handling: ₹${o.handlingCharge}</div>${o.pointsRedeemed?'<div style="color:green">Points Redeemed: -₹'+o.pointsRedeemed+'</div>':''}<div style="font-size:18px;font-weight:bold;border-top:2px solid #d4af37;padding-top:8px;margin-top:8px">TOTAL: ₹${o.total}</div></div><p style="text-align:center;margin-top:30px;font-size:11px;color:#666">Thank you for shopping with FAIZ FASHION!</p></div>`;setTimeout(()=>{window.print();setTimeout(()=>{pa.style.display='none';pa.innerHTML=''},500)},100)}
+function printInvoice(id){const o=allAdminOrdersCache.find(x=>x.id===id);if(!o)return;const date=o.date?new Date(o.date.toMillis()).toLocaleString():'';const items=o.items.map(i=>`<tr><td style="padding:8px;border:1px solid #ccc">${escapeHtml(i.name)}${i.size?' ('+i.size+')':''}${i.color?' '+i.color:''}</td><td style="padding:8px;border:1px solid #ccc;text-align:center">${i.qty||1}</td><td style="padding:8px;border:1px solid #ccc;text-align:right">₹${i.price}</td><td style="padding:8px;border:1px solid #ccc;text-align:right">₹${(i.qty||1)*i.price}</td></tr>`).join('');const pa=document.getElementById('printArea');pa.style.display='block';pa.innerHTML=`<div style="font-family:Arial;padding:20px;max-width:600px;margin:0 auto"><h1 style="text-align:center;color:#d4af37;border-bottom:2px solid #d4af37;padding-bottom:10px">FAIZ FASHION</h1><p style="text-align:center;font-size:12px;margin-bottom:20px">Wear Your Style | Invoice</p><div style="display:flex;justify-content:space-between;margin-bottom:15px"><div><b>Order ID:</b> #${o.orderCode || o.id.slice(-8).toUpperCase()}<br><b>Date:</b> ${date}</div><div style="text-align:right"><b>Customer:</b> ${escapeHtml(o.customerName)}<br><b>Phone:</b> ${escapeHtml(o.phone)}</div></div><div style="margin-bottom:15px;padding:10px;border:1px solid #ccc"><b>Address:</b><br>${escapeHtml((o.building||'')+(o.building?', ':'')+o.address)}${o.landmark?'<br>Near: '+escapeHtml(o.landmark):''}</div><table style="width:100%;border-collapse:collapse;margin-bottom:15px"><thead><tr style="background:#f0f0f0"><th style="padding:8px;border:1px solid #ccc;text-align:left">Item</th><th style="padding:8px;border:1px solid #ccc">Qty</th><th style="padding:8px;border:1px solid #ccc">Price</th><th style="padding:8px;border:1px solid #ccc">Total</th></tr></thead><tbody>${items}</tbody></table><div style="text-align:right;font-size:14px"><div>Subtotal: ₹${o.subtotal}</div>${o.couponDiscount?'<div style="color:green">Coupon: -₹'+o.couponDiscount+'</div>':''}<div>Delivery: ₹${o.deliveryCharge}</div><div>Platform Fee: ₹${o.platformFee}</div><div>Handling: ₹${o.handlingCharge}</div>${o.pointsRedeemed?'<div style="color:green">Points Redeemed: -₹'+o.pointsRedeemed+'</div>':''}<div style="font-size:18px;font-weight:bold;border-top:2px solid #d4af37;padding-top:8px;margin-top:8px">TOTAL: ₹${o.total}</div></div><p style="text-align:center;margin-top:30px;font-size:11px;color:#666">Thank you for shopping with FAIZ FASHION!</p></div>`;setTimeout(()=>{window.print();setTimeout(()=>{pa.style.display='none';pa.innerHTML=''},500)},100)}
 
 function updateAdminNotifBadge(){const b=document.getElementById('adminNotifBadge');if(!b)return;const po=allAdminOrdersCache.filter(o=>(o.status||'Pending')==='Pending').length;const rr=allAdminOrdersCache.filter(o=>o.returnStatus==='Requested').length;const pp=(allAdminPreOrdersCache||[]).filter(o=>(o.status||'Pending')==='Pending').length;const t=po+rr+pp;if(t>0){b.textContent=t;b.style.display='block'}else b.style.display='none'}
 function showAdminNotifs(){const l=document.getElementById('adminNotifList');let h='';const po=allAdminOrdersCache.filter(o=>(o.status||'Pending')==='Pending');const rr=allAdminOrdersCache.filter(o=>o.returnStatus==='Requested');const pp=(allAdminPreOrdersCache||[]).filter(o=>(o.status||'Pending')==='Pending');if(po.length===0&&rr.length===0&&pp.length===0)l.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:20px">✅ Sab clear!</div>';else{if(po.length)h+=`<div style="margin-bottom:15px"><div style="color:var(--gold);font-weight:800;margin-bottom:8px">📦 Pending Orders (${po.length})</div>${po.slice(0,5).map(o=>`<div style="padding:8px;background:var(--card2);border-radius:6px;margin-bottom:6px;font-size:13px">${escapeHtml(o.customerName)} — ₹${o.total}</div>`).join('')}</div>`;if(rr.length)h+=`<div style="margin-bottom:15px"><div style="color:var(--danger);font-weight:800;margin-bottom:8px">🔄 Return Requests (${rr.length})</div>${rr.slice(0,5).map(o=>`<div style="padding:8px;background:var(--card2);border-radius:6px;margin-bottom:6px;font-size:13px">${escapeHtml(o.customerName)}</div>`).join('')}</div>`;if(pp.length)h+=`<div style="margin-bottom:15px"><div style="color:#3498db;font-weight:800;margin-bottom:8px">📝 Pending Pre-Orders (${pp.length})</div>${pp.slice(0,5).map(o=>`<div style="padding:8px;background:var(--card2);border-radius:6px;margin-bottom:6px;font-size:13px">${escapeHtml(o.phone)}</div>`).join('')}</div>`;l.innerHTML=h}document.getElementById('adminNotifModal').style.display='flex'}
@@ -1162,7 +1206,14 @@ function openPriceRange(){const input=prompt('Max price (₹) — khaali chhodo 
 function clearAllFilters(){filterInStock=false;filterMaxPrice=null;document.getElementById('inStockFilterBtn').classList.remove('active');document.getElementById('priceFilterBtn').classList.remove('active');updateClearFilterBtn();renderShop()}
 function updateClearFilterBtn(){document.getElementById('clearFilterBtn').style.display=(filterInStock||filterMaxPrice!==null)?'inline-block':'none'}
 
-function renderShop(){const grid=document.getElementById('shopGrid');if(!grid)return;let items=[...categoriesCache];if(mainCategory==='Watchlist')items=items.filter(c=>watchlistIds.has(c.id));else if(mainCategory!=='All')items=items.filter(c=>c.mainCategory===mainCategory);if(searchQuery)items=items.filter(c=>c.name.toLowerCase().includes(searchQuery)||(c.description||'').toLowerCase().includes(searchQuery));if(filterInStock)items=items.filter(c=>(c.times||0)>0);if(filterMaxPrice!==null)items=items.filter(c=>c.discountPrice<=filterMaxPrice);if(sortOrder==='low-high')items.sort((a,b)=>a.discountPrice-b.discountPrice);else if(sortOrder==='high-low')items.sort((a,b)=>b.discountPrice-a.discountPrice);else items.sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));if(items.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim)">No products found.</div>';return}grid.innerHTML=items.map(c=>{const out=(c.times||0)<=0,off=getDiscountPercent(c.originalPrice,c.discountPrice);const liked=watchlistIds.has(c.id);const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const inCart=cartProductIds.has(c.id);return`<div class="product-card" onclick="openProductDetails('${c.id}')"><div class="img-wrap"><img src="${optImg(img,400)}"><button class="share-card-btn" onclick="event.stopPropagation(); shareProductCard('${c.id}')">📤</button><button class="heart-btn ${liked?'liked':''}" onclick="event.stopPropagation(); toggleWatchlist('${c.id}')">${liked?'❤️':'🤍'}</button>${out?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;color:var(--danger);font-weight:800;z-index:2">OUT OF STOCK</div>':''}</div><div class="product-info"><div class="pname">${escapeHtml(c.name)}</div><div class="price-line"><span class="disc">₹${c.discountPrice}</span><span style="text-decoration:line-through;font-size:11px;color:var(--text-dim)">₹${c.originalPrice}</span>${off>0?`<span style="color:var(--success);font-size:11px;font-weight:800">${off}% OFF</span>`:''}</div>${(c.bundleQty>0&&c.bundlePrice>0)?`<div class="bundle-badge">🎁 BUY ${c.bundleQty} @ ₹${c.bundlePrice}</div>`:''}<div class="product-actions"><button class="btn-cart" onclick="event.stopPropagation(); toggleCartFromCard('${c.id}')">${inCart?'✓ In Cart':'+ Cart'}</button></div></div></div>`}).join('')}
+function renderShop(){const grid=document.getElementById('shopGrid');if(!grid)return;let items=[...categoriesCache];if(mainCategory==='Watchlist')items=items.filter(c=>watchlistIds.has(c.id));else if(mainCategory!=='All')items=items.filter(c=>c.mainCategory===mainCategory);if(searchQuery)items=items.filter(c=>c.name.toLowerCase().includes(searchQuery)||(c.description||'').toLowerCase().includes(searchQuery));if(filterInStock)items=items.filter(c=>(c.times||0)>0);if(filterMaxPrice!==null)items=items.filter(c=>c.discountPrice<=filterMaxPrice);if(sortOrder==='low-high')items.sort((a,b)=>a.discountPrice-b.discountPrice);else if(sortOrder==='high-low')items.sort((a,b)=>b.discountPrice-a.discountPrice);else items.sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));if(items.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim)">No products found.</div>';return}grid.innerHTML=items.map(c=>{const out=(c.times||0)<=0,off=getDiscountPercent(c.originalPrice,c.discountPrice);const liked=watchlistIds.has(c.id);const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const inCart=cartProductIds.has(c.id);return`<div class="product-card" onclick="openProductDetails('${c.id}')"><div class="img-wrap"><img src="${optImg(img,400)}">
+  
+  <!-- WHATSAPP SHARE ICON ON PRODUCT CARD -->
+  <button class="share-card-btn" onclick="event.stopPropagation(); shareProductCard('${c.id}')" style="background:#25D366;border:none;color:#fff;display:flex;align-items:center;justify-content:center">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </button>
+  
+  <button class="heart-btn ${liked?'liked':''}" onclick="event.stopPropagation(); toggleWatchlist('${c.id}')">${liked?'❤️':'🤍'}</button>${out?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;color:var(--danger);font-weight:800;z-index:2">OUT OF STOCK</div>':''}</div><div class="product-info"><div class="pname">${escapeHtml(c.name)}</div><div class="price-line"><span class="disc">₹${c.discountPrice}</span><span style="text-decoration:line-through;font-size:11px;color:var(--text-dim)">₹${c.originalPrice}</span>${off>0?`<span style="color:var(--success);font-size:11px;font-weight:800">${off}% OFF</span>`:''}</div>${(c.bundleQty>0&&c.bundlePrice>0)?`<div class="bundle-badge">🎁 BUY ${c.bundleQty} @ ₹${c.bundlePrice}</div>`:''}<div class="product-actions"><button class="btn-cart" onclick="event.stopPropagation(); toggleCartFromCard('${c.id}')">${inCart?'✓ In Cart':'+ Cart'}</button></div></div></div>`}).join('')}
 
 function shareProductCard(id){const c=categoriesCache.find(x=>x.id===id);if(!c)return;window.open(`https://wa.me/?text=${encodeURIComponent(`Check out ${c.name} at ₹${c.discountPrice} on FAIZ FASHION!\n${window.location.origin}${window.location.pathname}`)}`,'_blank')}
 
@@ -1228,7 +1279,7 @@ function openCheckout(){
   const g=document.getElementById('pointsRedeemGroup');if(userPoints>0){g.style.display='block';document.getElementById('chkPointBalance').textContent=userPoints}else g.style.display='none';showScreen('checkout')
 }
 
-function buildOrderWhatsAppMsg(name,phone,building,address,landmark,items,total,orderId){let m=`🛍️ *NEW ORDER - FAIZ FASHION*\n\n*Order ID:* ${orderId.slice(-8).toUpperCase()}\n\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Address:*\n${building?building+', ':''}${address}${landmark?'\nLandmark: '+landmark:''}\n\n📦 *Items:*\n`;items.forEach((i,idx)=>{m+=`${idx+1}. ${i.name}`;if(i.size)m+=` | Size: ${i.size}`;if(i.color)m+=` | Color: ${i.color}`;m+=`\n   Qty: ${i.qty} × ₹${i.price} = ₹${i.qty*i.price}\n`});m+=`\n💰 *Total: ₹${Math.round(total)}*\n\n_Payment: Cash on Delivery_`;return m}
+function buildOrderWhatsAppMsg(name,phone,building,address,landmark,items,total,orderCode){let m=`🛍️ *NEW ORDER - FAIZ FASHION*\n\n*Order ID:* #${orderCode}\n\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Address:*\n${building?building+', ':''}${address}${landmark?'\nLandmark: '+landmark:''}\n\n📦 *Items:*\n`;items.forEach((i,idx)=>{m+=`${idx+1}. ${i.name}`;if(i.size)m+=` | Size: ${i.size}`;if(i.color)m+=` | Color: ${i.color}`;m+=`\n   Qty: ${i.qty} × ₹${i.price} = ₹${i.qty*i.price}\n`});m+=`\n💰 *Total: ₹${Math.round(total)}*\n\n_Payment: Cash on Delivery_`;return m}
 
 async function submitOrder(){
   if(!isShopOpen) return alert('🛑 Shop is closed. Please visit early morning!');
@@ -1269,6 +1320,9 @@ async function submitOrder(){
   }
 
   let subtotal=items.reduce((s,i)=>{const c=categoriesCache.find(x=>x.id===i.productId);return s+(c?calculateItemPrice({qty:i.qty},c):i.price*i.qty)},0);const cd=discountPercent>0?Math.round(subtotal*discountPercent/100):0;const ac=subtotal-cd;let del=(ac>0&&ac<freeDeliveryAbove)?deliveryCharge:0;let pf=ac>0?platformFee:0,hc=ac>0?handlingCharge:0;const rEl=document.getElementById('chkRedeemPoints');const rp=rEl?(parseInt(rEl.value)||0):0;const earned=Math.floor(Math.max(0,ac+del+pf+hc-rp)/100);let total=Math.max(0,ac+del+pf+hc-rp);
+
+  // 🔥 GENERATE UNIQUE ORDER CODE
+  const orderCode = 'FF-' + Math.floor(1000 + Math.random() * 9000);
   
   addDoc(collection(db,'orders'),{
     userId:currentUid,
@@ -1291,6 +1345,7 @@ async function submitOrder(){
     latitude: orderLat, 
     longitude: orderLng,
     locationShared: locationShared,
+    orderCode: orderCode, // 👈 Saving the unique code
     date:serverTimestamp()
   }).then(async(orderRef)=>{
     if(saveAddr)await setDoc(doc(db,'users',currentUid,'addresses',Date.now().toString()),{name,phone,building,address,landmark});
@@ -1302,7 +1357,7 @@ async function submitOrder(){
     discountPercent=0;appliedCoupon='';
     hideLoading();
     showScreen('shop');
-    const waMsg=buildOrderWhatsAppMsg(name,phone,building,address,landmark,items,total,orderRef.id);
+    const waMsg=buildOrderWhatsAppMsg(name,phone,building,address,landmark,items,total,orderCode);
     setTimeout(()=>{if(confirm('✅ Order Placed!\n\nAdmin ko WhatsApp par notification bhejein?'))window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waMsg)}`,'_blank')},300)
   }).catch(err=>{hideLoading();alert('❌ Order failed: '+err.message)}).finally(()=>{btn.disabled=false;btn.textContent='Place Order'})
 }
@@ -1336,7 +1391,6 @@ function renderCustomerOrders(){
       return`<li>${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price*(i.qty||1)} ${i.img?`<img src="${optImg(i.img,60)}" class="order-img-thumb">`:''}</li>`
     }).join('');
     
-    // Order Tracking Timeline
     const steps = ['Pending', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered'];
     let currentIdx = steps.indexOf(o.status);
     if (o.status === 'Cancelled') currentIdx = -1;
@@ -1402,14 +1456,16 @@ function renderCustomerOrders(){
 
     const dbHtml=o.deliveryBoy?`<p style="font-size:12px;color:var(--success);margin-top:5px">🚴 Delivery: ${escapeHtml(o.deliveryBoy.name)} - ${escapeHtml(o.deliveryBoy.phone)}</p>`:'';
     
-    // WhatsApp Update Button
-    const waBtn = `<button class="btn-small" style="margin-top:8px;background:#25D366;color:#fff;border:none;width:100%" onclick="contactWhatsApp('Order ID: ${o.id.slice(-8).toUpperCase()}')">💬 WhatsApp Update</button>`;
+    const waBtn = `<button class="btn-small" style="margin-top:8px;background:#25D366;color:#fff;border:none;width:100%" onclick="contactWhatsApp('Order ID: #${o.orderCode || o.id.slice(-8).toUpperCase()} - Status: ${o.status}')">💬 WhatsApp Update</button>`;
+
+    const orderCodeBadge = `<div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;margin-bottom:5px">#${o.orderCode || o.id.slice(-8).toUpperCase()}</div>`;
     
     return`<div class="category-card" style="padding:15px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-        <span style="font-size:12px;color:var(--text-dim)">${date}</span>
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;align-items:center">
+        ${orderCodeBadge}
         <span style="color:var(--gold);font-weight:800">₹${o.total}</span>
       </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-bottom:5px">${date}</div>
       ${timelineHtml}
       <ul style="font-size:13px;margin-bottom:5px;padding-left:15px">${itemsHtml}</ul>
       ${dbHtml}
@@ -1538,7 +1594,6 @@ function contactWhatsApp(customMsg) {
 }
 function contactEmail() { window.open('mailto:shahidquamar72@gmail.com?subject=Enquiry%20from%20FAIZ%20FASHION%20App', '_blank'); }
 
-// SPIN WHEEL LOGIC
 function checkSpinWheel() {
   const lastSpin = localStorage.getItem('lastSpinDate');
   const today = new Date().toDateString();
@@ -1556,12 +1611,11 @@ function spinWheel() {
   btn.disabled = true;
   const wheel = document.getElementById('wheelCanvas');
   
-  const randomDeg = Math.floor(Math.random() * 360) + 720; // At least 2 full spins
+  const randomDeg = Math.floor(Math.random() * 360) + 720;
   currentSpinAngle += randomDeg;
   wheel.style.transform = `rotate(${currentSpinAngle}deg)`;
   
   setTimeout(() => {
-    // Pick a random coupon from DB
     if(couponsCache.length > 0) {
       const randomCoupon = couponsCache[Math.floor(Math.random() * couponsCache.length)];
       document.getElementById('spinResult').style.display = 'block';
@@ -1577,7 +1631,7 @@ function spinWheel() {
   }, 3000);
 }
 
-const EXPORTS=['showScreen','customerLogin','handleLogin','handleReset','handleLogout','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','previewSizeGuide','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','saveCoupon','editCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','filterProducts','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','requestReturn','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel'];
+const EXPORTS=['showScreen','customerLogin','handleLogin','handleReset','handleLogout','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','previewSizeGuide','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','saveCoupon','editCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','filterProducts','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','requestReturn','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
