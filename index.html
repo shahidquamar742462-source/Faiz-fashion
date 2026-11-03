@@ -945,7 +945,15 @@ const retHtml = o.returnStatus ? `
     `}
   </div>
 ` : '';
-const dbHtml=o.deliveryBoy?`<p style="font-size:12px;color:var(--success);margin-top:5px">🚴 Delivery: ${escapeHtml(o.deliveryBoy.name)} (${escapeHtml(o.deliveryBoy.phone)})</p>`:'';return`<div class="order-card"><div style="display:flex;justify-content:space-between;align-items:start"><h4>${escapeHtml(o.customerName)} - ₹${o.total}</h4><div style="display:flex;gap:5px"><button onclick="printInvoice('${o.id}')" style="background:none;border:none;color:var(--gold);font-size:16px;cursor:pointer">🖨️</button><button onclick="deleteOrder('${o.id}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">🗑️</button></div></div><p>📞 ${escapeHtml(o.phone)} | 📍 ${escapeHtml((o.building?o.building+', ':'')+o.address+(o.landmark?' (Near '+o.landmark+')':''))}</p><p>📅 ${date}</p><ul class="order-items-list">${itemsHtml}</ul><p style="font-size:12px;margin-top:5px">Del: ₹${o.deliveryCharge} | Plat: ₹${o.platformFee} | Hand: ₹${o.handlingCharge}${o.pointsRedeemed?' | Redeemed: '+o.pointsRedeemed+' pts':''}${o.pointsEarned?' | Earned: '+o.pointsEarned+' pts':''}</p>${dbHtml}${retHtml}<div style="display:flex;gap:5px;margin-top:10px"><input type="text" placeholder="Delivery Boy Name" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.name):''}" id="db-name-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><input type="tel" placeholder="Phone" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.phone):''}" id="db-phone-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><button class="btn-small" style="flex:0;padding:6px 10px" onclick="saveDeliveryBoy('${o.id}')">Save</button></div><span class="order-status ${sc}">${o.status||'Pending'}</span><select style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;float:right;margin-top:10px" onchange="updateOrderStatus('${o.id}',this.value)"><option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option><option value="Processing" ${o.status==='Processing'?'selected':''}>Processing</option><option value="Shipped" ${o.status==='Shipped'?'selected':''}>Shipped</option><option value="Out for Delivery" ${o.status==='Out for Delivery'?'selected':''}>Out for Delivery</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option></select></div>`}).join('')})}
+const dbHtml=o.deliveryBoy?`<p style="font-size:12px;color:var(--success);margin-top:5px">🚴 Delivery: ${escapeHtml(o.deliveryBoy.name)} (${escapeHtml(o.deliveryBoy.phone)})</p>`:'';return`<div class="order-card"><div style="display:flex;justify-content:space-between;align-items:start"><h4>${escapeHtml(o.customerName)} - ₹${o.total}</h4><div style="display:flex;gap:5px"><button onclick="printInvoice('${o.id}')" style="background:none;border:none;color:var(--gold);font-size:16px;cursor:pointer">🖨️</button><button onclick="deleteOrder('${o.id}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">🗑️</button></div></div><p>📞 ${escapeHtml(o.phone)} | 📍 ${escapeHtml((o.building?o.building+', ':'')+o.address+(o.landmark?' (Near '+o.landmark+')':''))}</p><p>📅 ${date}</p>
+
+${(o.latitude && o.longitude) ? `
+  <button onclick="window.open('https://www.google.com/maps?q=${o.latitude},${o.longitude}', '_blank')" style="background:var(--success);color:#000;border:none;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-top:5px;display:inline-flex;align-items:center;gap:5px">
+    📍 View Delivery Location (Map)
+  </button>
+` : `<p style="font-size:11px;color:var(--danger);margin-top:5px;font-weight:700">📍 Location not shared by customer</p>`}
+
+<ul class="order-items-list">${itemsHtml}</ul><p style="font-size:12px;margin-top:5px">Del: ₹${o.deliveryCharge} | Plat: ₹${o.platformFee} | Hand: ₹${o.handlingCharge}${o.pointsRedeemed?' | Redeemed: '+o.pointsRedeemed+' pts':''}${o.pointsEarned?' | Earned: '+o.pointsEarned+' pts':''}</p>${dbHtml}${retHtml}<div style="display:flex;gap:5px;margin-top:10px"><input type="text" placeholder="Delivery Boy Name" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.name):''}" id="db-name-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><input type="tel" placeholder="Phone" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.phone):''}" id="db-phone-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><button class="btn-small" style="flex:0;padding:6px 10px" onclick="saveDeliveryBoy('${o.id}')">Save</button></div><span class="order-status ${sc}">${o.status||'Pending'}</span><select style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;float:right;margin-top:10px" onchange="updateOrderStatus('${o.id}',this.value)"><option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option><option value="Processing" ${o.status==='Processing'?'selected':''}>Processing</option><option value="Shipped" ${o.status==='Shipped'?'selected':''}>Shipped</option><option value="Out for Delivery" ${o.status==='Out for Delivery'?'selected':''}>Out for Delivery</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option></select></div>`}).join('')})}
 
 async function updateOrderStatus(id,s){await setDoc(doc(db,'orders',id),{status:s},{merge:true})}
 async function deleteOrder(id){if(confirm('Delete this order permanently?')){await deleteDoc(doc(db,'orders',id))}}
@@ -1065,7 +1073,64 @@ function submitOrder(){
     }
   }
 
-  if(!name||!phone||!address)return alert('Name, Phone, Address zaroori hai!');if(!/^\d{10}$/.test(phone))return alert('Phone 10 digit hona chahiye');const items=cartItems.map(item=>{const c=categoriesCache.find(x=>x.id===item.productId);if(!c)return null;return{productId:item.productId,name:c.name,price:c.discountPrice,img:(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||''),size:item.size||'',color:item.color||'',qty:item.qty||1}}).filter(Boolean);if(items.length===0)return alert('Cart items no longer available');for(let item of items){const c=categoriesCache.find(x=>x.id===item.productId);if(!c||(c.times||0)<item.qty){return alert(`❌ "${item.name}" ka stock khatam ho gaya hai. Available: ${c?.times||0}`)}}const btn=document.getElementById('btnPlaceOrder');btn.disabled=true;btn.textContent='Placing...';showLoading();let subtotal=items.reduce((s,i)=>{const c=categoriesCache.find(x=>x.id===i.productId);return s+(c?calculateItemPrice({qty:i.qty},c):i.price*i.qty)},0);const cd=discountPercent>0?Math.round(subtotal*discountPercent/100):0;const ac=subtotal-cd;let del=(ac>0&&ac<freeDeliveryAbove)?deliveryCharge:0;let pf=ac>0?platformFee:0,hc=ac>0?handlingCharge:0;const rEl=document.getElementById('chkRedeemPoints');const rp=rEl?(parseInt(rEl.value)||0):0;const earned=Math.floor(Math.max(0,ac+del+pf+hc-rp)/100);let total=Math.max(0,ac+del+pf+hc-rp);addDoc(collection(db,'orders'),{userId:currentUid,customerName:name,phone,building,address,landmark,items,couponUsed:appliedCoupon||'',couponDiscount:cd,subtotal:Math.round(subtotal),deliveryCharge:del,platformFee:pf,handlingCharge:hc,total:Math.round(total),pointsRedeemed:rp,pointsEarned:earned,status:'Pending',date:serverTimestamp()}).then(async(orderRef)=>{if(saveAddr)await setDoc(doc(db,'users',currentUid,'addresses',Date.now().toString()),{name,phone,building,address,landmark});for(let item of cartItems)await deleteDoc(doc(db,'users',currentUid,'cart',item.cartId));for(let item of items){try{const ref=doc(db,'categories',item.productId);const snap=await getDoc(ref);if(snap.exists()){const cur=snap.data().times||0;await updateDoc(ref,{times:Math.max(0,cur-item.qty)})}}catch(e){}}if(rp>0)await addUserPoints(-rp);if(earned>0)await addUserPoints(earned);const rEl2=document.getElementById('chkRedeemPoints');if(rEl2)rEl2.value='';discountPercent=0;appliedCoupon='';hideLoading();showScreen('shop');const waMsg=buildOrderWhatsAppMsg(name,phone,building,address,landmark,items,total,orderRef.id);setTimeout(()=>{if(confirm('✅ Order Placed!\n\nAdmin ko WhatsApp par notification bhejein?'))window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waMsg)}`,'_blank')},300)}).catch(err=>{hideLoading();alert('❌ Order failed: '+err.message)}).finally(()=>{btn.disabled=false;btn.textContent='Place Order'})}
+  if(!name||!phone||!address)return alert('Name, Phone, Address zaroori hai!');if(!/^\d{10}$/.test(phone))return alert('Phone 10 digit hona chahiye');const items=cartItems.map(item=>{const c=categoriesCache.find(x=>x.id===item.productId);if(!c)return null;return{productId:item.productId,name:c.name,price:c.discountPrice,img:(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||''),size:item.size||'',color:item.color||'',qty:item.qty||1}}).filter(Boolean);if(items.length===0)return alert('Cart items no longer available');for(let item of items){const c=categoriesCache.find(x=>x.id===item.productId);if(!c||(c.times||0)<item.qty){return alert(`❌ "${item.name}" ka stock khatam ho gaya hai. Available: ${c?.times||0}`)}}
+  
+  const btn=document.getElementById('btnPlaceOrder');btn.disabled=true;btn.textContent='Placing...';showLoading();
+  
+  let orderLat = null;
+  let orderLng = null;
+  let locationShared = false;
+
+  // Ask for location
+  try {
+    const pos = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000, enableHighAccuracy: true });
+    });
+    orderLat = pos.coords.latitude;
+    orderLng = pos.coords.longitude;
+    locationShared = true;
+  } catch (e) {
+    console.log("Location fetch failed or denied by user");
+  }
+
+  let subtotal=items.reduce((s,i)=>{const c=categoriesCache.find(x=>x.id===i.productId);return s+(c?calculateItemPrice({qty:i.qty},c):i.price*i.qty)},0);const cd=discountPercent>0?Math.round(subtotal*discountPercent/100):0;const ac=subtotal-cd;let del=(ac>0&&ac<freeDeliveryAbove)?deliveryCharge:0;let pf=ac>0?platformFee:0,hc=ac>0?handlingCharge:0;const rEl=document.getElementById('chkRedeemPoints');const rp=rEl?(parseInt(rEl.value)||0):0;const earned=Math.floor(Math.max(0,ac+del+pf+hc-rp)/100);let total=Math.max(0,ac+del+pf+hc-rp);
+  
+  addDoc(collection(db,'orders'),{
+    userId:currentUid,
+    customerName:name,
+    phone,
+    building,
+    address,
+    landmark,
+    items,
+    couponUsed:appliedCoupon||'',
+    couponDiscount:cd,
+    subtotal:Math.round(subtotal),
+    deliveryCharge:del,
+    platformFee:pf,
+    handlingCharge:hc,
+    total:Math.round(total),
+    pointsRedeemed:rp,
+    pointsEarned:earned,
+    status:'Pending',
+    latitude: orderLat, 
+    longitude: orderLng,
+    locationShared: locationShared,
+    date:serverTimestamp()
+  }).then(async(orderRef)=>{
+    if(saveAddr)await setDoc(doc(db,'users',currentUid,'addresses',Date.now().toString()),{name,phone,building,address,landmark});
+    for(let item of cartItems)await deleteDoc(doc(db,'users',currentUid,'cart',item.cartId));
+    for(let item of items){try{const ref=doc(db,'categories',item.productId);const snap=await getDoc(ref);if(snap.exists()){const cur=snap.data().times||0;await updateDoc(ref,{times:Math.max(0,cur-item.qty)})}}catch(e){}}
+    if(rp>0)await addUserPoints(-rp);
+    if(earned>0)await addUserPoints(earned);
+    const rEl2=document.getElementById('chkRedeemPoints');if(rEl2)rEl2.value='';
+    discountPercent=0;appliedCoupon='';
+    hideLoading();
+    showScreen('shop');
+    const waMsg=buildOrderWhatsAppMsg(name,phone,building,address,landmark,items,total,orderRef.id);
+    setTimeout(()=>{if(confirm('✅ Order Placed!\n\nAdmin ko WhatsApp par notification bhejein?'))window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waMsg)}`,'_blank')},300)
+  }).catch(err=>{hideLoading();alert('❌ Order failed: '+err.message)}).finally(()=>{btn.disabled=false;btn.textContent='Place Order'})
+}
 
 async function loadSavedAddresses(){const sel=document.getElementById('chkSavedAddress');if(!sel)return;sel.innerHTML='<option value="">-- Select Address --</option>';savedAddressesCache=[];const snap=await getDocs(collection(db,'users',currentUid,'addresses'));if(!snap.empty){document.getElementById('savedAddressGroup').style.display='block';snap.forEach(d=>{const a=d.data();savedAddressesCache.push({id:d.id,...a});const idx=savedAddressesCache.length-1;sel.innerHTML+=`<option value="${idx}">${escapeHtml(a.name)} - ${escapeHtml(a.address.substring(0,40))}</option>`})}else document.getElementById('savedAddressGroup').style.display='none'}
 function fillSavedAddress(v){if(v==='')return;const a=savedAddressesCache[parseInt(v)];if(!a)return;document.getElementById('chkName').value=a.name||'';document.getElementById('chkPhone').value=a.phone||'';document.getElementById('chkBuilding').value=a.building||'';document.getElementById('chkAddress').value=a.address||'';document.getElementById('chkLandmark').value=a.landmark||''}
@@ -1096,7 +1161,17 @@ if(o.status==='Delivered'){
     }
   }
 }
-const dbHtml=o.deliveryBoy?`<p style="font-size:12px;color:var(--success);margin-top:5px">🚴 Delivery: ${escapeHtml(o.deliveryBoy.name)} - ${escapeHtml(o.deliveryBoy.phone)}</p>`:'';return`<div class="category-card" style="padding:15px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12px;color:var(--text-dim)">${date}</span><span style="color:var(--gold);font-weight:800">₹${o.total}</span></div><ul style="font-size:13px;margin-bottom:5px;padding-left:15px">${itemsHtml}</ul>${dbHtml}<div><span class="order-status ${sc}">${o.status||'Pending'}</span></div>${retBtn}</div>`}).join('')}
+
+let locBtn = '';
+if(o.status !== 'Delivered' && o.status !== 'Cancelled') {
+  if(o.latitude && o.longitude) {
+    locBtn = `<div style="font-size:11px;color:var(--success);margin-top:8px;font-weight:700">✅ Location Shared for Delivery</div>`;
+  } else {
+    locBtn = `<button class="btn-small" style="margin-top:8px;background:rgba(212,175,55,0.15);border:1px solid var(--gold);color:var(--gold);width:100%" onclick="shareLocationFromOrder('${o.id}')">📍 Share Location for Delivery</button>`;
+  }
+}
+
+const dbHtml=o.deliveryBoy?`<p style="font-size:12px;color:var(--success);margin-top:5px">🚴 Delivery: ${escapeHtml(o.deliveryBoy.name)} - ${escapeHtml(o.deliveryBoy.phone)}</p>`:'';return`<div class="category-card" style="padding:15px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12px;color:var(--text-dim)">${date}</span><span style="color:var(--gold);font-weight:800">₹${o.total}</span></div><ul style="font-size:13px;margin-bottom:5px;padding-left:15px">${itemsHtml}</ul>${dbHtml}<div><span class="order-status ${sc}">${o.status||'Pending'}</span></div>${retBtn}${locBtn}</div>`}).join('')}
 
 function loadCustomerOrders(){const list=document.getElementById('ordersList');if(!list)return;list.innerHTML='<div class="loading-row">Loading...</div>';if(unsubOrders)unsubOrders();unsubOrders=onSnapshot(query(collection(db,'orders'),where('userId','==',currentUid)),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders yet.</div>';return}allOrdersCache=snap.docs.map(d=>({id:d.id,...d.data()}));allOrdersCache.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));renderCustomerOrders()})}
 
@@ -1176,11 +1251,30 @@ async function submitReturnRequest() {
   hideLoading();
 }
 
+async function shareLocationFromOrder(orderId) {
+  if(!confirm('Kya aap delivery ke liye apni current location share karna chahte hain?')) return;
+  showLoading();
+  try {
+    const pos = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000, enableHighAccuracy: true });
+    });
+    await updateDoc(doc(db, 'orders', orderId), {
+      latitude: pos.coords.latitude,
+      longitude: pos.coords.longitude,
+      locationShared: true
+    });
+    alert('✅ Location share ho gayi! Delivery boy aapko aasani se dhoondh lega.');
+  } catch (e) {
+    alert('❌ Location share nahi ho payi. Kripya GPS on karein aur Allow karein.');
+  }
+  hideLoading();
+}
+
 function contactCall() { window.location.href = 'tel:+917838647693'; }
 function contactWhatsApp() { window.open('https://wa.me/917838647693?text=' + encodeURIComponent('Hello FAIZ FASHION, mujhe app se madad chahiye.'), '_blank'); }
 function contactEmail() { window.open('mailto:shahidquamar72@gmail.com?subject=Enquiry%20from%20FAIZ%20FASHION%20App', '_blank'); }
 
-const EXPORTS=['showScreen','customerLogin','handleLogin','handleReset','handleLogout','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','previewSizeGuide','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','saveCoupon','editCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','filterProducts','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','requestReturn','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail'];
+const EXPORTS=['showScreen','customerLogin','handleLogin','handleReset','handleLogout','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','previewSizeGuide','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','saveCoupon','editCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','filterProducts','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','requestReturn','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
