@@ -94,8 +94,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .badge{position:absolute;top:-5px;right:-5px;background:var(--gold);color:#000;font-size:10px;font-weight:800;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center}
 .notif-bell{position:relative}
 .notif-badge{position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;font-size:10px;padding:1px 6px;border-radius:8px;font-weight:800;display:none}
-
-/* AMAZON STYLE CATEGORY SCROLL */
 .horizontal-scroll-row{display:flex;overflow-x:auto;gap:15px;padding:10px 0;scrollbar-width:none;-ms-overflow-style:none}
 .horizontal-scroll-row::-webkit-scrollbar{display:none}
 .cat-icon-item{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:65px;cursor:pointer;transition:transform .2s ease}
@@ -103,20 +101,15 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .cat-icon-box{width:55px;height:55px;border-radius:16px;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 10px rgba(0,0,0,.1)}
 .cat-icon-item.active .cat-icon-box{border:2px solid var(--gold);background:var(--card)}
 .cat-icon-text{font-size:11px;font-weight:700;color:var(--text)}
-
-/* AMAZON STYLE SWIPE BANNER */
 .banner-container{width:100%;height:160px;margin-bottom:15px;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;scrollbar-width:none;border-radius:12px;position:relative}
 .banner-container::-webkit-scrollbar{display:none}
 .banner-slide{min-width:100%;height:100%;scroll-snap-align:center;border-radius:12px;overflow:hidden;position:relative}
 .banner-slide img{width:100%;height:100%;object-fit:cover}
-
 .countdown-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.85);color:var(--gold);padding:6px 12px;border-radius:20px;font-size:12px;font-weight:800;border:1px solid var(--gold);z-index:10}
 .low-stock-warning{background:rgba(231,76,60,.15);border:1px dashed var(--danger);padding:10px;border-radius:8px;margin-bottom:15px;font-size:13px;color:var(--danger);font-weight:700}
 .filter-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;margin-top:8px;scrollbar-width:none}
 .filter-chip{background:var(--card2);border:1px solid var(--border);color:var(--text);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
 .filter-chip.active{background:var(--gold);color:#000;border-color:var(--gold)}
-
-/* PRODUCT CARD WITH ANIMATION */
 .product-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-bottom:90px}
 .product-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;position:relative;cursor:pointer;transition:transform .1s ease}
 .product-card:active{transform:scale(.96)}
@@ -133,7 +126,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .product-actions{display:flex;gap:6px;margin-top:auto}
 .product-actions button{flex:1;padding:8px 0;border-radius:8px;font-size:11px;font-weight:700;border:none;cursor:pointer}
 .btn-cart{background:var(--card2);color:var(--text);border:1px solid var(--border)!important}
-
 #screen-product-details{padding:0;padding-bottom:80px}
 .detail-header{position:fixed;top:0;left:0;right:0;padding:15px 20px;display:flex;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,0.8),transparent)}
 .detail-gallery{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;width:100%;height:55vh;background:var(--card2);scrollbar-width:none}
@@ -153,7 +145,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .size-color-row select.required-empty{border-color:var(--danger)}
 .detail-bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);padding:15px 20px;display:flex;gap:10px;border-top:1px solid var(--border);z-index:20}
 .detail-bottom-bar button{padding:15px;border-radius:12px;font-size:16px;font-weight:800;border:none;flex:1;cursor:pointer}
-
 .review-section{margin-top:30px;border-top:1px solid var(--border);padding-top:20px}
 .review-card{background:var(--card2);padding:12px;border-radius:10px;margin-bottom:10px}
 .review-stars{color:var(--star);font-size:14px;margin-bottom:5px}
@@ -170,14 +161,11 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .recent-card{min-width:100px;background:var(--card);border-radius:10px;overflow:hidden;cursor:pointer;border:1px solid var(--border)}
 .recent-card img{width:100%;height:100px;object-fit:cover}
 .recent-card p{font-size:11px;padding:5px;font-weight:700}
-
-/* BOTTOM NAV ANIMATION */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:none;justify-content:space-around;padding:12px 0 15px;z-index:20;box-shadow:0 -2px 10px rgba(0,0,0,.1)}
 .nav-item{background:none;border:none;color:var(--text-dim);font-size:10px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;cursor:pointer;transition:transform .2s ease}
 .nav-item:active{transform:scale(.9)}
 .nav-item.active{color:var(--gold)}
 .nav-icon{font-size:20px}
-
 .cart-item{display:flex;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:10px;align-items:center}
 .cart-item img{width:70px;height:70px;object-fit:cover;border-radius:8px}
 .ci-info{flex:1}
@@ -222,7 +210,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <div style="width:50px;height:50px;border:4px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite"></div>
 </div>
 
-<!-- SPLASH SCREEN -->
 <div id="screen-splash" class="screen active">
   <div class="landing-container">
     <div class="logo-circle" style="margin:0 auto 20px"><img src="logo.png" alt="FAIZ FASHION" onerror="this.style.display='none'"></div>
@@ -233,7 +220,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- LANDING -->
 <div id="screen-landing" class="screen">
   <div class="landing-container">
     <div class="logo-circle"><img src="logo.png" alt="FAIZ FASHION" onerror="this.style.display='none'"></div>
@@ -247,7 +233,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- LOGIN -->
 <div id="screen-login" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('landing')">←</button><h2>Admin Login</h2></div>
   <div class="form-container">
@@ -258,7 +243,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- FORGOT -->
 <div id="screen-forgot" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('login')">←</button><h2>Reset Password</h2></div>
   <div class="form-container">
@@ -269,16 +253,14 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- ADMIN DASHBOARD -->
 <div id="screen-admin" class="screen">
   <div class="admin-header">
     <div style="margin-bottom:15px"><h2>FAIZ FASHION</h2><p style="font-size:12px;color:var(--text-dim)">Admin Panel</p></div>
-    <div style="display:grid;grid-template-columns:repeat(6, 1fr);gap:8px;width:100%">
+    <div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:8px;width:100%">
       <button class="btn-small" style="padding:10px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:10px;font-weight:700;margin:0" onclick="showScreen('admin-orders')"><span style="font-size:18px">📦</span>Orders</button>
       <button class="btn-small" style="padding:10px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:10px;font-weight:700;margin:0" onclick="showScreen('admin-preorders')"><span style="font-size:18px">📝</span>Pre</button>
       <button class="btn-small" style="padding:10px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:10px;font-weight:700;margin:0" onclick="showScreen('admin-reviews')"><span style="font-size:18px">⭐</span>Reviews</button>
       <button class="btn-small notif-bell" style="padding:10px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:10px;font-weight:700;margin:0;position:relative" onclick="showAdminNotifs()"><span style="font-size:18px">🔔</span>Alerts<span class="notif-badge" id="adminNotifBadge" style="top:4px;right:4px">0</span></button>
-      <button class="btn-small" style="padding:10px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:10px;font-weight:700;margin:0" onclick="toggleDarkMode()" id="adminModeToggle"><span style="font-size:18px">🌙</span>Theme</button>
       <button class="btn-small" style="padding:10px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:10px;font-weight:700;margin:0" onclick="openSettings()"><span style="font-size:18px">⚙️</span>Settings</button>
     </div>
   </div>
@@ -293,25 +275,21 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <div id="categoryList" class="category-list"></div>
 </div>
 
-<!-- ADMIN ORDERS -->
 <div id="screen-admin-orders" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>All Orders</h2></div>
   <div id="adminOrdersList"><div class="loading-row">Loading...</div></div>
 </div>
 
-<!-- ADMIN PRE-ORDERS -->
 <div id="screen-admin-preorders" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>Pre-Orders</h2></div>
   <div id="adminPreOrdersList"><div class="loading-row">Loading...</div></div>
 </div>
 
-<!-- ADMIN REVIEWS -->
 <div id="screen-admin-reviews" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>All Reviews</h2></div>
   <div id="adminReviewsList"><div class="loading-row">Loading...</div></div>
 </div>
 
-<!-- PRODUCT FORM -->
 <div id="screen-category-form" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2 id="formTitle">Add Product</h2></div>
   <div class="form-container">
@@ -330,7 +308,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
         <input type="number" id="catBundleQty" placeholder="Bundle Qty (e.g. 3)" min="0" style="flex:1;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--text)">
         <input type="number" id="catBundlePrice" placeholder="Bundle Price (₹)" min="0" style="flex:1;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--text)">
       </div>
-      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">Example: Qty 3, Price ₹250 → customer 3 items ₹250 me lega</div>
     </div>
     <div style="display:flex;gap:10px">
       <div class="input-group" style="flex:1"><label>Original Price</label><input type="number" id="catOriginalPrice"></div>
@@ -341,15 +318,21 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- SETTINGS -->
 <div id="screen-settings" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>Settings</h2></div>
   <div class="form-container">
-    <!-- SHOP OPEN/CLOSE TOGGLE -->
     <div class="settings-section" style="border:1px solid var(--gold);background:rgba(212,175,55,0.05)">
       <h3 style="color:var(--gold);margin-bottom:15px">🏪 Shop Status (Open / Close)</h3>
       <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Shop close karne par customers order nahi kar payenge.</p>
       <button class="btn-primary" id="shopStatusBtn" onclick="toggleShopStatus()" style="background:var(--success);color:#000">Loading...</button>
+    </div>
+
+    <div class="settings-section">
+      <h3>Appearance</h3>
+      <button class="btn-primary" style="background:var(--card2);color:var(--text);border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;margin-top:10px" onclick="toggleDarkMode()">
+        <span>Switch Theme</span>
+        <span id="adminThemeIcon" style="font-size:20px">🌙</span>
+      </button>
     </div>
 
     <div class="settings-section">
@@ -358,7 +341,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <div class="input-group">
         <label>Delivery Pincodes / Areas (Optional)</label>
         <input type="text" id="settingsAllowedAreas" placeholder="e.g. 783101, Goalpara, Guwahati">
-        <div style="font-size:11px;color:var(--text-dim);margin-top:5px">Agar aap isko khali chhodenge, toh har jagah delivery hogi. Agar kuch likhenge, toh sirf us area me delivery hogi.</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:5px">Agar aap isko khali chhodenge, toh har jagah delivery hogi.</div>
       </div>
       <div style="display:flex;gap:10px">
         <div class="input-group" style="flex:1"><label>Delivery Charge (₹)</label><input type="number" id="settingsDelCharge" placeholder="50"></div>
@@ -369,14 +352,14 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
         <div class="input-group" style="flex:1"><label>Handling Charge (₹)</label><input type="number" id="settingsHandlingCharge" placeholder="20"></div>
       </div>
       <div class="input-group"><label>Sale End Date (Countdown)</label><input type="datetime-local" id="settingsSaleEnd"></div>
-      <div class="input-group"><label>Sale Banners (Multiple — Carousel)</label>
+      <div class="input-group"><label>Sale Banners (Multiple)</label>
         <div class="photo-upload" onclick="document.getElementById('bannerPhoto').click()">
           <input type="file" id="bannerPhoto" accept="image/*" multiple hidden onchange="previewBanner(event)">
           <div id="bannerPlaceholder">📷 Tap to upload banner(s)</div>
         </div>
         <div id="bannerPreviews"></div>
       </div>
-      <div class="input-group"><label>Size Guide Image (Optional)</label>
+      <div class="input-group"><label>Size Guide Image</label>
         <div class="photo-upload" onclick="document.getElementById('sizeGuidePhoto').click()">
           <input type="file" id="sizeGuidePhoto" accept="image/*" hidden onchange="previewSizeGuide(event)">
           <img id="sizeGuidePreview" style="max-width:100%;max-height:100px;border-radius:8px;display:none;margin-top:10px">
@@ -403,17 +386,13 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     </div>
     <div class="settings-section" style="border:1px solid var(--danger);margin-top:25px">
       <h3 style="color:var(--danger);margin-bottom:12px">🚪 Logout</h3>
-      <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Admin account se sign out karein</p>
       <button class="btn-primary" style="background:linear-gradient(135deg,var(--danger),#c0392b);color:#fff" onclick="handleLogout()">Logout</button>
     </div>
   </div>
 </div>
 
-<!-- SHOP -->
 <div id="screen-shop" class="screen">
   <div class="install-banner"><span>📥 Install FAIZ FASHION App</span><button onclick="installPWA()">Install Now</button></div>
-  
-  <!-- SHOP CLOSED NOTICE -->
   <div id="shopClosedNotice" style="display:none;background:rgba(231,76,60,0.15);border:1px dashed var(--danger);padding:15px;border-radius:12px;text-align:center;margin-bottom:15px">
     <h3 style="color:var(--danger);font-size:16px;margin-bottom:5px">🛑 Shop is Closed</h3>
     <p style="color:var(--text-dim);font-size:13px">We are currently closed. Please visit again early morning!</p>
@@ -425,7 +404,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <div style="display:flex;gap:8px">
         <button class="icon-btn" onclick="showScreen('orders')">📦</button>
         <button class="icon-btn" onclick="showScreen('cart')">🛒<span class="badge" id="shopCartBadge">0</span></button>
-        <!-- NAYA SETTINGS ICON -->
         <button class="icon-btn" onclick="showScreen('customer-settings')">⚙️</button>
       </div>
     </div>
@@ -435,7 +413,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <select class="sort-select" onchange="sortProducts(this.value)"><option value="default">Sort</option><option value="low-high">Low to High</option><option value="high-low">High to Low</option></select>
     </div>
     
-    <!-- AMAZON STYLE CATEGORY ICONS -->
     <div class="horizontal-scroll-row" id="mainTabs">
       <div class="cat-icon-item active" onclick="setMainCategory('All')">
         <div class="cat-icon-box" style="background:var(--gold);color:#000;">✨</div>
@@ -478,7 +455,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     </div>
   </div>
 
-  <!-- AMAZON STYLE SWIPE BANNER -->
   <div class="banner-container" id="shopBanner" style="display:none"></div>
 
   <div id="recentlyViewedSection" style="display:none;margin-bottom:15px">
@@ -488,21 +464,17 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <div id="shopGrid" class="product-grid"></div>
 </div>
 
-<!-- CUSTOMER SETTINGS SCREEN -->
 <div id="screen-customer-settings" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Settings</h2></div>
   <div class="form-container">
-    
     <button class="btn-primary" style="background:var(--card2);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="showScreen('contact')">
       <span style="font-size:24px">🎧</span>
       <div><div style="font-size:16px;font-weight:800">Contact Us</div><div style="font-size:13px;color:var(--text-dim)">Call, WhatsApp, or Email</div></div>
     </button>
-
     <button class="btn-primary" style="background:var(--card2);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="toggleDarkMode()">
       <span style="font-size:24px" id="custThemeIcon">🌙</span>
       <div><div style="font-size:16px;font-weight:800">Theme</div><div style="font-size:13px;color:var(--text-dim)">Switch Light/Dark Mode</div></div>
     </button>
-
     <button class="btn-primary" style="background:rgba(212,175,55,0.1);border:1px solid var(--gold);color:var(--gold);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="requestGlobalLocation()">
       <span style="font-size:24px">📍</span>
       <div>
@@ -510,26 +482,21 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
         <div style="font-size:13px;color:var(--text-dim)" id="globalLocStatus">Tap to allow GPS access</div>
       </div>
     </button>
-
   </div>
 </div>
 
-<!-- CONTACT / SUPPORT SCREEN -->
 <div id="screen-contact" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('customer-settings')">←</button><h2>Contact Us</h2></div>
   <div class="form-container">
     <p style="text-align:center;color:var(--text-dim);margin-bottom:20px">Kisi bhi sawaal ya madad ke liye humse sampark karein.</p>
-    
     <button class="btn-primary" style="background:var(--card2);border:1px solid var(--gold);color:var(--gold);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="contactCall()">
       <span style="font-size:24px">📞</span>
       <div><div style="font-size:16px;font-weight:800">Call Us</div><div style="font-size:13px;color:var(--text-dim)">+91 78386 47693</div></div>
     </button>
-
     <button class="btn-primary" style="background:#25D366;color:#fff;border:none;display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="contactWhatsApp()">
       <span style="font-size:24px">💬</span>
       <div><div style="font-size:16px;font-weight:800">WhatsApp Us</div><div style="font-size:13px;opacity:0.8">+91 78386 47693</div></div>
     </button>
-
     <button class="btn-primary" style="background:var(--card2);border:1px solid var(--gold);color:var(--gold);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="contactEmail()">
       <span style="font-size:24px">✉️</span>
       <div><div style="font-size:16px;font-weight:800">Email Us</div><div style="font-size:13px;color:var(--text-dim)">shahidquamar72@gmail.com</div></div>
@@ -537,7 +504,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- PRODUCT DETAILS -->
 <div id="screen-product-details" class="screen">
   <div class="detail-header">
     <button class="back-btn" style="background:rgba(0,0,0,0.5);border:none;color:#fff" onclick="goBackFromDetails()">←</button>
@@ -573,7 +539,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- REVIEW MODAL -->
 <div id="reviewModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--card);padding:20px;border-radius:16px;width:100%;max-width:400px">
     <h3 style="margin-bottom:15px;color:var(--gold)">Write a Review</h3>
@@ -588,12 +553,10 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- SIZE GUIDE MODAL -->
 <div id="sizeGuideModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);z-index:100;align-items:center;justify-content:center;padding:20px" onclick="closeSizeGuide()">
   <img id="sizeGuideImg" style="max-width:100%;max-height:90vh;border-radius:12px" onclick="event.stopPropagation()">
 </div>
 
-<!-- ADMIN NOTIF MODAL -->
 <div id="adminNotifModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeAdminNotifs()">
   <div style="background:var(--card);padding:20px;border-radius:16px;width:100%;max-width:400px;max-height:80vh;overflow-y:auto">
     <h3 style="margin-bottom:15px;color:var(--gold)">🔔 Notifications</h3>
@@ -602,21 +565,16 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- RETURN / EXCHANGE MODAL -->
 <div id="returnRequestModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--card);padding:20px;border-radius:16px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto">
     <h3 style="margin-bottom:15px;color:var(--gold)">🔄 Return / Exchange</h3>
-    
     <div class="input-group"><label>Select Product</label><select id="retItemSelect" onchange="updateReturnItemDetails()"></select></div>
-    
     <div class="input-group"><label>Request Type</label><select id="retType" onchange="toggleExchangeFields()">
       <option value="Return">Return (Refund)</option>
       <option value="Exchange">Exchange (Replace)</option>
     </select></div>
-
     <div class="input-group" id="exchangeSizeGroup" style="display:none"><label>New Size (For Exchange)</label><select id="retNewSize"></select></div>
     <div class="input-group" id="exchangeColorGroup" style="display:none"><label>New Color (For Exchange)</label><select id="retNewColor"></select></div>
-
     <div class="input-group"><label>Issue / Condition</label><select id="retCondition">
       <option value="Size Issue">Size Issue (Chhota/Bada hai)</option>
       <option value="Color Issue">Color Issue (Alag color aaya)</option>
@@ -624,9 +582,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <option value="Wrong Item">Wrong Item (Galat saman aaya)</option>
       <option value="Other">Other (Dusra koi karan)</option>
     </select></div>
-
     <div class="input-group"><label>Reason (Compulsory)</label><textarea id="retReason" rows="2" placeholder="Thoda detail me likhein..."></textarea></div>
-
     <div style="display:flex;gap:10px;margin-top:15px">
       <button class="btn-small" onclick="closeReturnModal()">Cancel</button>
       <button class="btn-primary" style="flex:1;padding:10px" onclick="submitReturnRequest()">Submit Request</button>
@@ -634,7 +590,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- PRE-ORDER -->
 <div id="screen-preorder" class="screen" style="padding-bottom:100px">
   <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Custom Pre-Order</h2></div>
   <div class="form-container">
@@ -649,13 +604,11 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- MY PRE-ORDERS -->
 <div id="screen-my-preorders" class="screen" style="padding-bottom:100px">
   <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>My Pre-Orders</h2></div>
   <div id="myPreOrdersList" class="category-list"><div class="loading-row">Loading...</div></div>
 </div>
 
-<!-- CART -->
 <div id="screen-cart" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Cart</h2></div>
   <div id="cartList"></div>
@@ -674,7 +627,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <button class="btn-wa" onclick="openCheckout()">Proceed to Checkout</button>
 </div>
 
-<!-- ADDRESSES -->
 <div id="screen-addresses" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('checkout')">←</button><h2>My Addresses</h2></div>
   <div id="addressesList"></div>
@@ -691,7 +643,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- CHECKOUT -->
 <div id="screen-checkout" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('cart')">←</button><h2>Checkout</h2></div>
   <div class="form-container">
@@ -701,17 +652,12 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <div class="input-group"><label>Phone Number</label><input type="tel" id="chkPhone" maxlength="10"></div>
     <div class="input-group"><label>Building / House No.</label><input type="text" id="chkBuilding"></div>
     <div class="input-group"><label>Full Address</label><textarea id="chkAddress" rows="2"></textarea></div>
-    
-    <!-- PINCODE / AREA BOX -->
     <div class="input-group" id="chkPincodeGroup" style="display:none">
       <label>Pincode / Area (Delivery Check)</label>
       <input type="text" id="chkPincode" placeholder="Enter your Pincode or Area">
     </div>
-    
     <div class="input-group"><label>Famous Place Near You</label><input type="text" id="chkLandmark"></div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px"><input type="checkbox" id="chkSaveAddress" style="width:20px;height:20px"><label for="chkSaveAddress" style="font-size:14px;color:var(--text-dim)">Save this address for future orders</label></div>
-    
-    <!-- 👇 NAYA LOCATION SHARE OPTION CHECKOUT ME 👇 -->
     <div class="input-group" id="checkoutLocGroup" style="background:rgba(212,175,55,0.1);border:1px dashed var(--gold);padding:12px;border-radius:8px;margin-bottom:20px">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
@@ -721,8 +667,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
         <button class="btn-small" style="flex:0;background:var(--gold);color:#000;padding:6px 12px" onclick="requestCheckoutLocation()">Share</button>
       </div>
     </div>
-    <!-- 👆 NAYA LOCATION SHARE OPTION END 👆 -->
-
     <div class="input-group" id="pointsRedeemGroup" style="display:none">
       <label>⭐ Redeem Points (Balance: <span id="chkPointBalance" style="color:var(--gold)">0</span>)</label>
       <div style="display:flex;gap:8px;align-items:center">
@@ -737,7 +681,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<!-- MY ORDERS -->
 <div id="screen-orders" class="screen" style="padding-bottom:100px">
   <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>My Orders</h2></div>
   <div class="ref-card">
@@ -805,16 +748,16 @@ function hideLoading(){document.getElementById('loadingOverlay').style.display='
 
 function initTheme(){
   const s=localStorage.getItem('theme')||'dark';
-  const adminT=document.getElementById('adminModeToggle');
+  const adminT=document.getElementById('adminThemeIcon');
   const custT=document.getElementById('custThemeIcon');
   if(s==='light'){
     document.body.classList.add('light');
     document.getElementById('modeToggle').textContent='☀️';
-    if(adminT) adminT.innerHTML='<span style="font-size:18px">☀️</span>Theme';
+    if(adminT) adminT.textContent='☀️';
     if(custT) custT.textContent='☀️';
   } else {
     document.getElementById('modeToggle').textContent='🌙';
-    if(adminT) adminT.innerHTML='<span style="font-size:18px">🌙</span>Theme';
+    if(adminT) adminT.textContent='🌙';
     if(custT) custT.textContent='🌙';
   }
 }
@@ -823,8 +766,8 @@ function toggleDarkMode(){
   const l=document.body.classList.toggle('light');
   localStorage.setItem('theme',l?'light':'dark');
   document.getElementById('modeToggle').textContent=l?'☀️':'🌙';
-  const adminT=document.getElementById('adminModeToggle');
-  if(adminT) adminT.innerHTML=l?'<span style="font-size:18px">☀️</span>Theme':'<span style="font-size:18px">🌙</span>Theme';
+  const adminT=document.getElementById('adminThemeIcon');
+  if(adminT) adminT.textContent=l?'☀️':'🌙';
   const custT=document.getElementById('custThemeIcon');
   if(custT) custT.textContent=l?'☀️':'🌙';
 }
@@ -1038,7 +981,7 @@ function previewSizeGuide(e){const f=e.target.files[0];if(!f)return;currentSizeG
 
 async function saveSettings(){const num=document.getElementById('settingsWhatsapp').value.replace(/\D/g,'');const delC=parseFloat(document.getElementById('settingsDelCharge').value)||0;const freeAbv=parseFloat(document.getElementById('settingsFreeAbove').value)||0;const platF=parseFloat(document.getElementById('settingsPlatformFee').value)||0;const handC=parseFloat(document.getElementById('settingsHandlingCharge').value)||0;const saleEndVal=document.getElementById('settingsSaleEnd').value;const allowedAreasVal=document.getElementById('settingsAllowedAreas').value.trim();showLoading();try{let finalBanners=[...existingBannersCache];for(const f of pendingBannerFiles){const fd=new FormData();fd.append('file',f);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();if(data.secure_url)finalBanners.push(data.secure_url)}let sgUrl=sizeGuideUrl;if(currentSizeGuideFile){const fd=new FormData();fd.append('file',currentSizeGuideFile);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();if(data.secure_url)sgUrl=data.secure_url}const payload={whatsappNumber:num,bannerUrls:finalBanners,bannerUrl:finalBanners[0]||'',sizeGuideUrl:sgUrl,deliveryCharge:delC,freeDeliveryAbove:freeAbv,platformFee:platF,handlingCharge:handC,allowedAreas:allowedAreasVal};if(saleEndVal)payload.saleEnd=new Date(saleEndVal);else payload.saleEnd=null;await setDoc(doc(db,'settings','config'),payload,{merge:true});pendingBannerFiles=[];currentSizeGuideFile=null;document.getElementById('bannerPhoto').value='';document.getElementById('sizeGuidePhoto').value='';alert('✅ Settings Saved!')}catch(e){alert('Error: '+e.message)}hideLoading()}
 
-function loadAdminOrders(){const list=document.getElementById('adminOrdersList');if(!list)return;if(unsubAdminOrders)unsubAdminOrders();unsubAdminOrders=onSnapshot(collection(db,'orders'),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders yet.</div>';return}let arr=snap.docs.map(d=>({id:d.id,...d.data()}));arr.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));allAdminOrdersCache=arr;updateAdminNotifBadge();const rc=arr.filter(o=>o.returnStatus==='Requested').length;document.getElementById('statReturns').textContent=rc;list.innerHTML=arr.map(o=>{const date=o.date?new Date(o.date.toMillis()).toLocaleString():'Recent';let sc=o.status==='Shipped'?'status-Shipped':(o.status==='Delivered'?'status-Delivered':(o.status==='Processing'?'status-Processing':(o.status==='Out for Delivery'?'status-Out-for-Delivery':'status-Pending')));const itemsHtml=o.items.map(i=>{const v=[i.size?`Size: ${i.size}`:'',i.color?`Color: ${i.color}`:''].filter(Boolean).join(' | ');return`<li>${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price} ${i.img?`<img src="${optImg(i.img,60)}" class="order-img-thumb">`:''}</li>`}).join('');
+function loadAdminOrders(){const list=document.getElementById('adminOrdersList');if(!list)return;if(unsubAdminOrders)unsubAdminOrders();unsubAdminOrders=onSnapshot(collection(db,'orders'),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders yet.</div>';return}let arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.deletedByAdmin!==true);arr.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));allAdminOrdersCache=arr;updateAdminNotifBadge();const rc=arr.filter(o=>o.returnStatus==='Requested').length;document.getElementById('statReturns').textContent=rc;list.innerHTML=arr.map(o=>{const date=o.date?new Date(o.date.toMillis()).toLocaleString():'Recent';let sc=o.status==='Shipped'?'status-Shipped':(o.status==='Delivered'?'status-Delivered':(o.status==='Processing'?'status-Processing':(o.status==='Out for Delivery'?'status-Out-for-Delivery':'status-Pending')));const itemsHtml=o.items.map(i=>{const v=[i.size?`Size: ${i.size}`:'',i.color?`Color: ${i.color}`:''].filter(Boolean).join(' | ');return`<li>${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price} ${i.img?`<img src="${optImg(i.img,60)}" class="order-img-thumb">`:''}</li>`}).join('');
 const retHtml = o.returnStatus ? `
   <div style="background:rgba(243,156,18,0.15);border:1px dashed #f39c12;padding:10px;border-radius:8px;margin:10px 0">
     <div style="color:#f39c12;font-weight:800;font-size:13px;margin-bottom:5px">🔄 Return/Exchange: ${o.returnStatus}</div>
@@ -1082,7 +1025,14 @@ ${(o.latitude && o.longitude) ? `
 <ul class="order-items-list">${itemsHtml}</ul><p style="font-size:12px;margin-top:5px">Del: ₹${o.deliveryCharge} | Plat: ₹${o.platformFee} | Hand: ₹${o.handlingCharge}${o.pointsRedeemed?' | Redeemed: '+o.pointsRedeemed+' pts':''}${o.pointsEarned?' | Earned: '+o.pointsEarned+' pts':''}</p>${dbHtml}${retHtml}<div style="display:flex;gap:5px;margin-top:10px"><input type="text" placeholder="Delivery Boy Name" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.name):''}" id="db-name-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><input type="tel" placeholder="Phone" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.phone):''}" id="db-phone-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><button class="btn-small" style="flex:0;padding:6px 10px" onclick="saveDeliveryBoy('${o.id}')">Save</button></div><span class="order-status ${sc}">${o.status||'Pending'}</span><select style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;float:right;margin-top:10px" onchange="updateOrderStatus('${o.id}',this.value)"><option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option><option value="Processing" ${o.status==='Processing'?'selected':''}>Processing</option><option value="Shipped" ${o.status==='Shipped'?'selected':''}>Shipped</option><option value="Out for Delivery" ${o.status==='Out for Delivery'?'selected':''}>Out for Delivery</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option></select></div>`}).join('')})}
 
 async function updateOrderStatus(id,s){await setDoc(doc(db,'orders',id),{status:s},{merge:true})}
-async function deleteOrder(id){if(confirm('Delete this order permanently?')){await deleteDoc(doc(db,'orders',id))}}
+
+async function deleteOrder(id){
+  if(confirm('Delete this order from YOUR view? (Customer will still see it)')){
+    await updateDoc(doc(db,'orders',id), { deletedByAdmin: true });
+    alert('✅ Order aapki list se delete ho gaya!');
+  }
+}
+
 async function saveDeliveryBoy(id){const n=document.getElementById('db-name-'+id).value.trim();const p=document.getElementById('db-phone-'+id).value.trim();await setDoc(doc(db,'orders',id),{deliveryBoy:{name:n,phone:p}},{merge:true});alert('✅ Delivery boy saved')}
 
 async function updateReturnTracking(orderId, newStatus) {
@@ -1269,38 +1219,89 @@ async function saveNewAddress(){const name=document.getElementById('addrName').v
 async function deleteAddress(id){if(!confirm('Delete this address?'))return;await deleteDoc(doc(db,'users',currentUid,'addresses',id));renderAddressesScreen()}
 
 function setOrderFilter(f){orderFilter=f;document.querySelectorAll('#orderFilterTabs .tab').forEach(t=>t.classList.toggle('active',t.textContent.toLowerCase()===f));renderCustomerOrders()}
-function renderCustomerOrders(){const list=document.getElementById('ordersList');let filtered=allOrdersCache;if(orderFilter==='active')filtered=allOrdersCache.filter(o=>['Pending','Processing','Shipped','Out for Delivery'].includes(o.status));else if(orderFilter==='delivered')filtered=allOrdersCache.filter(o=>o.status==='Delivered');else if(orderFilter==='cancelled')filtered=allOrdersCache.filter(o=>o.status==='Cancelled');if(filtered.length===0){list.innerHTML='<div class="loading-row">No orders in this category.</div>';return}list.innerHTML=filtered.map(o=>{const date=o.date?new Date(o.date.toMillis()).toLocaleDateString():'Recent';let sc=o.status==='Shipped'?'status-Shipped':(o.status==='Delivered'?'status-Delivered':(o.status==='Processing'?'status-Processing':(o.status==='Out for Delivery'?'status-Out-for-Delivery':(o.status==='Cancelled'?'status-Cancelled':'status-Pending'))));const itemsHtml=o.items.map(i=>{const v=[i.size?`Size: ${i.size}`:'',i.color?`Color: ${i.color}`:''].filter(Boolean).join(' | ');return`<li>${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price*(i.qty||1)} ${i.img?`<img src="${optImg(i.img,60)}" class="order-img-thumb">`:''}</li>`}).join('');
-let retBtn='';
-if(o.status==='Delivered'){
-  if(o.returnStatus){
-    retBtn = `<div style="font-size:12px;color:var(--gold);margin-top:10px;padding:8px;background:var(--card2);border-radius:6px"><b>Return Status: ${o.returnStatus}</b>`;
-    if(o.returnTimeline) {
-       retBtn += `<div style="font-size:10px;color:var(--text-dim);margin-top:5px;border-top:1px solid #444;padding-top:5px">${o.returnTimeline.map(t=>`• ${t.status}`).join('<br>')}</div>`;
+function renderCustomerOrders(){
+  const list=document.getElementById('ordersList');
+  let filtered=allOrdersCache.filter(o => o.deletedByCustomer !== true);
+  
+  if(orderFilter==='active') filtered=filtered.filter(o=>['Pending','Processing','Shipped','Out for Delivery'].includes(o.status));
+  else if(orderFilter==='delivered') filtered=filtered.filter(o=>o.status==='Delivered');
+  else if(orderFilter==='cancelled') filtered=filtered.filter(o=>o.status==='Cancelled');
+  
+  if(filtered.length===0){
+    list.innerHTML='<div class="loading-row">No orders in this category.</div>';
+    return;
+  }
+  
+  list.innerHTML=filtered.map(o=>{
+    const date=o.date?new Date(o.date.toMillis()).toLocaleDateString():'Recent';
+    let sc=o.status==='Shipped'?'status-Shipped':(o.status==='Delivered'?'status-Delivered':(o.status==='Processing'?'status-Processing':(o.status==='Out for Delivery'?'status-Out-for-Delivery':(o.status==='Cancelled'?'status-Cancelled':'status-Pending'))));
+    const itemsHtml=o.items.map(i=>{
+      const v=[i.size?`Size: ${i.size}`:'',i.color?`Color: ${i.color}`:''].filter(Boolean).join(' | ');
+      return`<li>${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price*(i.qty||1)} ${i.img?`<img src="${optImg(i.img,60)}" class="order-img-thumb">`:''}</li>`
+    }).join('');
+    
+    let retBtn='';
+    if(o.status==='Delivered'){
+      if(o.returnStatus){
+        retBtn = `<div style="font-size:12px;color:var(--gold);margin-top:10px;padding:8px;background:var(--card2);border-radius:6px"><b>Return Status: ${o.returnStatus}</b>`;
+        if(o.returnTimeline) {
+           retBtn += `<div style="font-size:10px;color:var(--text-dim);margin-top:5px;border-top:1px solid #444;padding-top:5px">${o.returnTimeline.map(t=>`• ${t.status}`).join('<br>')}</div>`;
+        }
+        retBtn += `</div>`;
+      } else {
+        const returnableItems = o.items.filter(i => { 
+          const p = categoriesCache.find(c=>c.id===i.productId); 
+          return p && p.returnPolicy !== 'No Return Policy'; 
+        });
+        if(returnableItems.length > 0){
+          retBtn = `<button class="btn-small" style="margin-top:10px;background:var(--card);border:1px solid var(--gold);color:var(--gold)" onclick="openReturnModal('${o.id}')">🔄 Return / Exchange Request</button>`;
+        } else {
+          retBtn = `<div style="font-size:11px;color:var(--danger);margin-top:10px;font-weight:700">❌ Is order me No Return Policy wale items hain.</div>`;
+        }
+      }
     }
-    retBtn += `</div>`;
-  } else {
-    const returnableItems = o.items.filter(i => { 
-      const p = categoriesCache.find(c=>c.id===i.productId); 
-      return p && p.returnPolicy !== 'No Return Policy'; 
-    });
-    if(returnableItems.length > 0){
-      retBtn = `<button class="btn-small" style="margin-top:10px;background:var(--card);border:1px solid var(--gold);color:var(--gold)" onclick="openReturnModal('${o.id}')">🔄 Return / Exchange Request</button>`;
-    } else {
-      retBtn = `<div style="font-size:11px;color:var(--danger);margin-top:10px;font-weight:700">❌ Is order me No Return Policy wale items hain.</div>`;
+
+    let locBtn = '';
+    if(o.status !== 'Delivered' && o.status !== 'Cancelled') {
+      if(o.latitude && o.longitude) {
+        locBtn = `<div style="font-size:11px;color:var(--success);margin-top:8px;font-weight:700">✅ Location Shared for Delivery</div>`;
+      } else {
+        locBtn = `<button class="btn-small" style="margin-top:8px;background:rgba(212,175,55,0.15);border:1px solid var(--gold);color:var(--gold);width:100%" onclick="shareLocationFromOrder('${o.id}')">📍 Share Location for Delivery</button>`;
+      }
+    }
+    
+    let delBtn = '';
+    if (o.status === 'Delivered' || o.status === 'Cancelled') {
+      delBtn = `<button class="btn-small" style="margin-top:8px;background:rgba(231,76,60,0.1);border:1px solid var(--danger);color:var(--danger);width:100%" onclick="deleteCustomerOrder('${o.id}')">🗑️ Delete from My List</button>`;
+    }
+
+    const dbHtml=o.deliveryBoy?`<p style="font-size:12px;color:var(--success);margin-top:5px">🚴 Delivery: ${escapeHtml(o.deliveryBoy.name)} - ${escapeHtml(o.deliveryBoy.phone)}</p>`:'';
+    
+    return`<div class="category-card" style="padding:15px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+        <span style="font-size:12px;color:var(--text-dim)">${date}</span>
+        <span style="color:var(--gold);font-weight:800">₹${o.total}</span>
+      </div>
+      <ul style="font-size:13px;margin-bottom:5px;padding-left:15px">${itemsHtml}</ul>
+      ${dbHtml}
+      <div><span class="order-status ${sc}">${o.status||'Pending'}</span></div>
+      ${retBtn}
+      ${locBtn}
+      ${delBtn}
+    </div>`
+  }).join('')
+}
+
+async function deleteCustomerOrder(id) {
+  if(confirm('Kya aap is order ko apni list se delete karna chahte hain?')) {
+    try {
+      await updateDoc(doc(db, 'orders', id), { deletedByCustomer: true });
+      alert('✅ Order aapki list se delete ho gaya!');
+    } catch(e) {
+      alert('❌ Error: ' + e.message);
     }
   }
 }
-
-let locBtn = '';
-if(o.status !== 'Delivered' && o.status !== 'Cancelled') {
-  if(o.latitude && o.longitude) {
-    locBtn = `<div style="font-size:11px;color:var(--success);margin-top:8px;font-weight:700">✅ Location Shared for Delivery</div>`;
-  } else {
-    locBtn = `<button class="btn-small" style="margin-top:8px;background:rgba(212,175,55,0.15);border:1px solid var(--gold);color:var(--gold);width:100%" onclick="shareLocationFromOrder('${o.id}')">📍 Share Location for Delivery</button>`;
-  }
-}
-
-const dbHtml=o.deliveryBoy?`<p style="font-size:12px;color:var(--success);margin-top:5px">🚴 Delivery: ${escapeHtml(o.deliveryBoy.name)} - ${escapeHtml(o.deliveryBoy.phone)}</p>`:'';return`<div class="category-card" style="padding:15px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12px;color:var(--text-dim)">${date}</span><span style="color:var(--gold);font-weight:800">₹${o.total}</span></div><ul style="font-size:13px;margin-bottom:5px;padding-left:15px">${itemsHtml}</ul>${dbHtml}<div><span class="order-status ${sc}">${o.status||'Pending'}</span></div>${retBtn}${locBtn}</div>`}).join('')}
 
 function loadCustomerOrders(){const list=document.getElementById('ordersList');if(!list)return;list.innerHTML='<div class="loading-row">Loading...</div>';if(unsubOrders)unsubOrders();unsubOrders=onSnapshot(query(collection(db,'orders'),where('userId','==',currentUid)),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders yet.</div>';return}allOrdersCache=snap.docs.map(d=>({id:d.id,...d.data()}));allOrdersCache.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));renderCustomerOrders()})}
 
@@ -1403,7 +1404,7 @@ function contactCall() { window.location.href = 'tel:+917838647693'; }
 function contactWhatsApp() { window.open('https://wa.me/917838647693?text=' + encodeURIComponent('Hello FAIZ FASHION, mujhe app se madad chahiye.'), '_blank'); }
 function contactEmail() { window.open('mailto:shahidquamar72@gmail.com?subject=Enquiry%20from%20FAIZ%20FASHION%20App', '_blank'); }
 
-const EXPORTS=['showScreen','customerLogin','handleLogin','handleReset','handleLogout','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','previewSizeGuide','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','saveCoupon','editCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','filterProducts','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','requestReturn','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation'];
+const EXPORTS=['showScreen','customerLogin','handleLogin','handleReset','handleLogout','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','previewSizeGuide','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','saveCoupon','editCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','filterProducts','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','requestReturn','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
