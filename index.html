@@ -79,20 +79,19 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .order-status{padding:6px 10px;border-radius:6px;font-size:12px;font-weight:700;display:inline-block;margin-top:10px}
 .status-Pending{background:#f39c12;color:#000}
 .status-Priced{background:#3498db;color:#fff}
+.status-Accepted{background:#9b59b6;color:#fff}
 .status-Processing{background:#e67e22;color:#fff}
-.status-Shipped{background:#9b59b6;color:#fff}
-.status-Out-for-Delivery{background:#9b59b6;color:#fff}
+.status-Packed{background:#8e44ad;color:#fff}
+.status-Shipped{background:#2980b9;color:#fff}
 .status-Delivered{background:var(--success);color:#000}
-.status-Contacted{background:#3498db;color:#fff}
-.status-Completed{background:var(--success);color:#000}
 .status-Cancelled{background:var(--danger);color:#fff}
-.timeline{display:flex;align-items:center;justify-content:space-between;margin:20px 0;position:relative;padding:0 10px}
+.timeline{display:flex;align-items:center;justify-content:space-between;margin:20px 0;position:relative;padding:0 5px;overflow-x:auto}
 .timeline::before{content:'';position:absolute;top:10px;left:20px;right:20px;height:2px;background:var(--border);z-index:1}
-.timeline-step{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px;width:50px}
-.timeline-dot{width:20px;height:20px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center}
+.timeline-step{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px;width:45px;flex-shrink:0}
+.timeline-dot{width:20px;height:20px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px}
 .timeline-step.active .timeline-dot{background:var(--gold);border-color:var(--gold);color:#000}
 .timeline-step.completed .timeline-dot{background:var(--success);border-color:var(--success);color:#fff}
-.timeline-text{font-size:9px;color:var(--text-dim);text-align:center;font-weight:600}
+.timeline-text{font-size:8px;color:var(--text-dim);text-align:center;font-weight:600}
 .timeline-step.active .timeline-text{color:var(--gold)}
 .timeline-step.completed .timeline-text{color:var(--success)}
 .install-banner{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#000;padding:12px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;font-weight:700;font-size:14px}
@@ -659,6 +658,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <button onclick="showScreen('my-preorders')" style="width:100%;margin-bottom:18px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#000;border:none;padding:14px;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer">📋 View My Pre-Orders</button>
     <p style="color:var(--text-dim);font-size:13px;margin-bottom:15px">Kuch aisa chahiye jo app me nahi hai? Humein batayein, hum aapke liye laayenge!</p>
     <div class="input-group"><label>Product Description (Compulsory)</label><textarea id="preDesc" rows="3" placeholder="Aapko kya chahiye, uski detail likhein..."></textarea></div>
+    <div class="input-group"><label>Approx Budget (₹)</label><input type="number" id="preBudget" placeholder="e.g. 500 (Aapka budget kitna hai)"></div>
     <div class="input-group"><label>Photo (Optional)</label><div class="photo-upload" onclick="document.getElementById('prePhoto').click()"><input type="file" id="prePhoto" accept="image/*" hidden onchange="previewPrePhoto(event)"><img id="prePhotoPreview" style="max-width:100%;max-height:100px;border-radius:8px;display:none;margin:0 auto"><div id="prePhotoPlaceholder">📷 Tap to upload reference photo</div></div></div>
     <div class="input-group"><label>Voice Note (Optional)</label><button class="voice-btn" id="voiceRecordBtn" onclick="toggleVoiceRecord()">🎤 Start Recording</button><audio id="voicePlayback" controls style="display:none;width:100%;margin-top:10px"></audio></div>
     <div class="input-group"><label>Phone Number</label><input type="tel" id="prePhone" placeholder="10 digit mobile"></div>
@@ -803,7 +803,7 @@ let allowedAreas = [];
 let userSavedLat = null, userSavedLng = null;
 let currentSpinAngle = 0;
 let adminOrderSearchTerm = ''; 
-let adminPreOrderSearchTerm = ''; // NAYA: Pre-order search variable
+let adminPreOrderSearchTerm = '';
 
 const ADMIN_SCREENS=['admin','admin-orders','admin-preorders','admin-reviews','category-form','settings'];
 
@@ -1181,8 +1181,8 @@ async function updateReturnTracking(orderId, newStatus) {
 
 function printInvoice(id){const o=allAdminOrdersCache.find(x=>x.id===id);if(!o)return;const date=o.date?new Date(o.date.toMillis()).toLocaleString():'';const items=o.items.map(i=>`<tr><td style="padding:8px;border:1px solid #ccc">${escapeHtml(i.name)}${i.size?' ('+i.size+')':''}${i.color?' '+i.color:''}</td><td style="padding:8px;border:1px solid #ccc;text-align:center">${i.qty||1}</td><td style="padding:8px;border:1px solid #ccc;text-align:right">₹${i.price}</td><td style="padding:8px;border:1px solid #ccc;text-align:right">₹${(i.qty||1)*i.price}</td></tr>`).join('');const pa=document.getElementById('printArea');pa.style.display='block';pa.innerHTML=`<div style="font-family:Arial;padding:20px;max-width:600px;margin:0 auto"><h1 style="text-align:center;color:#d4af37;border-bottom:2px solid #d4af37;padding-bottom:10px">FAIZ FASHION</h1><p style="text-align:center;font-size:12px;margin-bottom:20px">Wear Your Style | Invoice</p><div style="display:flex;justify-content:space-between;margin-bottom:15px"><div><b>Order ID:</b> #${o.orderCode || o.id.slice(-8).toUpperCase()}<br><b>Date:</b> ${date}</div><div style="text-align:right"><b>Customer:</b> ${escapeHtml(o.customerName)}<br><b>Phone:</b> ${escapeHtml(o.phone)}</div></div><div style="margin-bottom:15px;padding:10px;border:1px solid #ccc"><b>Address:</b><br>${escapeHtml((o.building||'')+(o.building?', ':'')+o.address)}${o.landmark?'<br>Near: '+escapeHtml(o.landmark):''}</div><table style="width:100%;border-collapse:collapse;margin-bottom:15px"><thead><tr style="background:#f0f0f0"><th style="padding:8px;border:1px solid #ccc;text-align:left">Item</th><th style="padding:8px;border:1px solid #ccc">Qty</th><th style="padding:8px;border:1px solid #ccc">Price</th><th style="padding:8px;border:1px solid #ccc">Total</th></tr></thead><tbody>${items}</tbody></table><div style="text-align:right;font-size:14px"><div>Subtotal: ₹${o.subtotal}</div>${o.couponDiscount?'<div style="color:green">Coupon: -₹'+o.couponDiscount+'</div>':''}<div>Delivery: ₹${o.deliveryCharge}</div><div>Platform Fee: ₹${o.platformFee}</div><div>Handling: ₹${o.handlingCharge}</div>${o.pointsRedeemed?'<div style="color:green">Points Redeemed: -₹'+o.pointsRedeemed+'</div>':''}<div style="font-size:18px;font-weight:bold;border-top:2px solid #d4af37;padding-top:8px;margin-top:8px">TOTAL: ₹${o.total}</div></div><p style="text-align:center;margin-top:30px;font-size:11px;color:#666">Thank you for shopping with FAIZ FASHION!</p></div>`;setTimeout(()=>{window.print();setTimeout(()=>{pa.style.display='none';pa.innerHTML=''},500)},100)}
 
-function updateAdminNotifBadge(){const b=document.getElementById('adminNotifBadge');if(!b)return;const po=allAdminOrdersCache.filter(o=>(o.status||'Pending')==='Pending').length;const rr=allAdminOrdersCache.filter(o=>o.returnStatus==='Requested').length;const pp=(allAdminPreOrdersCache||[]).filter(o=>(o.status||'Pending')==='Pending'||o.status==='Priced').length;const t=po+rr+pp;if(t>0){b.textContent=t;b.style.display='block'}else b.style.display='none'}
-function showAdminNotifs(){const l=document.getElementById('adminNotifList');let h='';const po=allAdminOrdersCache.filter(o=>(o.status||'Pending')==='Pending');const rr=allAdminOrdersCache.filter(o=>o.returnStatus==='Requested');const pp=(allAdminPreOrdersCache||[]).filter(o=>(o.status||'Pending')==='Pending'||o.status==='Priced');if(po.length===0&&rr.length===0&&pp.length===0)l.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:20px">✅ Sab clear!</div>';else{if(po.length)h+=`<div style="margin-bottom:15px"><div style="color:var(--gold);font-weight:800;margin-bottom:8px">📦 Pending Orders (${po.length})</div>${po.slice(0,5).map(o=>`<div style="padding:8px;background:var(--card2);border-radius:6px;margin-bottom:6px;font-size:13px">${escapeHtml(o.customerName)} — ₹${o.total}</div>`).join('')}</div>`;if(rr.length)h+=`<div style="margin-bottom:15px"><div style="color:var(--danger);font-weight:800;margin-bottom:8px">🔄 Return Requests (${rr.length})</div>${rr.slice(0,5).map(o=>`<div style="padding:8px;background:var(--card2);border-radius:6px;margin-bottom:6px;font-size:13px">${escapeHtml(o.customerName)}</div>`).join('')}</div>`;if(pp.length)h+=`<div style="margin-bottom:15px"><div style="color:#3498db;font-weight:800;margin-bottom:8px">📝 Pending/Priced Pre-Orders (${pp.length})</div>${pp.slice(0,5).map(o=>`<div style="padding:8px;background:var(--card2);border-radius:6px;margin-bottom:6px;font-size:13px">${escapeHtml(o.phone)}</div>`).join('')}</div>`;l.innerHTML=h}document.getElementById('adminNotifModal').style.display='flex'}
+function updateAdminNotifBadge(){const b=document.getElementById('adminNotifBadge');if(!b)return;const po=allAdminOrdersCache.filter(o=>(o.status||'Pending')==='Pending').length;const rr=allAdminOrdersCache.filter(o=>o.returnStatus==='Requested').length;const pp=(allAdminPreOrdersCache||[]).filter(o=>['Pending','Priced','Accepted'].includes(o.status)).length;const t=po+rr+pp;if(t>0){b.textContent=t;b.style.display='block'}else b.style.display='none'}
+function showAdminNotifs(){const l=document.getElementById('adminNotifList');let h='';const po=allAdminOrdersCache.filter(o=>(o.status||'Pending')==='Pending');const rr=allAdminOrdersCache.filter(o=>o.returnStatus==='Requested');const pp=(allAdminPreOrdersCache||[]).filter(o=>['Pending','Priced','Accepted'].includes(o.status));if(po.length===0&&rr.length===0&&pp.length===0)l.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:20px">✅ Sab clear!</div>';else{if(po.length)h+=`<div style="margin-bottom:15px"><div style="color:var(--gold);font-weight:800;margin-bottom:8px">📦 Pending Orders (${po.length})</div>${po.slice(0,5).map(o=>`<div style="padding:8px;background:var(--card2);border-radius:6px;margin-bottom:6px;font-size:13px">${escapeHtml(o.customerName)} — ₹${o.total}</div>`).join('')}</div>`;if(rr.length)h+=`<div style="margin-bottom:15px"><div style="color:var(--danger);font-weight:800;margin-bottom:8px">🔄 Return Requests (${rr.length})</div>${rr.slice(0,5).map(o=>`<div style="padding:8px;background:var(--card2);border-radius:6px;margin-bottom:6px;font-size:13px">${escapeHtml(o.customerName)}</div>`).join('')}</div>`;if(pp.length)h+=`<div style="margin-bottom:15px"><div style="color:#3498db;font-weight:800;margin-bottom:8px">📝 Active Pre-Orders (${pp.length})</div>${pp.slice(0,5).map(o=>`<div style="padding:8px;background:var(--card2);border-radius:6px;margin-bottom:6px;font-size:13px">${escapeHtml(o.phone)}</div>`).join('')}</div>`;l.innerHTML=h}document.getElementById('adminNotifModal').style.display='flex'}
 function closeAdminNotifs(){document.getElementById('adminNotifModal').style.display='none'}
 
 // ================= PRE-ORDER ADMIN LOGIC =================
@@ -1218,9 +1218,8 @@ function renderAdminPreOrdersList() {
   list.innerHTML = filtered.map(o => {
     const date=o.date?new Date(o.date.toMillis()).toLocaleString():'Recent';
     const s=o.status||'Pending';
-    const cls=s==='Completed'?'status-Completed':s==='Cancelled'?'status-Cancelled':s==='Priced'?'status-Priced':s==='Processing'?'status-Processing':s==='Shipped'?'status-Shipped':s==='Out for Delivery'?'status-Out-for-Delivery':s==='Delivered'?'status-Delivered':'status-Pending';
+    const cls=s==='Completed'?'status-Completed':s==='Cancelled'?'status-Cancelled':s==='Priced'?'status-Priced':s==='Accepted'?'status-Accepted':s==='Processing'?'status-Processing':s==='Packed'?'status-Packed':s==='Shipped'?'status-Shipped':s==='Delivered'?'status-Delivered':'status-Pending';
     
-    // Pre-order ID Badge
     const orderIdBadge = `<div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;margin-bottom:5px">#${o.orderCode || 'Pending'}</div>`;
 
     let pricingHtml = '';
@@ -1228,6 +1227,7 @@ function renderAdminPreOrdersList() {
       pricingHtml = `
         <div style="background:rgba(212,175,55,0.1);border:1px dashed var(--gold);padding:10px;border-radius:8px;margin-top:10px">
           <div style="font-size:12px;font-weight:800;color:var(--gold);margin-bottom:8px">💰 Price this Order</div>
+          <div style="font-size:12px;font-weight:700;color:var(--success);margin-bottom:8px">Customer Budget: ₹${o.budget || 'Not Specified'}</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
             <input type="number" id="pre-prod-${o.id}" placeholder="Product Price" class="form-control" style="padding:6px;font-size:12px" oninput="calculatePreOrderTotal('${o.id}')">
             <input type="number" id="pre-del-${o.id}" placeholder="Delivery Fee" class="form-control" style="padding:6px;font-size:12px" oninput="calculatePreOrderTotal('${o.id}')">
@@ -1250,7 +1250,7 @@ function renderAdminPreOrdersList() {
       deliveryBoyHtml = `<div style="display:flex;gap:5px;margin-top:10px"><input type="text" placeholder="Delivery Boy Name" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.name):''}" id="pre-db-name-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><input type="tel" placeholder="Phone" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.phone):''}" id="pre-db-phone-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><button class="btn-small" style="flex:0;padding:6px 10px" onclick="savePreOrderDeliveryBoy('${o.id}')">Save</button></div>`;
     }
 
-    const statusOptions = ['Pending','Priced','Processing','Shipped','Out for Delivery','Delivered','Cancelled'];
+    const statusOptions = ['Pending','Priced','Accepted','Processing','Packed','Shipped','Delivered','Cancelled'];
 
     return `<div class="order-card">
       <div style="display:flex;justify-content:space-between;align-items:start">
@@ -1337,12 +1337,12 @@ function loadMyPreOrders(){
     list.innerHTML=arr.map(o=>{
       const date=o.date?new Date(o.date.toMillis()).toLocaleDateString():'Recent';
       const s=o.status||'Pending';
-      const cls=s==='Completed'?'status-Completed':s==='Cancelled'?'status-Cancelled':s==='Priced'?'status-Priced':s==='Processing'?'status-Processing':s==='Shipped'?'status-Shipped':s==='Out for Delivery'?'status-Out-for-Delivery':s==='Delivered'?'status-Delivered':'status-Pending';
+      const cls=s==='Completed'?'status-Completed':s==='Cancelled'?'status-Cancelled':s==='Priced'?'status-Priced':s==='Accepted'?'status-Accepted':s==='Processing'?'status-Processing':s==='Packed'?'status-Packed':s==='Shipped'?'status-Shipped':s==='Delivered'?'status-Delivered':'status-Pending';
       
       const orderIdBadge = `<div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;margin-bottom:5px">#${o.orderCode || 'Pending'}</div>`;
 
       // Customer Pre-order Timeline
-      const steps = ['Pending', 'Priced', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered'];
+      const steps = ['Pending', 'Priced', 'Accepted', 'Processing', 'Packed', 'Shipped', 'Delivered'];
       let currentIdx = steps.indexOf(s);
       if (s === 'Cancelled') currentIdx = -1;
       
@@ -1357,9 +1357,10 @@ function loadMyPreOrders(){
             if (tcls === 'completed') icon = '✓';
             if (step === 'Pending') icon = '⏳';
             if (step === 'Priced') icon = '💰';
+            if (step === 'Accepted') icon = '🤝';
             if (step === 'Processing') icon = '📦';
+            if (step === 'Packed') icon = '🎁';
             if (step === 'Shipped') icon = '🚚';
-            if (step === 'Out for Delivery') icon = '🛵';
             if (step === 'Delivered') icon = '🏠';
             return `<div class="timeline-step ${tcls}">
               <div class="timeline-dot">${icon}</div>
@@ -1370,6 +1371,8 @@ function loadMyPreOrders(){
       } else {
         timelineHtml = `<div style="text-align:center;padding:10px;background:rgba(231,76,60,0.1);border:1px dashed var(--danger);border-radius:8px;margin:10px 0"><span style="color:var(--danger);font-weight:800">❌ Pre-Order Cancelled</span></div>`;
       }
+
+      let budgetHtml = `<div style="font-size:12px;color:var(--text-dim);margin-bottom:5px">Budget: ₹${o.budget || 'Not Specified'}</div>`;
 
       let priceHtml = '';
       if (o.totalPrice) {
@@ -1397,6 +1400,7 @@ function loadMyPreOrders(){
         <div style="font-size:11px;color:var(--text-dim);margin-bottom:5px">${date}</div>
         ${timelineHtml}
         <p style="color:var(--text)">${escapeHtml(o.description)}</p>
+        ${budgetHtml}
         ${o.photoUrl?`<img src="${optImg(o.photoUrl,120)}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;margin-top:8px">`:''}
         ${priceHtml}
         ${acceptBtn}
@@ -1410,11 +1414,10 @@ async function acceptPreOrderPrice(id) {
   if(!confirm('Kya aap is price ko accept karke order place karna chahte hain?')) return;
   showLoading();
   try {
-    // 🔥 GENERATE UNIQUE PRE-ORDER CODE
     const preOrderCode = 'PRE-' + Math.floor(1000 + Math.random() * 9000);
     
     await updateDoc(doc(db, 'pre_orders', id), { 
-      status: 'Processing',
+      status: 'Accepted',
       orderCode: preOrderCode 
     });
     alert('✅ Order Confirmed! Admin will process it soon.');
@@ -1737,7 +1740,10 @@ function previewPrePhoto(e){const f=e.target.files[0];if(!f)return;currentPrePho
 async function toggleVoiceRecord(){const btn=document.getElementById('voiceRecordBtn');if(mediaRecorder&&mediaRecorder.state==='recording'){mediaRecorder.stop();btn.textContent='🎤 Start Recording';btn.classList.remove('recording');return}try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});mediaRecorder=new MediaRecorder(stream);audioChunks=[];mediaRecorder.ondataavailable=e=>{audioChunks.push(e.data)};mediaRecorder.onstop=()=>{audioBlob=new Blob(audioChunks,{type:'audio/webm'});const url=URL.createObjectURL(audioBlob);document.getElementById('voicePlayback').src=url;document.getElementById('voicePlayback').style.display='block'};mediaRecorder.start();btn.textContent='⏹️ Stop Recording';btn.classList.add('recording')}catch(e){alert('Microphone access denied or not supported.')}}
 
 async function submitPreOrder(btn){
-  const desc=document.getElementById('preDesc').value.trim(),phone=document.getElementById('prePhone').value.trim(),address=document.getElementById('preAddress').value.trim();
+  const desc=document.getElementById('preDesc').value.trim();
+  const budget=parseFloat(document.getElementById('preBudget').value)||0;
+  const phone=document.getElementById('prePhone').value.trim(),address=document.getElementById('preAddress').value.trim();
+  
   if(!desc||!phone||!address){alert('Description, Phone, and Address are compulsory.');return}
   if(!/^\d{10}$/.test(phone)){alert('Phone 10 digit hona chahiye');return}
   
@@ -1775,6 +1781,7 @@ async function submitPreOrder(btn){
     await addDoc(collection(db,'pre_orders'),{
       userId:currentUid,
       description:desc,
+      budget: budget,
       phone,address,photoUrl,audioUrl,
       latitude: preLat,
       longitude: preLng,
@@ -1783,7 +1790,7 @@ async function submitPreOrder(btn){
     });
     
     alert('✅ Pre-Order Request Sent!');
-    ['preDesc','prePhone','preAddress'].forEach(id=>document.getElementById(id).value='');
+    ['preDesc','prePhone','preAddress','preBudget'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('prePhotoPreview').style.display='none';
     document.getElementById('prePhotoPlaceholder').style.display='block';
     document.getElementById('voicePlayback').style.display='none';
