@@ -50,6 +50,13 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px;text-align:center}
 .stat-val{font-size:24px;font-weight:800;color:var(--gold)}
 .stat-label{font-size:12px;color:var(--text-dim);margin-top:4px}
+
+/* Analytics Grid */
+.analytics-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;margin-bottom:20px}
+.analytics-card{background:var(--card2);border:1px solid var(--gold);border-radius:12px;padding:12px;text-align:center}
+.analytics-val{font-size:20px;font-weight:800;color:var(--gold)}
+.analytics-label{font-size:10px;color:var(--text-dim);margin-top:4px;text-transform:uppercase}
+
 .category-list{display:grid;grid-template-columns:1fr;gap:16px;padding-bottom:40px}
 .category-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
 .cat-img{width:100%;height:180px;object-fit:cover}
@@ -81,6 +88,18 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .status-Contacted{background:#3498db;color:#fff}
 .status-Completed{background:var(--success);color:#000}
 .status-Cancelled{background:var(--danger);color:#fff}
+
+/* Order Timeline */
+.timeline{display:flex;align-items:center;justify-content:space-between;margin:20px 0;position:relative;padding:0 10px}
+.timeline::before{content:'';position:absolute;top:10px;left:20px;right:20px;height:2px;background:var(--border);z-index:1}
+.timeline-step{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px;width:50px}
+.timeline-dot{width:20px;height:20px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center}
+.timeline-step.active .timeline-dot{background:var(--gold);border-color:var(--gold);color:#000}
+.timeline-step.completed .timeline-dot{background:var(--success);border-color:var(--success);color:#fff}
+.timeline-text{font-size:9px;color:var(--text-dim);text-align:center;font-weight:600}
+.timeline-step.active .timeline-text{color:var(--gold)}
+.timeline-step.completed .timeline-text{color:var(--success)}
+
 .install-banner{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#000;padding:12px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;font-weight:700;font-size:14px}
 .install-banner button{background:#000;color:var(--gold);border:none;padding:8px 15px;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer}
 .top-bar{display:flex;flex-direction:column;gap:12px;padding:10px 0 16px;border-bottom:1px solid var(--border);margin-bottom:16px;position:sticky;top:0;background:var(--bg);z-index:10}
@@ -130,7 +149,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .detail-header{position:fixed;top:0;left:0;right:0;padding:15px 20px;display:flex;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,0.8),transparent)}
 .detail-gallery{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;width:100%;height:55vh;background:var(--card2);scrollbar-width:none}
 .detail-gallery::-webkit-scrollbar{display:none}
-.detail-gallery img{width:100%;height:100%;object-fit:cover;flex-shrink:0;scroll-snap-align:center}
+.detail-gallery img{width:100%;height:100%;object-fit:cover;flex-shrink:0;scroll-snap-align:center;cursor:pointer}
 .detail-body{padding:20px;background:var(--bg);border-radius:24px 24px 0 0;margin-top:-20px;position:relative;z-index:2}
 .detail-title{font-size:24px;font-weight:800;margin-bottom:5px}
 .detail-price{display:flex;align-items:baseline;gap:10px;margin-bottom:15px;flex-wrap:wrap}
@@ -220,15 +239,26 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
-<div id="screen-landing" class="screen">
+<div id="screen-landing" class="screen" style="position:relative;">
+  <button onclick="showScreen('login')" style="position:absolute; top:20px; right:20px; width:45px; height:45px; border-radius:50%; background:var(--card); border:1px solid var(--border); color:var(--text-dim); font-size:20px; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:100; box-shadow:0 4px 10px rgba(0,0,0,0.2)">
+    ⚙️
+  </button>
+
   <div class="landing-container">
     <div class="logo-circle"><img src="logo.png" alt="FAIZ FASHION" onerror="this.style.display='none'"></div>
     <h1 class="app-name">FAIZ FASHION</h1>
     <p class="tagline">Wear Your Style</p>
-    <div class="box-grid">
-      <button class="box-btn" onclick="showScreen('login')"><div class="box-icon">🔒</div><div class="box-title">Admin Login</div><div class="box-sub">Manage Shop</div></button>
-      <button class="box-btn" onclick="customerLogin()"><div class="box-icon">🛍️</div><div class="box-title">Customer Login</div><div class="box-sub">Browse & Shop</div></button>
-      <button class="box-btn" style="background:var(--gold);color:#000" onclick="installPWA()"><div class="box-icon">📥</div><div class="box-title" style="color:#000">Install App</div><div class="box-sub" style="color:#333">Add to Home Screen</div></button>
+    <div class="box-grid" style="margin-top: 10px;">
+      <button class="box-btn" onclick="customerLogin()">
+        <div class="box-icon">🛍️</div>
+        <div class="box-title">Customer Login</div>
+        <div class="box-sub">Browse & Shop</div>
+      </button>
+      <button class="box-btn" style="background:var(--gold);color:#000" onclick="installPWA()">
+        <div class="box-icon">📥</div>
+        <div class="box-title" style="color:#000">Install App</div>
+        <div class="box-sub" style="color:#333">Add to Home Screen</div>
+      </button>
     </div>
   </div>
 </div>
@@ -264,6 +294,14 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <button class="btn-small" style="padding:10px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:10px;font-weight:700;margin:0" onclick="openSettings()"><span style="font-size:18px">⚙️</span>Settings</button>
     </div>
   </div>
+  
+  <!-- ANALYTICS DASHBOARD -->
+  <div class="analytics-grid">
+    <div class="analytics-card"><div class="analytics-val" id="statRevenue">₹0</div><div class="analytics-label">Revenue</div></div>
+    <div class="analytics-card"><div class="analytics-val" id="statOrders">0</div><div class="analytics-label">Orders</div></div>
+    <div class="analytics-card"><div class="analytics-val" id="statUsers">0</div><div class="analytics-label">Users</div></div>
+  </div>
+
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-val" id="statTotal">0</div><div class="stat-label">Total Items</div></div>
     <div class="stat-card"><div class="stat-val" id="statOut" style="color:var(--danger)">0</div><div class="stat-label">Out of Stock</div></div>
@@ -512,7 +550,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <button class="back-btn" style="background:rgba(0,0,0,0.5);border:none;color:#fff" onclick="shareProduct()">🔗</button>
     </div>
   </div>
-  <div class="detail-gallery" id="detailGallery"></div>
+  <div class="detail-gallery" id="detailGallery" onclick="openImageZoom(event)"></div>
   <div class="detail-body">
     <div class="detail-title" id="detailName"></div>
     <div class="detail-price"><span class="disc" id="detailDisc"></span><span class="orig" id="detailOrig"></span><span class="off" id="detailOff"></span></div>
@@ -537,6 +575,12 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <button style="background:var(--card2);color:var(--text);border:1px solid var(--border)" onclick="addToCartDetails()">Add to Cart</button>
     <button style="background:var(--gold);color:#000" onclick="buyNowDetails()">Buy Now</button>
   </div>
+</div>
+
+<!-- IMAGE ZOOM MODAL -->
+<div id="imageZoomModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);z-index:9999;align-items:center;justify-content:center" onclick="closeImageZoom()">
+  <img id="zoomedImage" style="max-width:100%;max-height:100vh;object-fit:contain" onclick="event.stopPropagation()">
+  <button onclick="closeImageZoom()" style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.2);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer">✕</button>
 </div>
 
 <div id="reviewModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px">
@@ -587,6 +631,26 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <button class="btn-small" onclick="closeReturnModal()">Cancel</button>
       <button class="btn-primary" style="flex:1;padding:10px" onclick="submitReturnRequest()">Submit Request</button>
     </div>
+  </div>
+</div>
+
+<!-- SPIN WHEEL MODAL -->
+<div id="spinWheelModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)">
+  <div style="background:var(--card);padding:25px;border-radius:20px;width:100%;max-width:350px;text-align:center;border:2px solid var(--gold);position:relative">
+    <button onclick="closeSpinWheel()" style="position:absolute;top:10px;right:15px;background:none;border:none;color:var(--text-dim);font-size:24px;cursor:pointer">✕</button>
+    <h2 style="color:var(--gold);margin-bottom:10px">🎉 Spin & Win!</h2>
+    <p style="font-size:13px;color:var(--text-dim);margin-bottom:20px">Ghumayein aur jeetein exciting discount!</p>
+    
+    <div style="position:relative;width:200px;height:200px;margin:0 auto 25px">
+      <!-- Simple CSS Wheel -->
+      <div id="wheelCanvas" style="width:100%;height:100%;border-radius:50%;border:8px solid var(--gold);background:conic-gradient(var(--gold) 0deg 45deg, var(--card2) 45deg 90deg, var(--gold) 90deg 135deg, var(--card2) 135deg 180deg, var(--gold) 180deg 225deg, var(--card2) 225deg 270deg, var(--gold) 270deg 315deg, var(--card2) 315deg 360deg);transition:transform 3s cubic-bezier(0.17,0.67,0.12,0.99);display:flex;align-items:center;justify-content:center">
+        <div style="width:40px;height:40px;background:var(--bg);border-radius:50%;border:4px solid var(--gold);z-index:2"></div>
+      </div>
+      <div style="position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:30px;color:var(--danger);z-index:3;text-shadow:0 2px 5px rgba(0,0,0,0.5)">▼</div>
+    </div>
+    
+    <button id="spinBtn" class="btn-primary" onclick="spinWheel()" style="border-radius:30px;font-size:18px">SPIN NOW</button>
+    <div id="spinResult" style="margin-top:15px;font-size:18px;font-weight:800;color:var(--success);display:none"></div>
   </div>
 </div>
 
@@ -738,6 +802,7 @@ let existingBannersCache=[];
 let isShopOpen = true;
 let allowedAreas = [];
 let userSavedLat = null, userSavedLng = null;
+let currentSpinAngle = 0;
 
 const ADMIN_SCREENS=['admin','admin-orders','admin-preorders','admin-reviews','category-form','settings'];
 
@@ -782,7 +847,7 @@ function showScreen(name){
   const nav=document.getElementById('bottomNav');
   nav.style.display=['shop','cart','orders','preorder','my-preorders'].includes(name)?'flex':'none';
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.screen===name));
-  if(name==='shop'){renderShop();renderRecentlyViewed()}
+  if(name==='shop'){renderShop();renderRecentlyViewed(); checkSpinWheel()}
   if(name==='cart'){renderCart();loadSavedAddresses()}
   if(name==='orders'){loadCustomerOrders();updateRewardsDisplay()}
   if(name==='my-preorders')loadMyPreOrders();
@@ -793,7 +858,28 @@ function showScreen(name){
   if(name==='settings'&&isAdminUser)renderAdminCoupons();
   if(name==='customer-settings') updateGlobalLocStatus();
   if(name==='checkout') updateCheckoutLocStatus();
+  if(name==='admin') loadAnalytics();
   window.scrollTo(0,0)
+}
+
+function loadAnalytics() {
+  if(!isAdminUser) return;
+  getDocs(collection(db,'users')).then(snap => {
+    document.getElementById('statUsers').textContent = snap.size;
+  });
+  getDocs(collection(db,'orders')).then(snap => {
+    let rev = 0;
+    let count = 0;
+    snap.forEach(d => {
+      const o = d.data();
+      if(o.status !== 'Cancelled') {
+        rev += Number(o.total) || 0;
+        count++;
+      }
+    });
+    document.getElementById('statRevenue').textContent = '₹' + rev;
+    document.getElementById('statOrders').textContent = count;
+  });
 }
 
 function getDiscountPercent(o,d){if(!o||o<=0||!d||d>=o)return 0;return Math.round(((o-d)/o)*100)}
@@ -1108,6 +1194,16 @@ function updateDetailLikeBtn(){if(!currentDetailProduct)return;const liked=watch
 async function toggleWatchlistDetails(){if(!currentDetailProduct)return;await toggleWatchlist(currentDetailProduct.id)}
 function shareProduct(){const c=currentDetailProduct;if(!c)return;window.open(`https://wa.me/?text=${encodeURIComponent(`Check out ${c.name} at ₹${c.discountPrice}\n${window.location.origin}${window.location.pathname}`)}`,'_blank')}
 
+function openImageZoom(e) {
+  if(e.target.tagName === 'IMG') {
+    document.getElementById('zoomedImage').src = e.target.src;
+    document.getElementById('imageZoomModal').style.display = 'flex';
+  }
+}
+function closeImageZoom() {
+  document.getElementById('imageZoomModal').style.display = 'none';
+}
+
 function renderCart(){const list=document.getElementById('cartList');if(!list)return;if(cartItems.length===0){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-dim)">Cart is empty</div>';['cartSubtotal','cartDelivery','cartPlatformFee','cartHandlingFee','cartTotal'].forEach(id=>document.getElementById(id).textContent='₹0');document.getElementById('couponRow').style.display='none';return}list.innerHTML=cartItems.map(item=>{const c=categoriesCache.find(x=>x.id===item.productId);if(!c)return'';const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const v=[item.size?`Size: ${item.size}`:'',item.color?`Color: ${item.color}`:''].filter(Boolean).join(' | ');const qty=item.qty||1;return`<div class="cart-item"><img src="${optImg(img,120)}"><div class="ci-info"><div class="ci-name">${escapeHtml(c.name)}</div>${v?`<div class="ci-variant">${v}</div>`:''}<div class="ci-price">₹${c.discountPrice} × ${qty} = ₹${calculateItemPrice(item,c)}${(c.bundleQty>0&&qty>=c.bundleQty)?' 🎁':''}</div><div class="qty-row"><button class="qty-btn" onclick="updateCartQty('${item.cartId}',${qty-1})">−</button><span class="qty-val">${qty}</span><button class="qty-btn" onclick="updateCartQty('${item.cartId}',${qty+1})">+</button></div></div><button class="ci-remove" onclick="removeCartItem('${item.cartId}')">✕</button></div>`}).join('');calculateTotal()}
 
 function removeCoupon(){discountPercent=0;appliedCoupon='';document.getElementById('couponInput').value='';calculateTotal()}
@@ -1240,6 +1336,35 @@ function renderCustomerOrders(){
       return`<li>${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price*(i.qty||1)} ${i.img?`<img src="${optImg(i.img,60)}" class="order-img-thumb">`:''}</li>`
     }).join('');
     
+    // Order Tracking Timeline
+    const steps = ['Pending', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered'];
+    let currentIdx = steps.indexOf(o.status);
+    if (o.status === 'Cancelled') currentIdx = -1;
+    
+    let timelineHtml = '';
+    if (o.status !== 'Cancelled') {
+      timelineHtml = `<div class="timeline">
+        ${steps.map((step, idx) => {
+          let cls = '';
+          if (idx < currentIdx) cls = 'completed';
+          else if (idx === currentIdx) cls = 'active';
+          let icon = '•';
+          if (cls === 'completed') icon = '✓';
+          if (step === 'Pending') icon = '📝';
+          if (step === 'Processing') icon = '📦';
+          if (step === 'Shipped') icon = '🚚';
+          if (step === 'Out for Delivery') icon = '🛵';
+          if (step === 'Delivered') icon = '🏠';
+          return `<div class="timeline-step ${cls}">
+            <div class="timeline-dot">${icon}</div>
+            <div class="timeline-text">${step}</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    } else {
+      timelineHtml = `<div style="text-align:center;padding:10px;background:rgba(231,76,60,0.1);border:1px dashed var(--danger);border-radius:8px;margin:10px 0"><span style="color:var(--danger);font-weight:800">❌ Order Cancelled</span></div>`;
+    }
+
     let retBtn='';
     if(o.status==='Delivered'){
       if(o.returnStatus){
@@ -1277,17 +1402,22 @@ function renderCustomerOrders(){
 
     const dbHtml=o.deliveryBoy?`<p style="font-size:12px;color:var(--success);margin-top:5px">🚴 Delivery: ${escapeHtml(o.deliveryBoy.name)} - ${escapeHtml(o.deliveryBoy.phone)}</p>`:'';
     
+    // WhatsApp Update Button
+    const waBtn = `<button class="btn-small" style="margin-top:8px;background:#25D366;color:#fff;border:none;width:100%" onclick="contactWhatsApp('Order ID: ${o.id.slice(-8).toUpperCase()}')">💬 WhatsApp Update</button>`;
+    
     return`<div class="category-card" style="padding:15px">
       <div style="display:flex;justify-content:space-between;margin-bottom:5px">
         <span style="font-size:12px;color:var(--text-dim)">${date}</span>
         <span style="color:var(--gold);font-weight:800">₹${o.total}</span>
       </div>
+      ${timelineHtml}
       <ul style="font-size:13px;margin-bottom:5px;padding-left:15px">${itemsHtml}</ul>
       ${dbHtml}
       <div><span class="order-status ${sc}">${o.status||'Pending'}</span></div>
       ${retBtn}
       ${locBtn}
       ${delBtn}
+      ${waBtn}
     </div>`
   }).join('')
 }
@@ -1401,10 +1531,53 @@ async function shareLocationFromOrder(orderId) {
 }
 
 function contactCall() { window.location.href = 'tel:+917838647693'; }
-function contactWhatsApp() { window.open('https://wa.me/917838647693?text=' + encodeURIComponent('Hello FAIZ FASHION, mujhe app se madad chahiye.'), '_blank'); }
+function contactWhatsApp(customMsg) { 
+  let msg = 'Hello FAIZ FASHION, mujhe app se madad chahiye.';
+  if(customMsg) msg = customMsg;
+  window.open('https://wa.me/917838647693?text=' + encodeURIComponent(msg), '_blank'); 
+}
 function contactEmail() { window.open('mailto:shahidquamar72@gmail.com?subject=Enquiry%20from%20FAIZ%20FASHION%20App', '_blank'); }
 
-const EXPORTS=['showScreen','customerLogin','handleLogin','handleReset','handleLogout','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','previewSizeGuide','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','saveCoupon','editCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','filterProducts','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','requestReturn','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder'];
+// SPIN WHEEL LOGIC
+function checkSpinWheel() {
+  const lastSpin = localStorage.getItem('lastSpinDate');
+  const today = new Date().toDateString();
+  if (lastSpin !== today && !isAdminUser) {
+    setTimeout(() => { document.getElementById('spinWheelModal').style.display = 'flex'; }, 2000);
+  }
+}
+
+function closeSpinWheel() {
+  document.getElementById('spinWheelModal').style.display = 'none';
+}
+
+function spinWheel() {
+  const btn = document.getElementById('spinBtn');
+  btn.disabled = true;
+  const wheel = document.getElementById('wheelCanvas');
+  
+  const randomDeg = Math.floor(Math.random() * 360) + 720; // At least 2 full spins
+  currentSpinAngle += randomDeg;
+  wheel.style.transform = `rotate(${currentSpinAngle}deg)`;
+  
+  setTimeout(() => {
+    // Pick a random coupon from DB
+    if(couponsCache.length > 0) {
+      const randomCoupon = couponsCache[Math.floor(Math.random() * couponsCache.length)];
+      document.getElementById('spinResult').style.display = 'block';
+      document.getElementById('spinResult').innerHTML = `🎉 You won: <br><span style="font-size:24px;color:var(--gold)">${randomCoupon.code}</span><br><span style="font-size:12px;color:var(--text-dim)">${randomCoupon.discountPercent}% OFF</span>`;
+      localStorage.setItem('lastSpinDate', new Date().toDateString());
+    } else {
+      document.getElementById('spinResult').style.display = 'block';
+      document.getElementById('spinResult').innerHTML = `😔 No active coupons right now. Try later!`;
+    }
+    btn.textContent = 'CLOSE';
+    btn.onclick = closeSpinWheel;
+    btn.disabled = false;
+  }, 3000);
+}
+
+const EXPORTS=['showScreen','customerLogin','handleLogin','handleReset','handleLogout','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','previewSizeGuide','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','saveCoupon','editCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','filterProducts','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','requestReturn','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
