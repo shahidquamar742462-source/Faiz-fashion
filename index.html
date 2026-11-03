@@ -1145,7 +1145,8 @@ async function submitPreOrder(btn) {
   }
 }
 
-Object.assign(window, { showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, previewBanner, openCategoryForm, previewPhoto, removeExistingPhoto, removeNewPhoto, saveCategory, deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, setMainCategory, filterProducts, sortProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrder, loadAdminOrders, updateOrderStatus, openReviewForm, closeReviewForm, submitReview, previewPrePhoto, toggleVoiceRecord, submitPreOrder, requestReturn });
+// === YE LINE SABSE ZAROORI HAI (Fixes Click Issue) ===
+Object.assign(window, { showScreen, customerLogin, handleLogin, handleReset, handleLogout, openSettings, saveSettings, previewBanner, openCategoryForm, previewPhoto, removeExistingPhoto, removeNewPhoto, saveCategory, deleteCategory, saveCoupon, editCoupon, deleteCoupon, changeAdminPassword, setMainCategory, filterProducts, sortProducts, openProductDetails, shareProduct, addToCartDetails, buyNowDetails, toggleCart, toggleWatchlist, toggleWatchlistDetails, goCart, applyCoupon, openCheckout, submitOrder, loadAdminOrders, updateOrderStatus, openReviewForm, closeReviewForm, submitReview, previewPrePhoto, toggleVoiceRecord, submitPreOrder, requestReturn, fillSavedAddress, loadAdminPreOrders });
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
