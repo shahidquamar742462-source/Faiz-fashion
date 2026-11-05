@@ -597,7 +597,9 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <button class="back-btn" style="background:rgba(0,0,0,0.5);border:none;color:#fff" onclick="goBackFromDetails()">←</button>
     <div style="display:flex;gap:10px">
       <button class="back-btn" id="detailLikeBtn" style="background:rgba(0,0,0,0.5);border:none;color:#fff" onclick="toggleWatchlistDetails()">🤍</button>
-      <button class="back-btn" style="background:#25D366;border:none;color:#fff" onclick="shareProduct()">💬</button>
+      <button class="back-btn" style="background:#25D366;border:none;color:#fff" onclick="shareProduct()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      </button>
     </div>
   </div>
   <div class="detail-gallery" id="detailGallery" onclick="openImageZoom(event)"></div>
@@ -1203,7 +1205,7 @@ async function saveSettings(){
   hideLoading();
 }
 
-// ============ ADMIN ORDERS (WITH IMAGES) ============
+// ============ ADMIN ORDERS (WITH IMAGES & RETURN) ============
 function loadAdminOrders(){const list=document.getElementById('adminOrdersList');if(!list)return;if(unsubAdminOrders)unsubAdminOrders();unsubAdminOrders=onSnapshot(collection(db,'orders'),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders</div>';return}let arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.deletedByAdmin!==true);arr.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));allAdminOrdersCache=arr;updateAdminNotifBadge();document.getElementById('statReturns').textContent=arr.filter(o=>o.returnStatus==='Requested').length;renderAdminOrdersList();})}
 
 function renderAdminOrdersList(){
@@ -1231,7 +1233,41 @@ function renderAdminOrdersList(){
     const payBadge=o.paymentStatus==='Paid'?`<span style="background:var(--success);color:#000;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800">💳PAID</span>`:`<span style="background:#f39c12;color:#000;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800">COD</span>`;
     const otpBadge=o.deliveryOtp&&o.status!=='Delivered'?`<span style="background:rgba(52,152,219,0.15);color:#3498db;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:800">OTP: ${o.deliveryOtp}</span>`:'';
     const verifyOtpBtn=(o.status==='Shipped'||o.status==='Out for Delivery')?`<button class="btn-small" style="background:rgba(46,204,113,0.2);border:1px solid var(--success);color:var(--success);font-weight:800" onclick="openOtpModal('${o.id}')">🔐 Verify & Delivered</button>`:'';
-    
+
+    // RETURN HTML ADDED HERE
+    const retHtml = o.returnStatus ? `
+      <div style="background:rgba(243,156,18,0.15);border:1px dashed #f39c12;padding:10px;border-radius:8px;margin:10px 0">
+        <div style="color:#f39c12;font-weight:800;font-size:13px;margin-bottom:5px">🔄 Return/Exchange: ${o.returnStatus}</div>
+        ${o.returnDetails ? `
+          <div style="font-size:12px;color:var(--text);margin-bottom:5px;line-height:1.5">
+            <b>Item:</b> ${escapeHtml(o.returnDetails.productName)}<br>
+            <b>Type:</b> ${o.returnDetails.type} | <b>Issue:</b> ${o.returnDetails.condition}<br>
+            <b>Reason:</b> ${escapeHtml(o.returnDetails.reason)}
+            ${o.returnDetails.type === 'Exchange' ? `<br><b>Requested:</b> Size: ${o.returnDetails.newSize || '-'}, Color: ${o.returnDetails.newColor || '-'}` : ''}
+          </div>
+        ` : ''}
+        ${o.returnTimeline ? `<div style="font-size:11px;color:var(--text-dim);margin-top:8px;border-top:1px solid #555;padding-top:5px">${o.returnTimeline.map(t=>`✅ ${t.status}`).join('<br>')}</div>` : ''}
+        
+        ${o.returnStatus === 'Requested' ? `
+          <div style="display:flex;gap:5px;margin-top:10px">
+            <button class="btn-small" style="background:var(--success);color:#000" onclick="updateReturnTracking('${o.id}','Approved')">✅ Approve</button>
+            <button class="btn-small" style="background:var(--danger);color:#fff" onclick="updateReturnTracking('${o.id}','Rejected')">❌ Reject</button>
+          </div>
+        ` : `
+          <select style="margin-top:10px;background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;width:100%" onchange="updateReturnTracking('${o.id}',this.value)">
+            <option value="" disabled selected>Update Tracking...</option>
+            <option value="Approved">Approved</option>
+            <option value="Pickup Scheduled">Pickup Scheduled</option>
+            <option value="Item Picked Up">Item Picked Up</option>
+            <option value="Processing in Warehouse">Processing</option>
+            <option value="Exchange Shipped">Exchange Shipped</option>
+            <option value="Completed">Completed (Done)</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        `}
+      </div>
+    ` : '';
+
     return`<div class="order-card">
       <div style="display:flex;justify-content:space-between;align-items:start">
         <div>${orderIdBadge}${payBadge}${walletInfo}<h4>${escapeHtml(o.customerName)} - ₹${o.total}</h4></div>
@@ -1244,6 +1280,9 @@ function renderAdminOrdersList(){
       <div class="order-items-list">${itemsHtml}</div>
       
       <p style="font-size:12px">Del:₹${o.deliveryCharge}|Plat:₹${o.platformFee}|Hand:₹${o.handlingCharge}${o.pointsRedeemed?'|Pts:-'+o.pointsRedeemed:''}${o.walletUsed?'|Wallet:₹'+Math.round(o.walletUsed):''}</p>
+      
+      ${retHtml}
+
       <div style="display:flex;gap:5px;margin-top:10px">
         <input type="text" placeholder="Delivery Boy" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.name):''}" id="db-name-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px">
         <input type="tel" placeholder="Phone" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.phone):''}" id="db-phone-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px">
@@ -1337,7 +1376,13 @@ function renderShop(){
   if(filterMaxPrice!==null)items=items.filter(c=>getEffectivePrice(c)<=filterMaxPrice);
   if(sortOrder==='low-high')items.sort((a,b)=>getEffectivePrice(a)-getEffectivePrice(b));else if(sortOrder==='high-low')items.sort((a,b)=>getEffectivePrice(b)-getEffectivePrice(a));else items.sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));
   if(items.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim)">No products found</div>';return}
-  grid.innerHTML=items.map(c=>{const out=(c.times||0)<=0;const price=getEffectivePrice(c);const isFlash=isFlashActive(c);const off=getDiscountPercent(isFlash?c.originalPrice:c.originalPrice,price);const liked=watchlistIds.has(c.id);const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const inCart=cartProductIds.has(c.id);const flashBadge=isFlash?`<div class="flash-badge">⚡ FLASH</div>`:'';return`<div class="product-card" onclick="openProductDetails('${c.id}')"><div class="img-wrap"><img src="${optImg(img,400)}"><button class="share-card-btn" onclick="event.stopPropagation();shareProductCard('${c.id}')" style="background:#25D366;border:none;color:#fff">📤</button><button class="heart-btn ${liked?'liked':''}" onclick="event.stopPropagation();toggleWatchlist('${c.id}')">${liked?'❤️':'🤍'}</button>${flashBadge}${out?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;color:var(--danger);font-weight:800;z-index:2">OUT OF STOCK</div>':''}</div><div class="product-info"><div class="pname">${escapeHtml(c.name)}</div><div class="price-line"><span class="disc" style="${isFlash?'color:#ff6b6b':''}">₹${price}</span>${isFlash?`<span style="text-decoration:line-through;font-size:11px;color:var(--text-dim)">₹${c.discountPrice}</span>`:''}<span style="text-decoration:line-through;font-size:11px;color:var(--text-dim)">₹${c.originalPrice}</span>${off>0?`<span style="color:${isFlash?'#ff6b6b':'var(--success)'};font-size:11px;font-weight:800">${off}% OFF</span>`:''}</div>${(c.bundleQty>0&&c.bundlePrice>0)?`<div class="bundle-badge">🎁 ${c.bundleQty}@₹${c.bundlePrice}</div>`:''}${(c.wholesalePrice>0)?`<div style="font-size:10px;color:var(--success);font-weight:700;margin-top:3px">📦 Wholesale ${c.wholesaleMinQty}+ @ ₹${c.wholesalePrice}</div>`:''}<div class="product-actions"><button class="btn-cart" onclick="event.stopPropagation();toggleCartFromCard('${c.id}')">${inCart?'✓ In Cart':'+ Cart'}</button></div></div></div>`}).join('');
+  grid.innerHTML=items.map(c=>{const out=(c.times||0)<=0;const price=getEffectivePrice(c);const isFlash=isFlashActive(c);const off=getDiscountPercent(isFlash?c.originalPrice:c.originalPrice,price);const liked=watchlistIds.has(c.id);const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const inCart=cartProductIds.has(c.id);const flashBadge=isFlash?`<div class="flash-badge">⚡ FLASH</div>`:'';return`<div class="product-card" onclick="openProductDetails('${c.id}')"><div class="img-wrap"><img src="${optImg(img,400)}">
+  
+  <button class="share-card-btn" onclick="event.stopPropagation(); shareProductCard('${c.id}')" style="background:#25D366;border:none;color:#fff;display:flex;align-items:center;justify-content:center">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </button>
+  
+  <button class="heart-btn ${liked?'liked':''}" onclick="event.stopPropagation();toggleWatchlist('${c.id}')">${liked?'❤️':'🤍'}</button>${flashBadge}${out?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;color:var(--danger);font-weight:800;z-index:2">OUT OF STOCK</div>':''}</div><div class="product-info"><div class="pname">${escapeHtml(c.name)}</div><div class="price-line"><span class="disc" style="${isFlash?'color:#ff6b6b':''}">₹${price}</span>${isFlash?`<span style="text-decoration:line-through;font-size:11px;color:var(--text-dim)">₹${c.discountPrice}</span>`:''}<span style="text-decoration:line-through;font-size:11px;color:var(--text-dim)">₹${c.originalPrice}</span>${off>0?`<span style="color:${isFlash?'#ff6b6b':'var(--success)'};font-size:11px;font-weight:800">${off}% OFF</span>`:''}</div>${(c.bundleQty>0&&c.bundlePrice>0)?`<div class="bundle-badge">🎁 ${c.bundleQty}@₹${c.bundlePrice}</div>`:''}${(c.wholesalePrice>0)?`<div style="font-size:10px;color:var(--success);font-weight:700;margin-top:3px">📦 Wholesale ${c.wholesaleMinQty}+ @ ₹${c.wholesalePrice}</div>`:''}<div class="product-actions"><button class="btn-cart" onclick="event.stopPropagation();toggleCartFromCard('${c.id}')">${inCart?'✓ In Cart':'+ Cart'}</button></div></div></div>`}).join('');
 }
 function shareProductCard(id){const c=categoriesCache.find(x=>x.id===id);if(!c)return;window.open(`https://wa.me/?text=${encodeURIComponent(`Check out ${c.name} at ₹${getEffectivePrice(c)} on FAIZ FASHION!\n${window.location.origin}${window.location.pathname}`)}`,'_blank')}
 
