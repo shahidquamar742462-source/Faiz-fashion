@@ -354,7 +354,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <div class="stat-card"><div class="stat-val" id="statReturns">0</div><div class="stat-label">Returns</div></div>
   </div>
   <div id="lowStockWarning"></div>
-  <!-- ADD PRODUCT BUTTON REMOVED FROM HERE AND MOVED TO SETTINGS -->
+  <!-- ADD PRODUCT BUTTON MOVED TO SETTINGS -->
   <div id="categoryList" class="category-list"></div>
 </div>
 
@@ -451,7 +451,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>Settings</h2></div>
   <div class="form-container">
     
-    <!-- MOVED ADD PRODUCT BUTTON HERE -->
+    <!-- ADD PRODUCT BUTTON MOVED HERE -->
     <button class="btn-primary" onclick="openCategoryForm()" style="margin-bottom:20px;background:linear-gradient(135deg,var(--success),#27ae60);color:#fff">+ Add New Product</button>
 
     <div class="settings-section" style="border:1px solid var(--gold)">
@@ -709,6 +709,10 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 <div id="cancelOrderModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--card);padding:20px;border-radius:16px;width:100%;max-width:400px">
     <h3 style="margin-bottom:15px;color:var(--danger)">❌ Cancel Order</h3>
+    <div class="input-group">
+      <label>Select Products to Cancel</label>
+      <div id="cancelItemsList" style="max-height:150px; overflow-y:auto; margin-bottom:10px;"></div>
+    </div>
     <div class="input-group"><label>Reason (Compulsory)</label><select id="cancelReason">
       <option value="Changed my mind">Changed my mind</option>
       <option value="Found better price elsewhere">Found better price</option>
@@ -716,7 +720,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <option value="Delivery taking too long">Delivery taking too long</option>
       <option value="Other">Other</option>
     </select></div>
-    <div style="display:flex;gap:10px"><button class="btn-small" onclick="closeCancelModal()">Keep Order</button><button class="btn-primary" style="flex:1;padding:10px;background:var(--danger);color:#fff" onclick="confirmCancelOrder()">Cancel Order</button></div>
+    <div style="display:flex;gap:10px"><button class="btn-small" onclick="closeCancelModal()">Keep Order</button><button class="btn-primary" style="flex:1;padding:10px;background:var(--danger);color:#fff" onclick="confirmCancelOrder()">Cancel Selected</button></div>
   </div>
 </div>
 
@@ -897,7 +901,7 @@ let flashSaleCountdownInterval=null;
 let currentChatOrderId=null,currentAdminChatUid=null,currentAdminChatUserName='';
 let recentSearches=JSON.parse(localStorage.getItem('recentSearches')||'[]');
 let pendingCancelOrderId=null,pendingOtpOrderId=null;
-let unlockedOtps=[]; // Track unlocked OTPs in session
+let unlockedOtps=[]; 
 
 const ADMIN_SCREENS=['admin','admin-orders','admin-preorders','admin-reviews','category-form','settings','admin-dashboard','admin-qa','admin-chats','admin-chat-view'];
 
@@ -1278,7 +1282,7 @@ async function saveSettings(){
   hideLoading();
 }
 
-// ============ ADMIN ORDERS (WITH IMAGES & RETURN) ============
+// ============ ADMIN ORDERS (WITH IMAGES & RETURN & OTP FIX) ============
 function loadAdminOrders(){const list=document.getElementById('adminOrdersList');if(!list)return;if(unsubAdminOrders)unsubAdminOrders();unsubAdminOrders=onSnapshot(collection(db,'orders'),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders</div>';return}let arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.deletedByAdmin!==true);arr.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));allAdminOrdersCache=arr;updateAdminNotifBadge();document.getElementById('statReturns').textContent=arr.filter(o=>o.returnStatus==='Requested').length;renderAdminOrdersList();})}
 
 function renderAdminOrdersList(){
@@ -1288,12 +1292,13 @@ function renderAdminOrdersList(){
   list.innerHTML=filtered.map(o=>{
     const date=o.date?new Date(o.date.toMillis()).toLocaleString():'Recent';let sc='status-'+(o.status||'Pending');
     
-    const itemsHtml=o.items.map(i=>{
+    const itemsHtml=o.items.map((i, idx)=>{
       const v=[i.size?'Size:'+i.size:'',i.color?'Color:'+i.color:''].filter(Boolean).join(' | ');
-      return`<div class="order-item-row">
+      const isCancelled = o.cancelledItems && o.cancelledItems.includes(idx);
+      return`<div class="order-item-row" style="${isCancelled?'opacity:0.5;text-decoration:line-through;':''}">
         ${i.img?`<img src="${optImg(i.img,100)}" class="order-img-thumb">`:`<div class="order-img-thumb" style="background:#333;display:flex;align-items:center;justify-content:center;font-size:10px">No Img</div>`}
         <div style="flex:1">
-          <div style="font-weight:700">${escapeHtml(i.name)}</div>
+          <div style="font-weight:700">${escapeHtml(i.name)} ${isCancelled?'(Cancelled)':''}</div>
           <div style="font-size:11px;color:var(--text-dim)">${v}</div>
         </div>
         <div style="text-align:right;font-weight:800;color:var(--gold)">₹${i.price} <span style="color:var(--text-dim);font-size:11px">x${i.qty||1}</span></div>
@@ -1311,7 +1316,7 @@ function renderAdminOrdersList(){
       if(isUnlocked) {
         otpBadge = `<span style="background:rgba(52,152,219,0.15);color:#3498db;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:800">OTP: ${o.deliveryOtp}</span>`;
         if(o.status==='Shipped'||o.status==='Out for Delivery') {
-          verifyOtpBtn = `<button class="btn-small" style="background:rgba(46,204,113,0.2);border:1px solid var(--success);color:var(--success);font-weight:800" onclick="openOtpModal('${o.id}')">🔐 Verify & Delivered</button>`;
+          verifyOtpBtn = `<button class="btn-small" style="background:rgba(46,204,113,0.2);border:1px solid var(--success);color:var(--success);font-weight:800;width:100%;margin-top:5px" onclick="openOtpModal('${o.id}')">🔐 Verify & Delivered</button>`;
         }
       } else {
         otpBadge = `<button onclick="unlockAdminOtp('${o.id}')" style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:4px 8px;border-radius:4px;font-size:11px;font-weight:800;cursor:pointer">🔒 Unlock OTP</button>`;
@@ -1373,11 +1378,12 @@ function renderAdminOrdersList(){
       </div>
       <div style="display:flex;gap:5px;margin-top:8px">
         <button class="btn-small" style="background:rgba(46,204,113,0.15);border:1px solid var(--success);color:var(--success)" onclick="adminAdjustWallet('${o.userId}','${escapeHtml(o.customerName)}')">💰 Wallet</button>
-        ${verifyOtpBtn}
       </div>
+      ${verifyOtpBtn}
+      
       <span class="order-status ${sc}">${o.status||'Pending'}</span>
       <select style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;float:right;margin-top:10px" onchange="updateOrderStatus('${o.id}',this.value)">
-        ${['Pending','Processing','Shipped','Out for Delivery','Delivered','Cancelled'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}
+        ${['Pending','Processing','Shipped','Out for Delivery','Cancelled'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}
       </select>
     </div>`
   }).join('');
@@ -1599,11 +1605,18 @@ function renderCustomerOrders(){
   if(filtered.length===0){list.innerHTML='<div class="loading-row">No orders</div>';return}
   list.innerHTML=filtered.map(o=>{
     const date=o.date?new Date(o.date.toMillis()).toLocaleDateString():'Recent';const sc='status-'+(o.status||'Pending');
-    const itemsHtml=o.items.map(i=>{const v=[i.size?`Size: ${i.size}`:'',i.color?`Color: ${i.color}`:''].filter(Boolean).join(' | ');return`<li>${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price*(i.qty||1)}</li>`}).join('');
+    
+    const itemsHtml=o.items.map((i, idx)=>{
+      const v=[i.size?`Size: ${i.size}`:'',i.color?`Color: ${i.color}`:''].filter(Boolean).join(' | ');
+      const isCancelled = o.cancelledItems && o.cancelledItems.includes(idx);
+      return`<li style="${isCancelled?'opacity:0.5;text-decoration:line-through;':''}">${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price*(i.qty||1)} ${isCancelled?'(Cancelled)':''}</li>`;
+    }).join('');
+    
     const steps=['Pending','Processing','Shipped','Out for Delivery','Delivered'];let ci=steps.indexOf(o.status);if(o.status==='Cancelled')ci=-1;
     let timelineHtml='';
     if(o.status!=='Cancelled'){timelineHtml=`<div class="timeline">${steps.map((step,idx)=>{let cls='';if(idx<ci)cls='completed';else if(idx===ci)cls='active';const icons={Pending:'📝',Processing:'📦',Shipped:'🚚','Out for Delivery':'🛵',Delivered:'🏠'};const icon=cls==='completed'?'✓':icons[step];return`<div class="timeline-step ${cls}"><div class="timeline-dot">${icon}</div><div class="timeline-text">${step}</div></div>`}).join('')}</div>`}else timelineHtml=`<div style="text-align:center;padding:10px;background:rgba(231,76,60,0.1);border:1px dashed var(--danger);border-radius:8px;margin:10px 0"><span style="color:var(--danger);font-weight:800">❌ Cancelled</span>${o.cancelReason?`<div style="font-size:11px;color:var(--text-dim);margin-top:4px">Reason: ${escapeHtml(o.cancelReason)}</div>`:''}</div>`;
     let otpHtml='';if(o.deliveryOtp&&['Shipped','Out for Delivery'].includes(o.status)){otpHtml=`<div style="background:rgba(46,204,113,0.1);border:1px dashed var(--success);padding:10px;border-radius:8px;margin:10px 0;text-align:center"><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:700">Delivery OTP</div><div style="font-size:28px;font-weight:900;color:var(--success);letter-spacing:8px;font-family:monospace">${o.deliveryOtp}</div><div style="font-size:10px;color:var(--text-dim);margin-top:3px">Delivery boy ko ye code batayein</div></div>`}
+    
     let cancelBtn='';if(['Pending','Processing'].includes(o.status)){cancelBtn=`<button class="btn-small" style="margin-top:8px;background:rgba(231,76,60,0.1);border:1px solid var(--danger);color:var(--danger);width:100%" onclick="openCancelModal('${o.id}')">❌ Cancel Order</button>`}
     let payHtml='';if(o.paymentStatus==='Paid')payHtml=`<span style="background:var(--success);color:#000;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800">💳 PAID</span>`;else if(o.paymentStatus==='Pending Verification')payHtml=`<span style="background:#f39c12;color:#000;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800">⏳ VERIFYING</span>`;else if(o.paymentMethod&&o.paymentMethod!=='cod')payHtml=`<span style="background:#f39c12;color:#000;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800">💳 ${o.paymentMethod.toUpperCase()}</span>`;else payHtml=`<span style="background:#f39c12;color:#000;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800">💵 COD</span>`;
     const orderCodeBadge=`<div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800">#${o.orderCode||o.id.slice(-8).toUpperCase()}</div>`;
@@ -1632,21 +1645,59 @@ function renderCustomerOrders(){
     return`<div class="category-card" style="padding:15px"><div style="display:flex;justify-content:space-between;margin-bottom:5px;align-items:center;flex-wrap:wrap;gap:5px">${orderCodeBadge}${payHtml}<span style="color:var(--gold);font-weight:800">₹${o.total}</span></div><div style="font-size:11px;color:var(--text-dim);margin-bottom:5px">${date}</div>${timelineHtml}${otpHtml}<ul style="font-size:13px;margin-bottom:5px;padding-left:15px">${itemsHtml}</ul><div><span class="order-status ${sc}">${o.status||'Pending'}</span></div>${retBtn}${cancelBtn}${waBtn}</div>`;
   }).join('');
 }
-function openCancelModal(id){pendingCancelOrderId=id;document.getElementById('cancelOrderModal').style.display='flex'}
+
+function openCancelModal(id){
+  pendingCancelOrderId=id;
+  const order=allOrdersCache.find(o=>o.id===id);
+  if(!order)return;
+  const list=document.getElementById('cancelItemsList');
+  list.innerHTML=order.items.map((item, idx)=>`
+    <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;background:var(--card2);padding:10px;border-radius:8px;cursor:pointer;">
+      <input type="checkbox" class="cancel-item-cb" value="${idx}" checked style="width:18px;height:18px;">
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:13px;">${escapeHtml(item.name)}</div>
+        <div style="font-size:11px;color:var(--text-dim);">Size: ${item.size || '-'} | Qty: ${item.qty}</div>
+      </div>
+    </label>
+  `).join('');
+  document.getElementById('cancelOrderModal').style.display='flex';
+}
+
 function closeCancelModal(){document.getElementById('cancelOrderModal').style.display='none';pendingCancelOrderId=null}
+
 async function confirmCancelOrder(){
-  if(!pendingCancelOrderId)return;const reason=document.getElementById('cancelReason').value;showLoading();
+  if(!pendingCancelOrderId)return;
+  const reason=document.getElementById('cancelReason').value;
+  const selectedCbs=document.querySelectorAll('.cancel-item-cb:checked');
+  if(selectedCbs.length===0)return alert('Select at least one item to cancel.');
+  
+  const cancelIndices=Array.from(selectedCbs).map(cb=>parseInt(cb.value));
+  const order=allOrdersCache.find(o=>o.id===pendingCancelOrderId);
+  if(!order)return;
+  
+  const isFullCancel=cancelIndices.length===order.items.length;
+  showLoading();
   try{
-    const order=allOrdersCache.find(o=>o.id===pendingCancelOrderId);if(!order)throw new Error('Order not found');
-    for(const item of (order.items||[])){try{const ref=doc(db,'categories',item.productId);const snap=await getDoc(ref);if(snap.exists())await updateDoc(ref,{times:(snap.data().times||0)+item.qty})}catch(e){}}
-    if(order.walletUsed>0)await addUserWallet(order.walletUsed);
-    if(order.pointsRedeemed>0)await addUserPoints(order.pointsRedeemed);
-    if(order.pointsEarned>0)await addUserPoints(-order.pointsEarned);
-    await updateDoc(doc(db,'orders',pendingCancelOrderId),{status:'Cancelled',cancelReason:reason,cancelledAt:serverTimestamp()});
-    alert('✅ Order cancelled. Refunds processed.');closeCancelModal();
+    if(isFullCancel){
+      for(const item of (order.items||[])){try{const ref=doc(db,'categories',item.productId);const snap=await getDoc(ref);if(snap.exists())await updateDoc(ref,{times:(snap.data().times||0)+item.qty})}catch(e){}}
+      if(order.walletUsed>0)await addUserWallet(order.walletUsed);
+      if(order.pointsRedeemed>0)await addUserPoints(order.pointsRedeemed);
+      if(order.pointsEarned>0)await addUserPoints(-order.pointsEarned);
+    }
+    
+    const updateData = {
+      cancelReason: reason,
+      cancelledAt: serverTimestamp(),
+      cancelledItems: cancelIndices
+    };
+    if(isFullCancel) updateData.status = 'Cancelled';
+    
+    await updateDoc(doc(db,'orders',pendingCancelOrderId),updateData);
+    alert('✅ Order updated. Refunds processed.');closeCancelModal();
   }catch(e){alert('Error: '+e.message)}
   hideLoading();
 }
+
 async function deleteCustomerOrder(id){if(confirm('Delete from your list?')){try{await updateDoc(doc(db,'orders',id),{deletedByCustomer:true});alert('✅ Deleted')}catch(e){alert('Error: '+e.message)}}}
 function loadCustomerOrders(){const list=document.getElementById('ordersList');if(!list)return;list.innerHTML='<div class="loading-row">Loading...</div>';if(unsubOrders)unsubOrders();unsubOrders=onSnapshot(query(collection(db,'orders'),where('userId','==',currentUid)),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders yet</div>';return}allOrdersCache=snap.docs.map(d=>({id:d.id,...d.data()}));allOrdersCache.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));renderCustomerOrders()})}
 
