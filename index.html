@@ -259,7 +259,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 @media print{body *{visibility:hidden}#printArea,#printArea *{visibility:visible}#printArea{position:absolute;left:0;top:0;width:100%;background:#fff;color:#000;padding:20px}}
 </style>
 </head>
-<body>
+<body class="light">
 
 <div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center">
   <div style="width:50px;height:50px;border:4px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite"></div>
@@ -292,7 +292,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <div class="form-container">
     <p style="text-align:center;color:var(--text-dim);font-size:14px;margin-bottom:20px">Order tracking, wallet aur exclusive rewards ke liye login karein.</p>
     
-    <button onclick="loginWithGoogle()" style="width:100%;background:#fff;color:#000;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;cursor:pointer">
+    <button onclick="loginWithGoogle()" style="width:100%;background:#fff;color:#000;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;cursor:pointer;border:1px solid #ddd">
       <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Continue with Google
     </button>
@@ -354,7 +354,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <div class="stat-card"><div class="stat-val" id="statReturns">0</div><div class="stat-label">Returns</div></div>
   </div>
   <div id="lowStockWarning"></div>
-  <!-- ADD PRODUCT BUTTON MOVED TO SETTINGS -->
   <div id="categoryList" class="category-list"></div>
 </div>
 
@@ -363,20 +362,17 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <div id="dashboardContent"><div class="loading-row">Loading...</div></div>
 </div>
 
-<!-- NEW SCREEN: ADMIN CUSTOMER ORDERS -->
 <div id="screen-admin-customer-orders" class="screen">
   <div class="header">
     <button class="back-btn" onclick="showScreen('admin-dashboard')">←</button>
     <h2 id="custOrdersTitle">Customer Data</h2>
   </div>
   
-  <!-- TABS -->
   <div style="display:flex; gap:10px; margin-bottom:15px;">
     <button id="btn-cust-orders" class="btn-primary" style="flex:1; padding:10px; margin:0;" onclick="switchCustOrderTab('orders')">📦 Orders</button>
     <button id="btn-cust-preorders" class="btn-primary" style="flex:1; padding:10px; margin:0; background:var(--card2); color:var(--text); border:1px solid var(--border);" onclick="switchCustOrderTab('preorders')">📝 Pre-Orders</button>
   </div>
 
-  <!-- LISTS -->
   <div id="custOrdersList" class="category-list"><div class="loading-row">Loading...</div></div>
   <div id="custPreOrdersList" class="category-list" style="display:none;"><div class="loading-row">Loading...</div></div>
 </div>
@@ -469,7 +465,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>Settings</h2></div>
   <div class="form-container">
     
-    <!-- ADD PRODUCT BUTTON MOVED HERE -->
     <button class="btn-primary" onclick="openCategoryForm()" style="margin-bottom:20px;background:linear-gradient(135deg,var(--success),#27ae60);color:#fff">+ Add New Product</button>
 
     <div class="settings-section" style="border:1px solid var(--gold)">
@@ -543,7 +538,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <div style="display:flex;gap:8px">
         <button class="icon-btn" onclick="showScreen('orders')">📦</button>
         <button class="icon-btn" onclick="showScreen('cart')">🛒<span class="badge" id="shopCartBadge">0</span></button>
-        <button class="icon-btn" onclick="showScreen('customer-settings')">⚙️</button>
+        <!-- Gear icon removed from here as requested -->
       </div>
     </div>
     <div class="search-row">
@@ -580,31 +575,63 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <div id="shopGrid" class="product-grid"></div>
 </div>
 
+<!-- NEW REDESIGNED CUSTOMER SETTINGS (ACCOUNT) SCREEN -->
 <div id="screen-customer-settings" class="screen">
-  <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Settings</h2></div>
-  <div class="form-container">
+  <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Account</h2></div>
+  <div class="form-container" style="max-width: 500px;">
 
-    <div class="settings-section" style="margin-bottom:15px; background:rgba(212,175,55,0.05); border:1px dashed var(--gold)">
-      <h3 style="color:var(--gold); margin-bottom:10px">👤 Account Details</h3>
-      <p style="font-size:14px; margin-top:5px; color:var(--text);"><b>Login Type:</b> <span id="custLoginType">Loading...</span></p>
-      <p style="font-size:14px; margin-top:5px; color:var(--text); word-break: break-all;"><b>Email/ID:</b> <span id="custLoginId">Loading...</span></p>
+    <!-- COMPACT PROFILE CARD -->
+    <div style="background: var(--card); padding: 15px; border-radius: 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid var(--border);">
+       <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 30px; color: #fff;">
+         👤
+       </div>
+       <div style="flex: 1; overflow: hidden;">
+         <div style="font-size: 18px; font-weight: 800; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="profileGreeting">Hey, User</div>
+         <div style="font-size: 12px; color: var(--text-dim); word-break: break-all;" id="custLoginId">Loading...</div>
+         <div style="font-size: 11px; color: var(--gold); font-weight: 700; margin-top:2px;" id="custLoginType">Loading...</div>
+       </div>
     </div>
 
-    <button class="btn-primary" style="background:var(--card2);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="openCustomerChat()">
+    <!-- ORDERS & WATCHLIST BUTTONS -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+      <button onclick="showScreen('orders')" style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <span style="font-size: 32px;">📦</span>
+        <span style="font-size: 14px; font-weight: 800; color: var(--text);">Orders</span>
+      </button>
+      
+      <button onclick="setMainCategory('Watchlist'); showScreen('shop');" style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <span style="font-size: 32px; color: #ff4d6d;">❤️</span>
+        <span style="font-size: 14px; font-weight: 800; color: var(--text);">Watchlist</span>
+      </button>
+    </div>
+
+    <!-- RECENTLY VIEWED SECTION -->
+    <div style="margin-bottom: 20px;">
+      <h3 style="font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 10px;">Recently Viewed</h3>
+      <div id="settingsRecentGrid" class="recent-grid" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;">
+         <!-- Dynamically populated by JS -->
+      </div>
+    </div>
+
+    <!-- OTHER SETTINGS (REST BELOW) -->
+    <button class="btn-primary" style="background:var(--card); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);" onclick="openCustomerChat()">
       <span style="font-size:24px">💬</span>
-      <div><div style="font-size:16px;font-weight:800">Support Chat</div><div style="font-size:13px;color:var(--text-dim)">Chat with admin directly</div></div>
+      <div><div style="font-size:16px; font-weight:800;">Support Chat</div><div style="font-size:13px;color:var(--text-dim)">Chat with admin directly</div></div>
     </button>
-    <button class="btn-primary" style="background:var(--card2);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="showScreen('contact')">
+    
+    <button class="btn-primary" style="background:var(--card); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);" onclick="showScreen('contact')">
       <span style="font-size:24px">🎧</span>
-      <div><div style="font-size:16px;font-weight:800">Contact Us</div><div style="font-size:13px;color:var(--text-dim)">Call, WhatsApp, Email</div></div>
+      <div><div style="font-size:16px; font-weight:800;">Contact Us</div><div style="font-size:13px;color:var(--text-dim)">Call, WhatsApp, Email</div></div>
     </button>
-    <button class="btn-primary" style="background:var(--card2);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="toggleDarkMode()">
+    
+    <button class="btn-primary" style="background:var(--card); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);" onclick="toggleDarkMode()">
       <span style="font-size:24px" id="custThemeIcon">🌙</span>
-      <div><div style="font-size:16px;font-weight:800">Theme</div><div style="font-size:13px;color:var(--text-dim)">Light/Dark Mode</div></div>
+      <div><div style="font-size:16px; font-weight:800;">Theme</div><div style="font-size:13px;color:var(--text-dim)">Switch Light/Dark Mode</div></div>
     </button>
-    <button class="btn-primary" style="background:rgba(212,175,55,0.1);border:1px solid var(--gold);color:var(--gold);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="requestGlobalLocation()">
+    
+    <button class="btn-primary" style="background:rgba(212,175,55,0.1); border:1px solid var(--gold); color:var(--gold); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px;" onclick="requestGlobalLocation()">
       <span style="font-size:24px">📍</span>
-      <div><div style="font-size:16px;font-weight:800">Share Location</div><div style="font-size:13px;color:var(--text-dim)" id="globalLocStatus">Tap to allow GPS</div></div>
+      <div><div style="font-size:16px; font-weight:800;">Share Location</div><div style="font-size:13px;color:var(--text-dim)" id="globalLocStatus">Tap to allow GPS</div></div>
     </button>
   </div>
 </div>
@@ -891,6 +918,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <button class="nav-item" data-screen="preorder" onclick="showScreen('preorder')"><span class="nav-icon">📝</span>Pre-Order</button>
   <button class="nav-item" data-screen="orders" onclick="showScreen('orders')"><span class="nav-icon">📦</span>Orders</button>
   <button class="nav-item" data-screen="cart" onclick="showScreen('cart')"><span class="nav-icon">🛒</span>Cart<span class="badge" id="navCartBadge" style="top:-2px">0</span></button>
+  <button class="nav-item" data-screen="customer-settings" onclick="showScreen('customer-settings')"><span class="nav-icon">👤</span>Account</button>
 </div>
 
 <script type="module">
@@ -937,17 +965,50 @@ function escapeHtml(str){return String(str??'').replace(/[&<>"']/g,m=>({'&':'&am
 function optImg(url,w){if(!url)return '';if(!url.includes('cloudinary.com')||!url.includes('/upload/'))return url;return url.replace('/upload/',`/upload/q_auto:eco,f_auto,w_${w||400}/`)}
 function showLoading(){document.getElementById('loadingOverlay').style.display='flex'}
 function hideLoading(){document.getElementById('loadingOverlay').style.display='none'}
-function initTheme(){const s=localStorage.getItem('theme')||'dark';if(s==='light'){document.body.classList.add('light');const a=document.getElementById('adminThemeIcon');const c=document.getElementById('custThemeIcon');if(a)a.textContent='☀️';if(c)c.textContent='☀️'}}
+function initTheme(){
+  // DEFAULT TO LIGHT
+  const s=localStorage.getItem('theme')||'light'; 
+  const adminT=document.getElementById('adminThemeIcon');
+  const custT=document.getElementById('custThemeIcon');
+  if(s==='light'){
+    document.body.classList.add('light');
+    if(adminT) adminT.textContent='☀️';
+    if(custT) custT.textContent='☀️';
+  } else {
+    document.body.classList.remove('light');
+    if(adminT) adminT.textContent='🌙';
+    if(custT) custT.textContent='🌙';
+  }
+}
 function toggleDarkMode(){const l=document.body.classList.toggle('light');localStorage.setItem('theme',l?'light':'dark');const a=document.getElementById('adminThemeIcon');const c=document.getElementById('custThemeIcon');if(a)a.textContent=l?'☀️':'🌙';if(c)c.textContent=l?'☀️':'🌙'}
 function addRecentlyViewed(id){let r=JSON.parse(localStorage.getItem('recentlyViewed')||'[]');r=r.filter(x=>x!==id);r.unshift(id);r=r.slice(0,10);localStorage.setItem('recentlyViewed',JSON.stringify(r))}
 function renderRecentlyViewed(){const r=JSON.parse(localStorage.getItem('recentlyViewed')||'[]');const s=document.getElementById('recentlyViewedSection');const g=document.getElementById('recentlyViewedGrid');const items=r.map(id=>categoriesCache.find(c=>c.id===id)).filter(Boolean).slice(0,8);if(items.length===0){s.style.display='none';return}s.style.display='block';g.innerHTML=items.map(c=>{const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:c.photoUrl;return`<div class="recent-card" onclick="openProductDetails('${c.id}')"><img src="${optImg(img,200)}"><p>${escapeHtml(c.name)}</p><p style="color:var(--gold)">₹${getEffectivePrice(c)}</p></div>`}).join('')}
+
+function renderSettingsRecentlyViewed() {
+  const grid = document.getElementById('settingsRecentGrid');
+  if(!grid) return;
+  const r = JSON.parse(localStorage.getItem('recentlyViewed')||'[]');
+  const items = r.map(id=>categoriesCache.find(c=>c.id===id)).filter(Boolean).slice(0, 8);
+  if(items.length === 0) {
+    grid.innerHTML = '<div style="font-size:13px; color:var(--text-dim);">No recently viewed items.</div>';
+    return;
+  }
+  grid.innerHTML = items.map(c=>{
+    const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:c.photoUrl;
+    return `<div class="recent-card" style="min-width: 100px;" onclick="openProductDetails('${c.id}')">
+      <img src="${optImg(img,200)}" style="width:100px; height:100px; object-fit:cover; border-radius:10px;">
+      <p style="font-size:12px; font-weight:700; margin-top:5px; color:var(--text);">${escapeHtml(c.name)}</p>
+      <p style="color:var(--gold); font-size:12px; font-weight:800;">₹${getEffectivePrice(c)}</p>
+    </div>`;
+  }).join('');
+}
 
 function showScreen(name){
   if(ADMIN_SCREENS.includes(name)&&!isAdminUser){alert('Admin required');return}
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const el=document.getElementById('screen-'+name);if(!el)return;el.classList.add('active');
   const nav=document.getElementById('bottomNav');
-  nav.style.display=['shop','cart','orders','preorder','my-preorders'].includes(name)?'flex':'none';
+  nav.style.display=['shop','cart','orders','preorder','my-preorders','customer-settings'].includes(name)?'flex':'none';
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.screen===name));
   
   if(name==='shop'){renderShop();renderRecentlyViewed();checkSpinWheel()}
@@ -962,23 +1023,30 @@ function showScreen(name){
   if(name==='admin-qa')loadAdminQA();
   if(name==='admin-chats')loadAdminChats();
   if(name==='settings'&&isAdminUser)renderAdminCoupons();
+  
   if(name==='customer-settings'){
     updateGlobalLocStatus();
     const user = auth.currentUser;
     if(user){
       const typeEl = document.getElementById('custLoginType');
       const idEl = document.getElementById('custLoginId');
+      const greetEl = document.getElementById('profileGreeting');
+      
       if(user.isAnonymous){
-        typeEl.textContent = 'Anonymous (Without Login)';
+        typeEl.textContent = 'Guest User';
         typeEl.style.color = '#f39c12';
         idEl.textContent = currentUid;
+        if(greetEl) greetEl.textContent = "Hey, Guest";
       } else {
         typeEl.textContent = 'Google Account';
         typeEl.style.color = 'var(--success)';
         idEl.textContent = user.email;
+        if(greetEl) greetEl.textContent = "Hey, " + (user.displayName || user.email.split('@')[0]);
       }
     }
+    renderSettingsRecentlyViewed();
   }
+  
   if(name==='checkout')updateCheckoutLocStatus();
   if(name==='admin')loadAnalytics();
   window.scrollTo(0,0)
@@ -1924,7 +1992,7 @@ function checkSpinWheel(){const last=localStorage.getItem('lastSpinDate');const 
 function closeSpinWheel(){document.getElementById('spinWheelModal').style.display='none'}
 function spinWheel(){const btn=document.getElementById('spinBtn');btn.disabled=true;const wheel=document.getElementById('wheelCanvas');const deg=Math.floor(Math.random()*360)+720;wheel.style.transform=`rotate(${deg}deg)`;setTimeout(()=>{if(couponsCache.length>0){const c=couponsCache[Math.floor(Math.random()*couponsCache.length)];document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML=`🎉 Won: <span style="color:var(--gold)">${c.code}</span> (${c.discountPercent}% OFF)`;localStorage.setItem('lastSpinDate',new Date().toDateString())}else{document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML='No coupons active'};btn.textContent='CLOSE';btn.onclick=closeSpinWheel;btn.disabled=false},3000)}
 
-const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers'];
+const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
