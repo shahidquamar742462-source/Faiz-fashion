@@ -363,6 +363,24 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <div id="dashboardContent"><div class="loading-row">Loading...</div></div>
 </div>
 
+<!-- NEW SCREEN: ADMIN CUSTOMER ORDERS -->
+<div id="screen-admin-customer-orders" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="showScreen('admin-dashboard')">←</button>
+    <h2 id="custOrdersTitle">Customer Data</h2>
+  </div>
+  
+  <!-- TABS -->
+  <div style="display:flex; gap:10px; margin-bottom:15px;">
+    <button id="btn-cust-orders" class="btn-primary" style="flex:1; padding:10px; margin:0;" onclick="switchCustOrderTab('orders')">📦 Orders</button>
+    <button id="btn-cust-preorders" class="btn-primary" style="flex:1; padding:10px; margin:0; background:var(--card2); color:var(--text); border:1px solid var(--border);" onclick="switchCustOrderTab('preorders')">📝 Pre-Orders</button>
+  </div>
+
+  <!-- LISTS -->
+  <div id="custOrdersList" class="category-list"><div class="loading-row">Loading...</div></div>
+  <div id="custPreOrdersList" class="category-list" style="display:none;"><div class="loading-row">Loading...</div></div>
+</div>
+
 <div id="screen-admin-orders" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>All Orders</h2></div>
   <div style="margin-bottom:15px">
@@ -565,6 +583,13 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 <div id="screen-customer-settings" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Settings</h2></div>
   <div class="form-container">
+
+    <div class="settings-section" style="margin-bottom:15px; background:rgba(212,175,55,0.05); border:1px dashed var(--gold)">
+      <h3 style="color:var(--gold); margin-bottom:10px">👤 Account Details</h3>
+      <p style="font-size:14px; margin-top:5px; color:var(--text);"><b>Login Type:</b> <span id="custLoginType">Loading...</span></p>
+      <p style="font-size:14px; margin-top:5px; color:var(--text); word-break: break-all;"><b>Email/ID:</b> <span id="custLoginId">Loading...</span></p>
+    </div>
+
     <button class="btn-primary" style="background:var(--card2);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="openCustomerChat()">
       <span style="font-size:24px">💬</span>
       <div><div style="font-size:16px;font-weight:800">Support Chat</div><div style="font-size:13px;color:var(--text-dim)">Chat with admin directly</div></div>
@@ -902,8 +927,10 @@ let currentChatOrderId=null,currentAdminChatUid=null,currentAdminChatUserName=''
 let recentSearches=JSON.parse(localStorage.getItem('recentSearches')||'[]');
 let pendingCancelOrderId=null,pendingOtpOrderId=null;
 let unlockedOtps=[]; 
+let customerOrdersCache=[];
+let customerPreOrdersCache=[];
 
-const ADMIN_SCREENS=['admin','admin-orders','admin-preorders','admin-reviews','category-form','settings','admin-dashboard','admin-qa','admin-chats','admin-chat-view'];
+const ADMIN_SCREENS=['admin','admin-orders','admin-preorders','admin-reviews','category-form','settings','admin-dashboard','admin-qa','admin-chats','admin-chat-view','admin-customer-orders'];
 
 function escapeHtml(str){return String(str??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function optImg(url,w){if(!url)return '';if(!url.includes('cloudinary.com')||!url.includes('/upload/'))return url;return url.replace('/upload/',`/upload/q_auto:eco,f_auto,w_${w||400}/`)}
@@ -921,6 +948,7 @@ function showScreen(name){
   const nav=document.getElementById('bottomNav');
   nav.style.display=['shop','cart','orders','preorder','my-preorders'].includes(name)?'flex':'none';
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.screen===name));
+  
   if(name==='shop'){renderShop();renderRecentlyViewed();checkSpinWheel()}
   if(name==='cart'){renderCart();loadSavedAddresses()}
   if(name==='orders'){loadCustomerOrders();updateRewardsDisplay()}
@@ -933,7 +961,23 @@ function showScreen(name){
   if(name==='admin-qa')loadAdminQA();
   if(name==='admin-chats')loadAdminChats();
   if(name==='settings'&&isAdminUser)renderAdminCoupons();
-  if(name==='customer-settings')updateGlobalLocStatus();
+  if(name==='customer-settings'){
+    updateGlobalLocStatus();
+    const user = auth.currentUser;
+    if(user){
+      const typeEl = document.getElementById('custLoginType');
+      const idEl = document.getElementById('custLoginId');
+      if(user.isAnonymous){
+        typeEl.textContent = 'Anonymous (Without Login)';
+        typeEl.style.color = '#f39c12';
+        idEl.textContent = currentUid;
+      } else {
+        typeEl.textContent = 'Google Account';
+        typeEl.style.color = 'var(--success)';
+        idEl.textContent = user.email;
+      }
+    }
+  }
   if(name==='checkout')updateCheckoutLocStatus();
   if(name==='admin')loadAnalytics();
   window.scrollTo(0,0)
@@ -1005,18 +1049,23 @@ async function loadDashboard(){
     const usersArr = custSnap.docs.map(d => ({id: d.id, ...d.data()}));
     usersArr.sort((a,b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
     const recentUsers = usersArr.slice(0, 10);
-    const usersHtml = recentUsers.map(u => `
-      <div style="padding:8px;background:var(--card2);border-radius:8px;margin-bottom:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center">
+    
+    const usersHtml = recentUsers.map(u => {
+      const userName = u.email || 'Anonymous';
+      const safeName = userName.replace(/'/g, "\\'");
+      return `
+      <div onclick="viewCustomerOrders('${u.id}', '${safeName}')" style="padding:8px;background:var(--card2);border-radius:8px;margin-bottom:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border:1px solid transparent;transition:0.2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='transparent'">
         <div>
           <b>${escapeHtml(u.email || 'Anonymous (No Email)')}</b><br>
-          <span style="color:var(--text-dim);font-size:10px">UID: ${u.id}</span>
+          <span style="color:var(--text-dim);font-size:10px">UID: ${u.id}</span><br>
+          <span style="font-size:10px;color:var(--gold);font-weight:800">👉 Click to view orders</span>
         </div>
         <div style="text-align:right">
           <span style="color:var(--success);font-weight:700">₹${Math.round(u.walletBalance||0)}</span><br>
           <span style="color:var(--gold);font-size:10px">⭐ ${u.points||0}</span>
         </div>
       </div>
-    `).join('');
+    `}).join('');
 
     cont.innerHTML=`
       <div class="analytics-grid">
@@ -1032,11 +1081,118 @@ async function loadDashboard(){
       <div class="settings-section"><h3 style="margin-bottom:15px">📈 Last 7 Days Sales</h3><div class="dash-chart" style="margin-bottom:30px">${chartHtml}</div></div>
       <div class="settings-section"><h3 style="margin-bottom:15px">🏆 Top Selling Products</h3>${topProducts.length===0?'<div style="color:var(--text-dim);text-align:center;padding:10px">No sales yet</div>':topProducts.map((p,i)=>`<div class="dash-top-item"><span class="dash-top-rank">#${i+1}</span><span style="flex:1">${escapeHtml(p.name)}</span><span style="color:var(--success);font-weight:700">₹${Math.round(p.rev)}</span><span style="color:var(--text-dim);font-size:11px">(${p.qty} sold)</span></div>`).join('')}</div>
       <div class="settings-section">
-        <h3 style="margin-bottom:15px">👥 Recent Users (Logged In)</h3>
+        <h3 style="margin-bottom:15px">👥 Recent Users (Click to view orders)</h3>
         ${usersHtml || '<div style="color:var(--text-dim);text-align:center">No users yet</div>'}
       </div>
     `;
   }catch(e){cont.innerHTML='<div class="loading-row">Error: '+e.message+'</div>'}
+}
+
+async function viewCustomerOrders(userId, emailOrName) {
+  showScreen('admin-customer-orders');
+  document.getElementById('custOrdersTitle').textContent = `Data: ${emailOrName}`;
+  
+  switchCustOrderTab('orders');
+  
+  const list = document.getElementById('custOrdersList');
+  const preList = document.getElementById('custPreOrdersList');
+  
+  list.innerHTML = '<div class="loading-row">Fetching orders...</div>';
+  preList.innerHTML = '<div class="loading-row">Fetching pre-orders...</div>';
+  
+  try {
+    const q = query(collection(db, 'orders'), where('userId', '==', userId));
+    const snap = await getDocs(q);
+    customerOrdersCache = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    customerOrdersCache.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
+    
+    const pq = query(collection(db, 'pre_orders'), where('userId', '==', userId));
+    const psnap = await getDocs(pq);
+    customerPreOrdersCache = psnap.docs.map(d => ({id: d.id, ...d.data()}));
+    customerPreOrdersCache.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
+
+    renderCustomerDashboardData();
+  } catch (e) {
+    list.innerHTML = `<div class="loading-row" style="color:var(--danger)">Error: ${e.message}</div>`;
+    preList.innerHTML = `<div class="loading-row" style="color:var(--danger)">Error: ${e.message}</div>`;
+  }
+}
+
+function switchCustOrderTab(tab) {
+  const btnOrders = document.getElementById('btn-cust-orders');
+  const btnPre = document.getElementById('btn-cust-preorders');
+  const listOrders = document.getElementById('custOrdersList');
+  const listPre = document.getElementById('custPreOrdersList');
+
+  if (tab === 'orders') {
+    listOrders.style.display = 'block';
+    listPre.style.display = 'none';
+    btnOrders.style.background = 'var(--gold)';
+    btnOrders.style.color = '#000';
+    btnOrders.style.border = 'none';
+    btnPre.style.background = 'var(--card2)';
+    btnPre.style.color = 'var(--text)';
+    btnPre.style.border = '1px solid var(--border)';
+  } else {
+    listOrders.style.display = 'none';
+    listPre.style.display = 'block';
+    btnPre.style.background = 'var(--gold)';
+    btnPre.style.color = '#000';
+    btnPre.style.border = 'none';
+    btnOrders.style.background = 'var(--card2)';
+    btnOrders.style.color = 'var(--text)';
+    btnOrders.style.border = '1px solid var(--border)';
+  }
+}
+
+function renderCustomerDashboardData() {
+  const list = document.getElementById('custOrdersList');
+  if (customerOrdersCache.length === 0) {
+    list.innerHTML = '<div class="loading-row">No normal orders found.</div>';
+  } else {
+    list.innerHTML = customerOrdersCache.map(o => {
+      const date = o.date ? new Date(o.date.toMillis()).toLocaleString() : 'Recent';
+      let sc = 'status-' + (o.status || 'Pending');
+      const itemsHtml = o.items.map(i => `<li>${escapeHtml(i.name)} ${i.size?'['+i.size+']':''} × ${i.qty||1} — ₹${i.price}</li>`).join('');
+      const orderIdBadge = `<div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;margin-bottom:5px">#${o.orderCode || o.id.slice(-8).toUpperCase()}</div>`;
+      
+      return `<div class="order-card">
+        <div style="display:flex;justify-content:space-between;align-items:start">
+          <div>${orderIdBadge}<h4>₹${o.total}</h4></div>
+          <div style="font-size:12px;color:var(--text-dim)">${date}</div>
+        </div>
+        <ul style="font-size:13px; margin:10px 0; padding-left:15px; color:var(--text);">${itemsHtml}</ul>
+        <div><span class="order-status ${sc}">${o.status||'Pending'}</span></div>
+      </div>`;
+    }).join('');
+  }
+
+  const preList = document.getElementById('custPreOrdersList');
+  if (customerPreOrdersCache.length === 0) {
+    preList.innerHTML = '<div class="loading-row">No pre-orders found.</div>';
+  } else {
+    preList.innerHTML = customerPreOrdersCache.map(o => {
+      const date = o.date ? new Date(o.date.toMillis()).toLocaleString() : 'Recent';
+      const s = o.status || 'Pending';
+      const cls = 'status-' + s;
+      let priceHtml = '';
+      if(o.totalPrice) {
+        priceHtml = `<div style="font-size:13px;font-weight:800;color:var(--gold);margin-top:5px">Quoted Price: ₹${o.totalPrice}</div>`;
+      }
+      const preIdBadge = `<div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;margin-bottom:5px">#${o.orderCode || 'PRE-'+o.id.slice(-4).toUpperCase()}</div>`;
+      
+      return `<div class="order-card">
+        <div style="display:flex;justify-content:space-between;align-items:start">
+          <div>${preIdBadge}</div>
+          <div style="font-size:12px;color:var(--text-dim)">${date}</div>
+        </div>
+        <p style="font-size:13px; margin:8px 0;">📝 <b>Request:</b> ${escapeHtml(o.description)}</p>
+        ${o.photoUrl?`<p style="font-size:12px;">📷 <a href="${o.photoUrl}" target="_blank" style="color:var(--gold)">View Photo</a></p>`:''}
+        ${priceHtml}
+        <div style="margin-top:10px;"><span class="order-status ${cls}">${s}</span></div>
+      </div>`;
+    }).join('');
+  }
 }
 
 let deferredPrompt;
@@ -1746,7 +1902,7 @@ function checkSpinWheel(){const last=localStorage.getItem('lastSpinDate');const 
 function closeSpinWheel(){document.getElementById('spinWheelModal').style.display='none'}
 function spinWheel(){const btn=document.getElementById('spinBtn');btn.disabled=true;const wheel=document.getElementById('wheelCanvas');const deg=Math.floor(Math.random()*360)+720;wheel.style.transform=`rotate(${deg}deg)`;setTimeout(()=>{if(couponsCache.length>0){const c=couponsCache[Math.floor(Math.random()*couponsCache.length)];document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML=`🎉 Won: <span style="color:var(--gold)">${c.code}</span> (${c.discountPercent}% OFF)`;localStorage.setItem('lastSpinDate',new Date().toDateString())}else{document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML='No coupons active'};btn.textContent='CLOSE';btn.onclick=closeSpinWheel;btn.disabled=false},3000)}
 
-const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod'];
+const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
