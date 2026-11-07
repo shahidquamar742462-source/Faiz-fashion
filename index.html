@@ -324,7 +324,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <span style="color:#fff; font-size:12px;">▼</span>
     </div>
 
-    <!-- 3. NEW SEARCH ROW (No Sort) -->
+    <!-- 3. NEW SEARCH ROW -->
     <div class="search-row">
       <div class="search-container">
         <span>🔍</span>
@@ -412,7 +412,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 <!-- OTHER SCREENS -->
 <div id="screen-watchlist" class="screen"><div class="header"><button class="back-btn" onclick="showScreen('customer-settings')">←</button><h2>❤️ My Watchlist</h2></div><div id="watchlistGrid" class="product-grid"></div></div>
 
-<!-- ACCOUNT SCREEN (REARRANGED) -->
+<!-- ACCOUNT SCREEN -->
 <div id="screen-customer-settings" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Account</h2></div>
   <div class="form-container" style="max-width: 500px;">
@@ -463,6 +463,13 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <button class="btn-primary" style="background:var(--card); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);" onclick="openCustomerChat()"><span style="font-size:24px">💬</span><div><div style="font-size:16px; font-weight:800;">Support Chat</div><div style="font-size:13px;color:var(--text-dim)">Chat with admin directly</div></div></button>
     <button class="btn-primary" style="background:var(--card); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);" onclick="showScreen('contact')"><span style="font-size:24px">🎧</span><div><div style="font-size:16px; font-weight:800;">Contact Us</div><div style="font-size:13px;color:var(--text-dim)">Call, WhatsApp, Email</div></div></button>
     <button class="btn-primary" style="background:var(--card); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);" onclick="toggleDarkMode()"><span style="font-size:24px" id="custThemeIcon">🌙</span><div><div style="font-size:16px; font-weight:800;">Theme</div><div style="font-size:13px;color:var(--text-dim)">Switch Light/Dark Mode</div></div></button>
+    
+    <!-- Share Location Option Added Back -->
+    <button class="btn-primary" style="background:var(--card); border:1px solid var(--gold); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px;" onclick="requestGlobalLocation()">
+      <span style="font-size:24px">📍</span>
+      <div><div style="font-size:16px; font-weight:800;">Share Location</div><div style="font-size:13px;color:var(--text-dim)" id="globalLocStatus">Tap to allow GPS</div></div>
+    </button>
+
     <button class="btn-primary" style="background:var(--card); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);" onclick="installPWA()"><span style="font-size:24px">📥</span><div><div style="font-size:16px; font-weight:800;">Install App</div><div style="font-size:13px;color:var(--text-dim)">Add to Home Screen</div></div></button>
   </div>
 </div>
@@ -485,9 +492,9 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 
 <div id="screen-contact" class="screen"><div class="header"><button class="back-btn" onclick="showScreen('customer-settings')">←</button><h2>Contact Us</h2></div><div class="form-container"><button class="btn-primary" style="background:var(--card2);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="contactCall()"><span style="font-size:24px">📞</span><div><div style="font-size:16px;font-weight:800">Call Us</div></div></button><button class="btn-primary" style="background:#25D366;color:#fff;border:none;display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="contactWhatsApp()"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg><div><div style="font-size:16px;font-weight:800">WhatsApp Us</div></div></button><button class="btn-primary" style="background:var(--card2);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="contactEmail()"><span style="font-size:24px">✉️</span><div><div style="font-size:16px;font-weight:800">Email Us</div></div></button></div></div>
 
-<!-- PRODUCT DETAILS SCREEN (FIXED SHARE & LIKE POSITIONS) -->
-<div id="screen-product-details" class="screen">
-  <div class="detail-header" style="position:fixed;top:0;left:0;right:0;padding:15px 20px;display:flex;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,0.6),transparent)">
+<!-- PRODUCT DETAILS SCREEN (FIXED) -->
+<div id="screen-product-details" class="screen" style="padding:0; padding-bottom:80px;">
+  <div class="detail-header" style="position:fixed;top:0;left:0;right:0;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,0.7),transparent)">
     <div style="display:flex;gap:10px">
       <button class="back-btn" style="background:rgba(255,255,255,0.9);border:none;color:#333" onclick="goBackFromDetails()">←</button>
       <button class="back-btn" style="background:#25D366;border:none;color:#fff" onclick="shareProduct()"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>
@@ -504,9 +511,21 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <div id="detailFlashInfo" class="bundle-info" style="display:none;background:rgba(255,107,107,0.15);border:1px dashed #ff6b6b;padding:12px;border-radius:12px;margin-bottom:15px;font-weight:700"></div>
     <div id="detailBundleInfo" class="bundle-info" style="display:none;background:rgba(212,175,55,0.15);border:1px dashed var(--gold);padding:12px;border-radius:12px;margin-bottom:15px;font-weight:700;color:var(--gold-dark)"></div>
     <div id="detailWholesaleInfo" class="bundle-info" style="display:none;background:rgba(46,204,113,0.1);border:1px dashed var(--success);padding:12px;border-radius:12px;margin-bottom:15px;font-weight:700;color:var(--success)"></div>
+    <button id="sizeGuideBtn" onclick="openSizeGuide()" style="display:none;margin-bottom:15px;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:13px">📏 Size Guide</button>
     <div class="detail-desc" id="detailDesc" style="font-size:15px;color:var(--text-dim);line-height:1.6;margin-bottom:24px"></div>
-    <div class="size-color-row" style="display:flex;gap:10px;margin-bottom:20px"><select id="detailSize" style="flex:1;padding:14px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:15px;font-weight:600;outline:none" onchange="validateSizeColor()"></select><select id="detailColor" style="flex:1;padding:14px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:15px;font-weight:600;outline:none" onchange="validateSizeColor()"></select></div>
+    
+    <div class="size-color-row" style="display:flex;gap:10px;margin-bottom:20px">
+      <select id="detailSize" style="flex:1;padding:14px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:15px;font-weight:600;outline:none" onchange="validateSizeColor()"></select>
+      <select id="detailColor" style="flex:1;padding:14px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:15px;font-weight:600;outline:none" onchange="validateSizeColor()"></select>
+    </div>
+    <div id="sizeRecommendationHint" class="size-hint" style="display:none"></div>
     <div id="detailStockMsg" style="font-size:12px;color:var(--danger);font-weight:700"></div>
+    
+    <div id="fbtSection" class="fbt-section" style="display:none; margin-bottom:20px; padding:16px; background:var(--card2); border-radius:12px;">
+      <div class="related-title" style="font-size:16px; font-weight:800; margin-bottom:10px;">🛒 Frequently Bought Together</div>
+      <div class="fbt-grid" id="fbtGrid" style="display:flex; gap:12px; overflow-x:auto; padding-bottom:10px;"></div>
+    </div>
+    
     <div class="review-section" style="margin-top:30px;border-top:1px solid var(--border);padding-top:20px"><h3 style="font-size:16px;margin-bottom:10px">Customer Reviews</h3><button class="btn-small" style="width:100%;margin-bottom:15px;background:var(--card);border:1px solid var(--border)" onclick="openReviewForm()">+ Write a Review</button><div id="reviewList"></div></div>
     <div style="margin-top:20px"><h3 style="font-size:16px;margin-bottom:10px">❓ Product Q&A</h3><button class="btn-small" style="width:100%;margin-bottom:15px;background:var(--card);border:1px solid var(--border)" onclick="openQAForm()">+ Ask a Question</button><div id="qaList"></div></div>
     <div class="related-title" style="font-size:16px;font-weight:800;margin:24px 0 12px;color:var(--text)">You May Also Like</div><div class="related-grid" id="relatedProducts" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:10px"></div>
@@ -724,9 +743,9 @@ function renderAddressSelectList(addresses) {
     
     let h = '';
     addresses.forEach((a, idx) => {
-        const isSelected = idx === 0;
+        const isSelected = false;
         h += `
-        <div class="addr-card-new" onclick="selectDeliveryAddress(${JSON.stringify(a).replace(/"/g, '&quot;')})">
+        <div class="addr-card-new" onclick="selectDeliveryAddressByIndex(${idx})">
             <div class="addr-icon-box">${a.building ? '🏢' : '🏠'}</div>
             <div class="addr-card-content">
                 <div class="addr-name-row">
@@ -748,7 +767,9 @@ function filterSavedAddresses(q) {
     renderAddressSelectList(filtered);
 }
 
-function selectDeliveryAddress(addr) {
+function selectDeliveryAddressByIndex(idx) {
+    const addr = savedAddressesCache[idx];
+    if(!addr) return;
     document.getElementById('currentAddressName').textContent = `Deliver to ${addr.name}`;
     document.getElementById('currentAddressText').textContent = addr.address.substring(0, 30) + '...';
     document.getElementById('chkName').value = addr.name || '';
@@ -1424,13 +1445,13 @@ async function requestGlobalLocation(){
     let updatedOrdersCount = 0;
     for (const orderDoc of ordersSnap.docs) {
         const orderData = orderDoc.data();
-        if (['Pending', 'Processing'].includes(orderData.status)) {
+        if (['Pending', 'Processing', 'Shipped', 'Out for Delivery'].includes(orderData.status)) {
             await updateDoc(doc(db,'orders', orderDoc.id), { latitude: userSavedLat, longitude: userSavedLng, locationShared: true });
             updatedOrdersCount++;
         }
     }
     updateGlobalLocStatus(); updateCheckoutLocStatus();
-    if(updatedOrdersCount > 0){ alert(`✅ Location saved! Aapke ${updatedOrdersCount} pending order(s) me location update ho gayi.`); } else { alert('✅ Location saved!'); }
+    if(updatedOrdersCount > 0){ alert(`✅ Location saved! Aapke ${updatedOrdersCount} active order(s) me location update ho gayi.`); } else { alert('✅ Location saved!'); }
   }catch(e){ alert('❌ GPS failed. Please check your location permissions.'); }
   hideLoading();
 }
@@ -1785,7 +1806,12 @@ function openProductDetails(id){
   const flashInfoEl=document.getElementById('detailFlashInfo');if(isFlash){flashInfoEl.style.display='block';const endTime=new Date(c.flashEnd.seconds?c.flashEnd.seconds*1000:c.flashEnd).toLocaleString();flashInfoEl.innerHTML=`⚡ <b>FLASH SALE!</b> Ends ${endTime} — was ₹${c.discountPrice}, now ₹${c.flashPrice}`}else flashInfoEl.style.display='none';
   const bundleEl=document.getElementById('detailBundleInfo');if(c.bundleQty>0&&c.bundlePrice>0){bundleEl.style.display='block';bundleEl.innerHTML=`🎁 <b>Bundle:</b> Buy ${c.bundleQty} for ₹${c.bundlePrice}`}else bundleEl.style.display='none';
   const wsEl=document.getElementById('detailWholesaleInfo');if(c.wholesalePrice>0&&c.wholesaleMinQty>0){wsEl.style.display='block';wsEl.innerHTML=`📦 <b>Wholesale:</b> Buy ${c.wholesaleMinQty}+ units at ₹${c.wholesalePrice}/unit`}else wsEl.style.display='none';
-  const sgBtn=document.getElementById('sizeGuideBtn');const catSG=c.sizeGuideUrl||sizeGuideUrl;sgBtn.style.display=catSG?'block':'none';sgBtn.dataset.url=catSG||'';
+  const sgBtn=document.getElementById('sizeGuideBtn');
+  if(sgBtn){
+    const catSG=c.sizeGuideUrl||sizeGuideUrl;
+    sgBtn.style.display=catSG?'block':'none';
+    sgBtn.dataset.url=catSG||'';
+  }
   document.getElementById('detailDesc').textContent=c.description||'No description';
   const sizesArr=c.sizes||[],colorsArr=c.colors||[];const sizeSel=document.getElementById('detailSize'),colorSel=document.getElementById('detailColor');
   sizeSel.innerHTML='<option value="">Select Size *</option>'+sizesArr.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');colorSel.innerHTML='<option value="">Select Color *</option>'+colorsArr.map(col=>`<option value="${escapeHtml(col)}">${escapeHtml(col)}</option>`).join('');
@@ -2288,7 +2314,7 @@ window.clearSearchText = clearSearchText;
 window.goToShopHome = goToShopHome;
 window.openAddressSelect = openAddressSelect;
 window.closeAddressSelect = closeAddressSelect;
-window.selectDeliveryAddress = selectDeliveryAddress;
+window.selectDeliveryAddressByIndex = selectDeliveryAddressByIndex;
 window.filterSavedAddresses = filterSavedAddresses;
 window.checkReferralClaim = checkReferralClaim;
 
