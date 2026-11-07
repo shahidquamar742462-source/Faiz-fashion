@@ -118,7 +118,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 
 /* FLIPKART STYLE TOP BAR WITH GRADIENT */
 .top-bar{
-  /* Gradient from deep red to orange to light background */
   background: linear-gradient(180deg, #8a0b0b 0%, #d32f2f 40%, #ff7043 75%, #f5f5f6 100%);
   padding:16px 16px 12px;
   margin:-20px -20px 16px -20px;
@@ -321,6 +320,83 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .lang-btn{flex:1;padding:10px;border-radius:8px;border:none;background:transparent;color:var(--text);font-weight:800;font-size:14px;cursor:pointer;transition:all 0.2s}
 .lang-btn.active{background:var(--card);color:var(--text);box-shadow:var(--shadow-sm)}
 .stock-alert-card{background:rgba(79,172,254,0.1);border:1px solid #4facfe;border-radius:10px;padding:12px;margin-bottom:10px;font-size:13px;font-weight:600}
+
+/* NEW FULLSCREEN FILTER PAGE CSS */
+#screen-filters {
+    padding: 0 !important;
+    background: var(--bg);
+}
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.filter-header h3 { font-size: 18px; font-weight: 800; }
+.filter-body {
+    display: flex;
+    height: calc(100vh - 120px);
+    overflow: hidden;
+}
+.filter-sidebar {
+    width: 35%;
+    background: var(--card2);
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+}
+.filter-tab {
+    padding: 16px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-left: 3px solid transparent;
+}
+.filter-tab.active {
+    background: var(--card);
+    color: #e52d27;
+    border-left: 3px solid #e52d27;
+    border-right: 1px solid transparent;
+}
+.filter-content-area {
+    width: 65%;
+    background: var(--card);
+    overflow-y: auto;
+    padding: 15px;
+}
+.filter-option-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+}
+.filter-option-item input {
+    width: 20px;
+    height: 20px;
+    accent-color: #e52d27;
+    cursor: pointer;
+}
+.filter-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card);
+    padding: 15px 20px;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+    z-index: 100;
+}
+
 @media print{body *{visibility:hidden}#printArea,#printArea *{visibility:visible}#printArea{position:absolute;left:0;top:0;width:100%;background:#fff;color:#000;padding:20px}}
 </style>
 </head>
@@ -659,9 +735,12 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <div class="filter-chip" onclick="clearAllFilters()" id="clearFilterBtn" style="display:none;color:var(--danger);border-color:var(--danger)">❌ Clear</div>
   </div>
 
-  <!-- NEW SEARCH FILTER BAR (Brand, Size, Color, Top Deals) -->
-  <div id="searchFilterBar" style="display:none; margin-bottom:15px; overflow-x:auto; white-space:nowrap; padding: 10px 0 5px 0; border-bottom: 1px solid var(--border);">
-      <!-- Injected Dynamically -->
+  <!-- NEW SEARCH FILTER BAR (Single Filter Button) -->
+  <div id="searchFilterBar" style="display:none; margin-bottom:15px;">
+      <button onclick="openFilterScreen()" style="width:100%; padding:12px; background:var(--grad-fk); color:#fff; font-weight:800; font-size:14px; border-radius:8px; border:none; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:var(--shadow-md);">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+        Filter Products
+      </button>
   </div>
 
   <div class="banner-container" id="shopBanner" style="display:none"></div>
@@ -694,10 +773,34 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <div class="recent-grid" id="recentlyViewedGrid"></div>
   </div>
   
-  <div class="new-arrival-header" style="margin-top:10px">
+  <div id="allProductsHeader" class="new-arrival-header" style="margin-top:10px">
     <span class="new-arrival-title">All Products</span>
   </div>
   <div id="shopGrid" class="product-grid"></div>
+</div>
+
+<!-- NEW: FULL SCREEN FILTER PAGE -->
+<div id="screen-filters" class="screen">
+    <div class="filter-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <button class="back-btn" style="width:30px; height:30px; font-size:16px; border:none; box-shadow:none; background:transparent;" onclick="closeFilterScreen()">←</button>
+            <h3>Filters</h3>
+        </div>
+        <button onclick="clearTempFilters()" style="background:none; border:none; color:#e52d27; font-weight:700; font-size:14px; cursor:pointer;">Clear All</button>
+    </div>
+    
+    <div class="filter-body">
+        <div class="filter-sidebar" id="filterSidebar">
+            <!-- Rendered by JS -->
+        </div>
+        <div class="filter-content-area" id="filterContentArea">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+    
+    <div class="filter-footer">
+        <button class="btn-primary" onclick="applyFilters()" id="applyFilterBtn">See Products</button>
+    </div>
 </div>
 
 <div id="screen-watchlist" class="screen">
@@ -1138,7 +1241,16 @@ let myStockAlerts=new Set();
 let searchFilterBrand = '';
 let searchFilterSize = '';
 let searchFilterColor = '';
+let searchFilterPrice = '';
 let searchFilterDeal = false;
+
+// TEMP FILTER VARIABLES
+let tempFilterBrand = '';
+let tempFilterSize = '';
+let tempFilterColor = '';
+let tempFilterPrice = '';
+let tempFilterDeal = false;
+let activeFilterTab = 'brand';
 
 let currentLang = localStorage.getItem('lang') || 'en';
 const LANG = { shop: {en:'Shop', hi:'दुकान'}, preorder: {en:'Pre-Order', hi:'प्री-ऑर्डर'}, cart: {en:'Cart', hi:'कार्ट'}, account: {en:'Account', hi:'खाता'} };
@@ -1177,62 +1289,155 @@ function renderSettingsRecentlyViewed() {
   }).join('');
 }
 
-// NEW: Render Search Filters dynamically
-function renderSearchFilters() {
-  const bar = document.getElementById('searchFilterBar');
-  if(!bar || !searchQuery) return;
-  
-  const matched = categoriesCache.filter(c => c.name.toLowerCase().includes(searchQuery) || (c.description || '').toLowerCase().includes(searchQuery));
-  
-  let sizes = new Set();
-  let colors = new Set();
-  let brands = new Set();
-  
-  matched.forEach(c => {
-    if(c.sizes) c.sizes.forEach(s => sizes.add(s));
-    if(c.colors) c.colors.forEach(col => colors.add(col));
-    const brand = c.name.split(' ')[0];
-    if(brand.length > 2) brands.add(brand);
-  });
-  
-  let html = '';
-  
-  // Top Deal chip
-  html += `<div class="filter-chip ${searchFilterDeal ? 'active' : ''}" onclick="toggleSearchFilter('deal')" style="margin-right:8px; display:inline-block;">🔥 Top Deals</div>`;
-  
-  // Brand chips
-  if(brands.size > 0) {
-    Array.from(brands).slice(0, 4).forEach(b => {
-      html += `<div class="filter-chip ${searchFilterBrand === b ? 'active' : ''}" onclick="toggleSearchFilter('brand', '${b}')" style="margin-right:8px; display:inline-block;">${b}</div>`;
-    });
-  }
-  
-  // Size chips
-  if(sizes.size > 0) {
-    Array.from(sizes).forEach(s => {
-      html += `<div class="filter-chip ${searchFilterSize === s ? 'active' : ''}" onclick="toggleSearchFilter('size', '${s}')" style="margin-right:8px; display:inline-block;">Size: ${s}</div>`;
-    });
-  }
-  
-  // Color chips
-  if(colors.size > 0) {
-    Array.from(colors).forEach(col => {
-      html += `<div class="filter-chip ${searchFilterColor === col ? 'active' : ''}" onclick="toggleSearchFilter('color', '${col}')" style="margin-right:8px; display:inline-block;">${col}</div>`;
-    });
-  }
-  
-  bar.innerHTML = html;
+// ============ NEW FULL SCREEN FILTER LOGIC ============
+
+function openFilterScreen() {
+    tempFilterBrand = searchFilterBrand;
+    tempFilterSize = searchFilterSize;
+    tempFilterColor = searchFilterColor;
+    tempFilterPrice = searchFilterPrice;
+    tempFilterDeal = searchFilterDeal;
+    activeFilterTab = 'brand';
+    
+    showScreen('filters');
+    renderFilterScreen();
 }
 
-function toggleSearchFilter(type, value) {
-  if(type === 'deal') searchFilterDeal = !searchFilterDeal;
-  if(type === 'brand') searchFilterBrand = searchFilterBrand === value ? '' : value;
-  if(type === 'size') searchFilterSize = searchFilterSize === value ? '' : value;
-  if(type === 'color') searchFilterColor = searchFilterColor === value ? '' : value;
-  renderShop();
+function closeFilterScreen() {
+    showScreen('shop');
 }
 
-// NEW: Render "Deals for You" & "Suggested for You"
+function renderFilterScreen() {
+    const currentSearchProducts = categoriesCache.filter(c => c.name.toLowerCase().includes(searchQuery) || (c.description || '').toLowerCase().includes(searchQuery));
+    
+    // Calculate dynamic prices
+    let maxPrice = 1000;
+    if(currentSearchProducts.length > 0) {
+        maxPrice = Math.max(...currentSearchProducts.map(c => getEffectivePrice(c)));
+        maxPrice = Math.ceil(maxPrice / 100) * 100;
+    }
+
+    let availableSizes = new Set();
+    let availableColors = new Set();
+    let availableBrands = new Set();
+    
+    currentSearchProducts.forEach(c => {
+        if(c.sizes) c.sizes.forEach(s => availableSizes.add(s));
+        if(c.colors) c.colors.forEach(col => availableColors.add(col));
+        const brand = c.name.split(' ')[0];
+        if(brand.length > 2) availableBrands.add(brand);
+    });
+
+    const sidebar = document.getElementById('filterSidebar');
+    let sideHtml = '';
+    if(availableBrands.size > 0) sideHtml += `<div class="filter-tab ${activeFilterTab==='brand'?'active':''}" onclick="switchFilterTab('brand')">Brand</div>`;
+    if(availableColors.size > 0) sideHtml += `<div class="filter-tab ${activeFilterTab==='color'?'active':''}" onclick="switchFilterTab('color')">Color</div>`;
+    if(availableSizes.size > 0) sideHtml += `<div class="filter-tab ${activeFilterTab==='size'?'active':''}" onclick="switchFilterTab('size')">Size</div>`;
+    sideHtml += `<div class="filter-tab ${activeFilterTab==='price'?'active':''}" onclick="switchFilterTab('price')">Price</div>`;
+    sideHtml += `<div class="filter-tab ${activeFilterTab==='deal'?'active':''}" onclick="switchFilterTab('deal')">Deals</div>`;
+    sidebar.innerHTML = sideHtml;
+
+    if(activeFilterTab === 'brand' && availableBrands.size === 0) activeFilterTab = 'price';
+    if(activeFilterTab === 'size' && availableSizes.size === 0) activeFilterTab = 'price';
+    if(activeFilterTab === 'color' && availableColors.size === 0) activeFilterTab = 'price';
+
+    const content = document.getElementById('filterContentArea');
+    let contentHtml = '';
+
+    if(activeFilterTab === 'brand') {
+        contentHtml = `<h4 style="margin-bottom:15px; font-size:16px;">Brands</h4>`;
+        availableBrands.forEach(b => {
+            contentHtml += `<label class="filter-option-item"><input type="checkbox" ${tempFilterBrand===b?'checked':''} onchange="updateTempFilter('brand','${b}',this.checked)"> ${b}</label>`;
+        });
+    } 
+    else if(activeFilterTab === 'color') {
+        contentHtml = `<h4 style="margin-bottom:15px; font-size:16px;">Colors</h4>`;
+        availableColors.forEach(c => {
+            contentHtml += `<label class="filter-option-item"><input type="checkbox" ${tempFilterColor===c?'checked':''} onchange="updateTempFilter('color','${c}',this.checked)"> ${c}</label>`;
+        });
+    }
+    else if(activeFilterTab === 'size') {
+        contentHtml = `<h4 style="margin-bottom:15px; font-size:16px;">Sizes</h4>`;
+        availableSizes.forEach(s => {
+            contentHtml += `<label class="filter-option-item"><input type="checkbox" ${tempFilterSize===s?'checked':''} onchange="updateTempFilter('size','${s}',this.checked)"> ${s}</label>`;
+        });
+    }
+    else if(activeFilterTab === 'price') {
+        contentHtml = `<h4 style="margin-bottom:15px; font-size:16px;">Price Range</h4>`;
+        let priceRanges = [
+            {label: '₹0 - ₹500', val: '0-500'},
+            {label: '₹500 - ₹1000', val: '500-1000'},
+            {label: '₹1000 - ₹2000', val: '1000-2000'},
+            {label: '₹2000+', val: '2000-999999'}
+        ];
+        priceRanges.forEach(pr => {
+            contentHtml += `<label class="filter-option-item"><input type="radio" name="priceRange" ${tempFilterPrice===pr.val?'checked':''} onchange="tempFilterPrice='${pr.val}'; renderFilterScreen();"> ${pr.label}</label>`;
+        });
+        contentHtml += `<label class="filter-option-item" style="margin-top:10px; color:var(--danger);"><input type="radio" name="priceRange" ${tempFilterPrice===''?'checked':''} onchange="tempFilterPrice=''; renderFilterScreen();"> Any Price</label>`;
+    }
+    else if(activeFilterTab === 'deal') {
+        contentHtml = `<h4 style="margin-bottom:15px; font-size:16px;">Discounts & Offers</h4>`;
+        contentHtml += `<label class="filter-option-item"><input type="checkbox" ${tempFilterDeal?'checked':''} onchange="tempFilterDeal=this.checked; renderFilterScreen();"> Top Deals (20%+ OFF)</label>`;
+    }
+
+    content.innerHTML = contentHtml;
+    updateApplyButtonText();
+}
+
+function switchFilterTab(tab) {
+    activeFilterTab = tab;
+    renderFilterScreen();
+}
+
+function updateTempFilter(type, val, checked) {
+    if(type === 'brand') tempFilterBrand = checked ? val : '';
+    if(type === 'size') tempFilterSize = checked ? val : '';
+    if(type === 'color') tempFilterColor = checked ? val : '';
+    renderFilterScreen();
+}
+
+function clearTempFilters() {
+    tempFilterBrand = '';
+    tempFilterSize = '';
+    tempFilterColor = '';
+    tempFilterPrice = '';
+    tempFilterDeal = false;
+    renderFilterScreen();
+}
+
+function applyFilters() {
+    searchFilterBrand = tempFilterBrand;
+    searchFilterSize = tempFilterSize;
+    searchFilterColor = tempFilterColor;
+    searchFilterPrice = tempFilterPrice;
+    searchFilterDeal = tempFilterDeal;
+    
+    showScreen('shop');
+    renderShop();
+}
+
+function updateApplyButtonText() {
+    // Predict how many products match
+    let items = categoriesCache.filter(c => c.name.toLowerCase().includes(searchQuery) || (c.description || '').toLowerCase().includes(searchQuery));
+    
+    if(tempFilterBrand) items = items.filter(c => c.name.toLowerCase().startsWith(tempFilterBrand.toLowerCase()));
+    if(tempFilterSize) items = items.filter(c => (c.sizes || []).includes(tempFilterSize));
+    if(tempFilterColor) items = items.filter(c => (c.colors || []).includes(tempFilterColor));
+    if(tempFilterDeal) items = items.filter(c => getDiscountPercent(c.originalPrice, c.discountPrice) >= 20);
+    
+    if(tempFilterPrice) {
+        const [min, max] = tempFilterPrice.split('-').map(Number);
+        items = items.filter(c => {
+            const p = getEffectivePrice(c);
+            return p >= min && p <= max;
+        });
+    }
+
+    document.getElementById('applyFilterBtn').textContent = `See ${items.length} Products`;
+}
+
+// ====================================================
+
 function renderDealsAndSuggested() {
   const dealsSec = document.getElementById('dealsForYouSection');
   const dealsGrid = document.getElementById('dealsForYouGrid');
@@ -2080,6 +2285,7 @@ function onSearchInput(q){
       searchFilterBrand = '';
       searchFilterSize = '';
       searchFilterColor = '';
+      searchFilterPrice = '';
       searchFilterDeal = false;
   }
   
@@ -2115,6 +2321,7 @@ function clearAllFilters(){
     searchFilterBrand = '';
     searchFilterSize = '';
     searchFilterColor = '';
+    searchFilterPrice = '';
     searchFilterDeal = false;
     renderShop();
 }
@@ -2136,11 +2343,28 @@ function renderShop(){
       renderNewArrivalsAndHot();
   }
   
-  // Show/Hide search filter bar
+  // Hide main category tabs and filter chips if searching
+  const topBarTabs = document.getElementById('mainTabs');
+  const filterTabs = document.querySelector('.filter-tabs');
+  const bannerContainer = document.getElementById('shopBanner');
+  const flashSaleBanner = document.getElementById('flashSaleBanner');
+  
+  if (isSearching) {
+      if(topBarTabs) topBarTabs.style.display = 'none';
+      if(filterTabs) filterTabs.style.display = 'none';
+      if(bannerContainer) bannerContainer.style.display = 'none';
+      if(flashSaleBanner) flashSaleBanner.style.display = 'none';
+  } else {
+      if(topBarTabs) topBarTabs.style.display = 'flex';
+      if(filterTabs) filterTabs.style.display = 'flex';
+      if(bannerUrls.length > 0 && bannerContainer) bannerContainer.style.display = 'flex';
+      // Flash sale handled by its own function
+  }
+
+  // Show/Hide search filter button bar
   const filterBar = document.getElementById('searchFilterBar');
   if(filterBar) {
       filterBar.style.display = isSearching ? 'block' : 'none';
-      if(isSearching) renderSearchFilters();
   }
   
   let items=[...categoriesCache];
@@ -2153,6 +2377,14 @@ function renderShop(){
       if(searchFilterSize) items = items.filter(c => (c.sizes || []).includes(searchFilterSize));
       if(searchFilterColor) items = items.filter(c => (c.colors || []).includes(searchFilterColor));
       if(searchFilterDeal) items = items.filter(c => getDiscountPercent(c.originalPrice, c.discountPrice) >= 20);
+      
+      if(searchFilterPrice) {
+          const [min, max] = searchFilterPrice.split('-').map(Number);
+          items = items.filter(c => {
+              const p = getEffectivePrice(c);
+              return p >= min && p <= max;
+          });
+      }
   }
   
   if(filterInStock)items=items.filter(c=>(c.times||0)>0);
@@ -2500,7 +2732,7 @@ function checkSpinWheel(){const last=localStorage.getItem('lastSpinDate');const 
 function closeSpinWheel(){document.getElementById('spinWheelModal').style.display='none'}
 function spinWheel(){const btn=document.getElementById('spinBtn');btn.disabled=true;const wheel=document.getElementById('wheelCanvas');const deg=Math.floor(Math.random()*360)+720;wheel.style.transform=`rotate(${deg}deg)`;setTimeout(()=>{if(couponsCache.length>0){const c=couponsCache[Math.floor(Math.random()*couponsCache.length)];document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML=`🎉 Won: <span style="color:var(--text)">${c.code}</span> (${c.discountPercent}% OFF)`;localStorage.setItem('lastSpinDate',new Date().toDateString())}else{document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML='No coupons active'};btn.textContent='CLOSE';btn.onclick=closeSpinWheel;btn.disabled=false},3000)}
 
-const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail','requestStockAlert','checkFirstOrderBonus','getSizeRecommendation','updateSizeRecommendation','lookupPincodeDebounced','lookupPincode','selectPincode','trackProductView','trackCartAdd','loadProductAnalytics','loadAbandonedCarts','setLanguage','applyLanguage','renderNewArrivalsAndHot','renderDealsAndSuggested','openProfileDetails','saveProfileDetails','toggleSearchFilter','renderSearchFilters'];
+const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail','requestStockAlert','checkFirstOrderBonus','getSizeRecommendation','updateSizeRecommendation','lookupPincodeDebounced','lookupPincode','selectPincode','trackProductView','trackCartAdd','loadProductAnalytics','loadAbandonedCarts','setLanguage','applyLanguage','renderNewArrivalsAndHot','renderDealsAndSuggested','openProfileDetails','saveProfileDetails','openFilterScreen','closeFilterScreen','switchFilterTab','updateTempFilter','clearTempFilters','applyFilters','updateApplyButtonText'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
