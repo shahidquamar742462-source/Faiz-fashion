@@ -929,6 +929,7 @@ let pendingCancelOrderId=null,pendingOtpOrderId=null;
 let unlockedOtps=[]; 
 let customerOrdersCache=[];
 let customerPreOrdersCache=[];
+let dashboardUsersCache=[];
 
 const ADMIN_SCREENS=['admin','admin-orders','admin-preorders','admin-reviews','category-form','settings','admin-dashboard','admin-qa','admin-chats','admin-chat-view','admin-customer-orders'];
 
@@ -997,6 +998,9 @@ function unlockAdminOtp(orderId) {
   if (pwd === "Gulab123@#++") {
     unlockedOtps.push(orderId);
     renderAdminOrdersList();
+    if(document.getElementById('screen-admin-customer-orders').classList.contains('active')) {
+        renderCustomerDashboardData();
+    }
   } else if (pwd !== null) {
     alert("❌ Incorrect Password!");
   }
@@ -1016,6 +1020,41 @@ function loadAnalytics(){
   if(!isAdminUser)return;
   getDocs(collection(db,'users')).then(s=>{document.getElementById('statUsers').textContent=s.size});
   getDocs(collection(db,'orders')).then(s=>{let r=0,c=0;s.forEach(d=>{const o=d.data();if(o.status!=='Cancelled'){r+=Number(o.total)||0;c++}});document.getElementById('statRevenue').textContent='₹'+r;document.getElementById('statOrders').textContent=c});
+}
+
+function generateUserHTML(u) {
+  const userName = u.email || 'Anonymous';
+  const safeName = userName.replace(/'/g, "\\'");
+  return `
+  <div onclick="viewCustomerOrders('${u.id}', '${safeName}')" style="padding:8px;background:var(--card2);border-radius:8px;margin-bottom:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border:1px solid transparent;transition:0.2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='transparent'">
+    <div>
+      <b>${escapeHtml(u.email || 'Anonymous (No Email)')}</b><br>
+      <span style="color:var(--text-dim);font-size:10px">UID: ${u.id}</span><br>
+      <span style="font-size:10px;color:var(--gold);font-weight:800">👉 Click to view orders</span>
+    </div>
+    <div style="text-align:right">
+      <span style="color:var(--success);font-weight:700">₹${Math.round(u.walletBalance||0)}</span><br>
+      <span style="color:var(--gold);font-size:10px">⭐ ${u.points||0}</span>
+    </div>
+  </div>
+`;}
+
+function filterDashboardUsers(q) {
+  const list = document.getElementById('dashboardUsersList');
+  if(!q || q.trim()==='') {
+    list.innerHTML = dashboardUsersCache.map(generateUserHTML).join('');
+    return;
+  }
+  const term = q.toLowerCase().trim();
+  const filtered = dashboardUsersCache.filter(u => 
+    (u.email && u.email.toLowerCase().includes(term)) || 
+    (u.id && u.id.toLowerCase().includes(term))
+  );
+  if(filtered.length === 0) {
+    list.innerHTML = '<div style="color:var(--text-dim);text-align:center;padding:10px;">No users found.</div>';
+  } else {
+    list.innerHTML = filtered.map(generateUserHTML).join('');
+  }
 }
 
 async function loadDashboard(){
@@ -1048,24 +1087,9 @@ async function loadDashboard(){
     const custSnap = await getDocs(collection(db, 'users'));
     const usersArr = custSnap.docs.map(d => ({id: d.id, ...d.data()}));
     usersArr.sort((a,b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
-    const recentUsers = usersArr.slice(0, 10);
     
-    const usersHtml = recentUsers.map(u => {
-      const userName = u.email || 'Anonymous';
-      const safeName = userName.replace(/'/g, "\\'");
-      return `
-      <div onclick="viewCustomerOrders('${u.id}', '${safeName}')" style="padding:8px;background:var(--card2);border-radius:8px;margin-bottom:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border:1px solid transparent;transition:0.2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='transparent'">
-        <div>
-          <b>${escapeHtml(u.email || 'Anonymous (No Email)')}</b><br>
-          <span style="color:var(--text-dim);font-size:10px">UID: ${u.id}</span><br>
-          <span style="font-size:10px;color:var(--gold);font-weight:800">👉 Click to view orders</span>
-        </div>
-        <div style="text-align:right">
-          <span style="color:var(--success);font-weight:700">₹${Math.round(u.walletBalance||0)}</span><br>
-          <span style="color:var(--gold);font-size:10px">⭐ ${u.points||0}</span>
-        </div>
-      </div>
-    `}).join('');
+    dashboardUsersCache = usersArr;
+    const usersHtml = usersArr.slice(0, 10).map(generateUserHTML).join('');
 
     cont.innerHTML=`
       <div class="analytics-grid">
@@ -1082,10 +1106,141 @@ async function loadDashboard(){
       <div class="settings-section"><h3 style="margin-bottom:15px">🏆 Top Selling Products</h3>${topProducts.length===0?'<div style="color:var(--text-dim);text-align:center;padding:10px">No sales yet</div>':topProducts.map((p,i)=>`<div class="dash-top-item"><span class="dash-top-rank">#${i+1}</span><span style="flex:1">${escapeHtml(p.name)}</span><span style="color:var(--success);font-weight:700">₹${Math.round(p.rev)}</span><span style="color:var(--text-dim);font-size:11px">(${p.qty} sold)</span></div>`).join('')}</div>
       <div class="settings-section">
         <h3 style="margin-bottom:15px">👥 Recent Users (Click to view orders)</h3>
-        ${usersHtml || '<div style="color:var(--text-dim);text-align:center">No users yet</div>'}
+        <input type="text" id="dashboardUserSearch" placeholder="Search by Gmail or UID..." oninput="filterDashboardUsers(this.value)" style="width:100%; padding:10px; margin-bottom:15px; background:var(--card); border:1px solid var(--border); border-radius:8px; color:var(--text); outline:none;">
+        <div id="dashboardUsersList">${usersHtml}</div>
       </div>
     `;
   }catch(e){cont.innerHTML='<div class="loading-row">Error: '+e.message+'</div>'}
+}
+
+function getAdminOrderCardHTML(o) {
+  const date=o.date?new Date(o.date.toMillis()).toLocaleString():'Recent';let sc='status-'+(o.status||'Pending');
+  
+  const itemsHtml=o.items.map((i, idx)=>{
+    const v=[i.size?'Size:'+i.size:'',i.color?'Color:'+i.color:''].filter(Boolean).join(' | ');
+    const isCancelled = o.cancelledItems && o.cancelledItems.includes(idx);
+    return`<div class="order-item-row" style="${isCancelled?'opacity:0.5;text-decoration:line-through;':''}">
+      ${i.img?`<img src="${optImg(i.img,100)}" class="order-img-thumb" onclick="event.stopPropagation(); openImageZoom(event)">`:`<div class="order-img-thumb" style="background:#333;display:flex;align-items:center;justify-content:center;font-size:10px">No Img</div>`}
+      <div style="flex:1">
+        <div style="font-weight:700">${escapeHtml(i.name)} ${isCancelled?'(Cancelled)':''}</div>
+        <div style="font-size:11px;color:var(--text-dim)">${v}</div>
+      </div>
+      <div style="text-align:right;font-weight:800;color:var(--gold)">₹${i.price} <span style="color:var(--text-dim);font-size:11px">x${i.qty||1}</span></div>
+    </div>`;
+  }).join('');
+  
+  const orderIdBadge=`<div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;margin-bottom:5px">#${o.orderCode||o.id.slice(-8).toUpperCase()}</div>`;
+  const walletInfo=(o.walletUsed&&o.walletUsed>0)?`<span style="background:rgba(46,204,113,0.15);color:var(--success);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:800;margin-left:5px">💰-₹${Math.round(o.walletUsed)}</span>`:'';
+  const payBadge=o.paymentStatus==='Paid'?`<span style="background:var(--success);color:#000;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800">💳PAID</span>`:`<span style="background:#f39c12;color:#000;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800">COD</span>`;
+  
+  const isUnlocked = unlockedOtps.includes(o.id);
+  let otpDisplay = '';
+  let verifyOtpBtn = '';
+  
+  if (o.deliveryOtp && o.status !== 'Delivered') {
+      if (isUnlocked) {
+          otpDisplay = `<span style="background:rgba(52,152,219,0.15);color:#3498db;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:800">OTP: ${o.deliveryOtp}</span>`;
+      } else {
+          otpDisplay = `<button onclick="unlockAdminOtp('${o.id}')" style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:4px 8px;border-radius:4px;font-size:11px;font-weight:800;cursor:pointer">🔒 View OTP</button>`;
+      }
+
+      if (o.status === 'Shipped' || o.status === 'Out for Delivery' || o.status === 'Pending' || o.status === 'Processing') {
+          verifyOtpBtn = `<button class="btn-small" style="background:rgba(46,204,113,0.2);border:1px solid var(--success);color:var(--success);font-weight:800;width:100%;margin-top:8px" onclick="openOtpModal('${o.id}')">🔐 Verify Delivery OTP</button>`;
+      }
+  }
+
+  const retHtml = o.returnStatus ? `
+    <div style="background:rgba(243,156,18,0.15);border:1px dashed #f39c12;padding:10px;border-radius:8px;margin:10px 0">
+      <div style="color:#f39c12;font-weight:800;font-size:13px;margin-bottom:5px">🔄 Return/Exchange: ${o.returnStatus}</div>
+      ${o.returnDetails ? `
+        <div style="font-size:12px;color:var(--text);margin-bottom:5px;line-height:1.5">
+          <b>Item:</b> ${escapeHtml(o.returnDetails.productName)}<br>
+          <b>Type:</b> ${o.returnDetails.type} | <b>Issue:</b> ${o.returnDetails.condition}<br>
+          <b>Reason:</b> ${escapeHtml(o.returnDetails.reason)}
+          ${o.returnDetails.type === 'Exchange' ? `<br><b>Requested:</b> Size: ${o.returnDetails.newSize || '-'}, Color: ${o.returnDetails.newColor || '-'}` : ''}
+        </div>
+      ` : ''}
+      ${o.returnTimeline ? `<div style="font-size:11px;color:var(--text-dim);margin-top:8px;border-top:1px solid #555;padding-top:5px">${o.returnTimeline.map(t=>`✅ ${t.status}`).join('<br>')}</div>` : ''}
+      
+      ${o.returnStatus === 'Requested' ? `
+        <div style="display:flex;gap:5px;margin-top:10px">
+          <button class="btn-small" style="background:var(--success);color:#000" onclick="updateReturnTracking('${o.id}','Approved')">✅ Approve</button>
+          <button class="btn-small" style="background:var(--danger);color:#fff" onclick="updateReturnTracking('${o.id}','Rejected')">❌ Reject</button>
+        </div>
+      ` : `
+        <select style="margin-top:10px;background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;width:100%" onchange="updateReturnTracking('${o.id}',this.value)">
+          <option value="" disabled selected>Update Tracking...</option>
+          <option value="Approved">Approved</option>
+          <option value="Pickup Scheduled">Pickup Scheduled</option>
+          <option value="Item Picked Up">Item Picked Up</option>
+          <option value="Processing in Warehouse">Processing</option>
+          <option value="Exchange Shipped">Exchange Shipped</option>
+          <option value="Completed">Completed (Done)</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+      `}
+    </div>
+  ` : '';
+
+  return`<div class="order-card">
+    <div style="display:flex;justify-content:space-between;align-items:start">
+      <div>${orderIdBadge}${payBadge}${walletInfo}<h4>${escapeHtml(o.customerName)} - ₹${o.total}</h4></div>
+      <div style="display:flex;gap:5px"><button onclick="printInvoice('${o.id}')" style="background:none;border:none;color:var(--gold);font-size:16px;cursor:pointer">🖨️</button><button onclick="deleteOrder('${o.id}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">🗑️</button></div>
+    </div>
+    <p>📞 ${escapeHtml(o.phone)} | 📍 ${escapeHtml((o.building?o.building+', ':'')+o.address)}</p>
+    <p>📅 ${date} | ${otpDisplay}</p>
+    ${(o.latitude&&o.longitude)?`<button onclick="window.open('https://www.google.com/maps?q=${o.latitude},${o.longitude}','_blank')" style="background:var(--success);color:#000;border:none;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-top:5px">📍 View Location</button>`:''}
+    
+    <div class="order-items-list">${itemsHtml}</div>
+    
+    <p style="font-size:12px">Del:₹${o.deliveryCharge}|Plat:₹${o.platformFee}|Hand:₹${o.handlingCharge}${o.pointsRedeemed?'|Pts:-'+o.pointsRedeemed:''}${o.walletUsed?'|Wallet:₹'+Math.round(o.walletUsed):''}</p>
+    
+    ${retHtml}
+
+    <div style="display:flex;gap:5px;margin-top:10px">
+      <input type="text" placeholder="Delivery Boy" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.name):''}" id="db-name-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px">
+      <input type="tel" placeholder="Phone" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.phone):''}" id="db-phone-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px">
+      <button class="btn-small" style="flex:0;padding:6px 10px" onclick="saveDeliveryBoy('${o.id}')">Save</button>
+    </div>
+    <div style="display:flex;gap:5px;margin-top:8px">
+      <button class="btn-small" style="background:rgba(46,204,113,0.15);border:1px solid var(--success);color:var(--success)" onclick="adminAdjustWallet('${o.userId}','${escapeHtml(o.customerName)}')">💰 Wallet</button>
+    </div>
+    ${verifyOtpBtn}
+    
+    <span class="order-status ${sc}">${o.status||'Pending'}</span>
+    <select style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;float:right;margin-top:10px" onchange="updateOrderStatus('${o.id}',this.value)">
+      ${['Pending','Processing','Shipped','Out for Delivery','Cancelled'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}
+    </select>
+  </div>`;
+}
+
+function getAdminPreOrderCardHTML(o) {
+  const date=o.date?new Date(o.date.toMillis()).toLocaleString():'Recent';const s=o.status||'Pending';const cls='status-'+s;let pricingHtml='';
+  if(s==='Pending'){
+    pricingHtml=`<div style="background:rgba(212,175,55,0.1);border:1px dashed var(--gold);padding:10px;border-radius:8px;margin-top:10px"><div style="font-size:12px;font-weight:800;color:var(--gold);margin-bottom:8px">💰 Price this Order</div><div style="font-size:12px;color:var(--success);margin-bottom:8px">Budget: ₹${o.budget||'N/A'}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px"><input type="number" id="pre-prod-${o.id}" placeholder="Product ₹" oninput="calculatePreOrderTotal('${o.id}')" style="padding:6px;font-size:12px;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:6px"><input type="number" id="pre-del-${o.id}" placeholder="Delivery ₹" oninput="calculatePreOrderTotal('${o.id}')" style="padding:6px;font-size:12px;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:6px"><input type="number" id="pre-plat-${o.id}" placeholder="Platform ₹" oninput="calculatePreOrderTotal('${o.id}')" style="padding:6px;font-size:12px;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:6px"><input type="number" id="pre-hand-${o.id}" placeholder="Handling ₹" oninput="calculatePreOrderTotal('${o.id}')" style="padding:6px;font-size:12px;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:6px"></div><div style="font-size:14px;font-weight:800;margin-bottom:8px">Total: ₹<span id="pre-total-${o.id}">0</span></div><button class="btn-small" style="background:var(--gold);color:#000;font-weight:800" onclick="sendPreOrderPrice('${o.id}')">📤 Send</button></div>`;
+  }else if(o.totalPrice){
+    pricingHtml=`<div style="font-size:12px;padding:8px;background:var(--card2);border-radius:6px;margin-top:5px"><b>Total: <span style="color:var(--gold);font-size:14px">₹${o.totalPrice}</span></b></div>`;
+  }
+  const dbHtml=(s!=='Pending'&&s!=='Priced')?`<div style="display:flex;gap:5px;margin-top:10px"><input type="text" id="pre-db-name-${o.id}" placeholder="Delivery Boy" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.name):''}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><input type="tel" id="pre-db-phone-${o.id}" placeholder="Phone" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.phone):''}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><button class="btn-small" style="flex:0;padding:6px 10px" onclick="savePreOrderDeliveryBoy('${o.id}')">Save</button></div>`:'';
+  
+  return`<div class="order-card">
+    <div style="display:flex;justify-content:space-between">
+      <div><div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;margin-bottom:5px">#${o.orderCode||'Pending'}</div><h4>Pre-Order — ${date}</h4></div>
+      <button onclick="deletePreOrder('${o.id}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">🗑️</button>
+    </div>
+    <p>📞 ${escapeHtml(o.phone)} | 📍 ${escapeHtml(o.address)}</p>
+    <p>📝 ${escapeHtml(o.description)}</p>
+    ${o.photoUrl?`<p>📷 <a href="${o.photoUrl}" target="_blank" style="color:var(--gold)">View</a></p>`:''}
+    ${o.audioUrl?`<audio controls src="${o.audioUrl}" style="width:100%;margin-top:5px"></audio>`:''}
+    ${pricingHtml}
+    ${dbHtml}
+    <div style="margin-top:15px">
+      <span class="order-status ${cls}">${s}</span>
+      <select style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;float:right;margin-top:10px" onchange="updatePreOrderStatus('${o.id}',this.value)">
+        ${['Pending','Priced','Accepted','Processing','Packed','Shipped','Delivered','Cancelled'].map(opt=>`<option value="${opt}" ${s===opt?'selected':''}>${opt}</option>`).join('')}
+      </select>
+    </div>
+  </div>`;
 }
 
 async function viewCustomerOrders(userId, emailOrName) {
@@ -1150,48 +1305,14 @@ function renderCustomerDashboardData() {
   if (customerOrdersCache.length === 0) {
     list.innerHTML = '<div class="loading-row">No normal orders found.</div>';
   } else {
-    list.innerHTML = customerOrdersCache.map(o => {
-      const date = o.date ? new Date(o.date.toMillis()).toLocaleString() : 'Recent';
-      let sc = 'status-' + (o.status || 'Pending');
-      const itemsHtml = o.items.map(i => `<li>${escapeHtml(i.name)} ${i.size?'['+i.size+']':''} × ${i.qty||1} — ₹${i.price}</li>`).join('');
-      const orderIdBadge = `<div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;margin-bottom:5px">#${o.orderCode || o.id.slice(-8).toUpperCase()}</div>`;
-      
-      return `<div class="order-card">
-        <div style="display:flex;justify-content:space-between;align-items:start">
-          <div>${orderIdBadge}<h4>₹${o.total}</h4></div>
-          <div style="font-size:12px;color:var(--text-dim)">${date}</div>
-        </div>
-        <ul style="font-size:13px; margin:10px 0; padding-left:15px; color:var(--text);">${itemsHtml}</ul>
-        <div><span class="order-status ${sc}">${o.status||'Pending'}</span></div>
-      </div>`;
-    }).join('');
+    list.innerHTML = customerOrdersCache.map(getAdminOrderCardHTML).join('');
   }
 
   const preList = document.getElementById('custPreOrdersList');
   if (customerPreOrdersCache.length === 0) {
     preList.innerHTML = '<div class="loading-row">No pre-orders found.</div>';
   } else {
-    preList.innerHTML = customerPreOrdersCache.map(o => {
-      const date = o.date ? new Date(o.date.toMillis()).toLocaleString() : 'Recent';
-      const s = o.status || 'Pending';
-      const cls = 'status-' + s;
-      let priceHtml = '';
-      if(o.totalPrice) {
-        priceHtml = `<div style="font-size:13px;font-weight:800;color:var(--gold);margin-top:5px">Quoted Price: ₹${o.totalPrice}</div>`;
-      }
-      const preIdBadge = `<div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;margin-bottom:5px">#${o.orderCode || 'PRE-'+o.id.slice(-4).toUpperCase()}</div>`;
-      
-      return `<div class="order-card">
-        <div style="display:flex;justify-content:space-between;align-items:start">
-          <div>${preIdBadge}</div>
-          <div style="font-size:12px;color:var(--text-dim)">${date}</div>
-        </div>
-        <p style="font-size:13px; margin:8px 0;">📝 <b>Request:</b> ${escapeHtml(o.description)}</p>
-        ${o.photoUrl?`<p style="font-size:12px;">📷 <a href="${o.photoUrl}" target="_blank" style="color:var(--gold)">View Photo</a></p>`:''}
-        ${priceHtml}
-        <div style="margin-top:10px;"><span class="order-status ${cls}">${s}</span></div>
-      </div>`;
-    }).join('');
+    preList.innerHTML = customerPreOrdersCache.map(getAdminPreOrderCardHTML).join('');
   }
 }
 
@@ -1445,106 +1566,7 @@ function renderAdminOrdersList(){
   const list=document.getElementById('adminOrdersList');let filtered=allAdminOrdersCache;
   if(adminOrderSearchTerm){const t=adminOrderSearchTerm.toLowerCase();filtered=filtered.filter(o=>(o.orderCode&&o.orderCode.toLowerCase().includes(t))||(o.customerName&&o.customerName.toLowerCase().includes(t))||(o.phone&&o.phone.includes(t)))}
   if(filtered.length===0){list.innerHTML='<div class="loading-row">No orders found</div>';return}
-  list.innerHTML=filtered.map(o=>{
-    const date=o.date?new Date(o.date.toMillis()).toLocaleString():'Recent';let sc='status-'+(o.status||'Pending');
-    
-    const itemsHtml=o.items.map((i, idx)=>{
-      const v=[i.size?'Size:'+i.size:'',i.color?'Color:'+i.color:''].filter(Boolean).join(' | ');
-      const isCancelled = o.cancelledItems && o.cancelledItems.includes(idx);
-      return`<div class="order-item-row" style="${isCancelled?'opacity:0.5;text-decoration:line-through;':''}">
-        ${i.img?`<img src="${optImg(i.img,100)}" class="order-img-thumb">`:`<div class="order-img-thumb" style="background:#333;display:flex;align-items:center;justify-content:center;font-size:10px">No Img</div>`}
-        <div style="flex:1">
-          <div style="font-weight:700">${escapeHtml(i.name)} ${isCancelled?'(Cancelled)':''}</div>
-          <div style="font-size:11px;color:var(--text-dim)">${v}</div>
-        </div>
-        <div style="text-align:right;font-weight:800;color:var(--gold)">₹${i.price} <span style="color:var(--text-dim);font-size:11px">x${i.qty||1}</span></div>
-      </div>`;
-    }).join('');
-    
-    const orderIdBadge=`<div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;margin-bottom:5px">#${o.orderCode||o.id.slice(-8).toUpperCase()}</div>`;
-    const walletInfo=(o.walletUsed&&o.walletUsed>0)?`<span style="background:rgba(46,204,113,0.15);color:var(--success);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:800;margin-left:5px">💰-₹${Math.round(o.walletUsed)}</span>`:'';
-    const payBadge=o.paymentStatus==='Paid'?`<span style="background:var(--success);color:#000;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800">💳PAID</span>`:`<span style="background:#f39c12;color:#000;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800">COD</span>`;
-    
-    const isUnlocked = unlockedOtps.includes(o.id);
-    let otpDisplay = '';
-    let verifyOtpBtn = '';
-    
-    if (o.deliveryOtp && o.status !== 'Delivered') {
-        if (isUnlocked) {
-            otpDisplay = `<span style="background:rgba(52,152,219,0.15);color:#3498db;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:800">OTP: ${o.deliveryOtp}</span>`;
-        } else {
-            otpDisplay = `<button onclick="unlockAdminOtp('${o.id}')" style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:4px 8px;border-radius:4px;font-size:11px;font-weight:800;cursor:pointer">🔒 View OTP</button>`;
-        }
-
-        if (o.status === 'Shipped' || o.status === 'Out for Delivery' || o.status === 'Pending' || o.status === 'Processing') {
-            verifyOtpBtn = `<button class="btn-small" style="background:rgba(46,204,113,0.2);border:1px solid var(--success);color:var(--success);font-weight:800;width:100%;margin-top:8px" onclick="openOtpModal('${o.id}')">🔐 Verify Delivery OTP</button>`;
-        }
-    }
-
-    const retHtml = o.returnStatus ? `
-      <div style="background:rgba(243,156,18,0.15);border:1px dashed #f39c12;padding:10px;border-radius:8px;margin:10px 0">
-        <div style="color:#f39c12;font-weight:800;font-size:13px;margin-bottom:5px">🔄 Return/Exchange: ${o.returnStatus}</div>
-        ${o.returnDetails ? `
-          <div style="font-size:12px;color:var(--text);margin-bottom:5px;line-height:1.5">
-            <b>Item:</b> ${escapeHtml(o.returnDetails.productName)}<br>
-            <b>Type:</b> ${o.returnDetails.type} | <b>Issue:</b> ${o.returnDetails.condition}<br>
-            <b>Reason:</b> ${escapeHtml(o.returnDetails.reason)}
-            ${o.returnDetails.type === 'Exchange' ? `<br><b>Requested:</b> Size: ${o.returnDetails.newSize || '-'}, Color: ${o.returnDetails.newColor || '-'}` : ''}
-          </div>
-        ` : ''}
-        ${o.returnTimeline ? `<div style="font-size:11px;color:var(--text-dim);margin-top:8px;border-top:1px solid #555;padding-top:5px">${o.returnTimeline.map(t=>`✅ ${t.status}`).join('<br>')}</div>` : ''}
-        
-        ${o.returnStatus === 'Requested' ? `
-          <div style="display:flex;gap:5px;margin-top:10px">
-            <button class="btn-small" style="background:var(--success);color:#000" onclick="updateReturnTracking('${o.id}','Approved')">✅ Approve</button>
-            <button class="btn-small" style="background:var(--danger);color:#fff" onclick="updateReturnTracking('${o.id}','Rejected')">❌ Reject</button>
-          </div>
-        ` : `
-          <select style="margin-top:10px;background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;width:100%" onchange="updateReturnTracking('${o.id}',this.value)">
-            <option value="" disabled selected>Update Tracking...</option>
-            <option value="Approved">Approved</option>
-            <option value="Pickup Scheduled">Pickup Scheduled</option>
-            <option value="Item Picked Up">Item Picked Up</option>
-            <option value="Processing in Warehouse">Processing</option>
-            <option value="Exchange Shipped">Exchange Shipped</option>
-            <option value="Completed">Completed (Done)</option>
-            <option value="Rejected">Rejected</option>
-          </select>
-        `}
-      </div>
-    ` : '';
-
-    return`<div class="order-card">
-      <div style="display:flex;justify-content:space-between;align-items:start">
-        <div>${orderIdBadge}${payBadge}${walletInfo}<h4>${escapeHtml(o.customerName)} - ₹${o.total}</h4></div>
-        <div style="display:flex;gap:5px"><button onclick="printInvoice('${o.id}')" style="background:none;border:none;color:var(--gold);font-size:16px;cursor:pointer">🖨️</button><button onclick="deleteOrder('${o.id}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">🗑️</button></div>
-      </div>
-      <p>📞 ${escapeHtml(o.phone)} | 📍 ${escapeHtml((o.building?o.building+', ':'')+o.address)}</p>
-      <p>📅 ${date} | ${otpDisplay}</p>
-      ${(o.latitude&&o.longitude)?`<button onclick="window.open('https://www.google.com/maps?q=${o.latitude},${o.longitude}','_blank')" style="background:var(--success);color:#000;border:none;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-top:5px">📍 View Location</button>`:''}
-      
-      <div class="order-items-list">${itemsHtml}</div>
-      
-      <p style="font-size:12px">Del:₹${o.deliveryCharge}|Plat:₹${o.platformFee}|Hand:₹${o.handlingCharge}${o.pointsRedeemed?'|Pts:-'+o.pointsRedeemed:''}${o.walletUsed?'|Wallet:₹'+Math.round(o.walletUsed):''}</p>
-      
-      ${retHtml}
-
-      <div style="display:flex;gap:5px;margin-top:10px">
-        <input type="text" placeholder="Delivery Boy" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.name):''}" id="db-name-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px">
-        <input type="tel" placeholder="Phone" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.phone):''}" id="db-phone-${o.id}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px">
-        <button class="btn-small" style="flex:0;padding:6px 10px" onclick="saveDeliveryBoy('${o.id}')">Save</button>
-      </div>
-      <div style="display:flex;gap:5px;margin-top:8px">
-        <button class="btn-small" style="background:rgba(46,204,113,0.15);border:1px solid var(--success);color:var(--success)" onclick="adminAdjustWallet('${o.userId}','${escapeHtml(o.customerName)}')">💰 Wallet</button>
-      </div>
-      ${verifyOtpBtn}
-      
-      <span class="order-status ${sc}">${o.status||'Pending'}</span>
-      <select style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;float:right;margin-top:10px" onchange="updateOrderStatus('${o.id}',this.value)">
-        ${['Pending','Processing','Shipped','Out for Delivery','Cancelled'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}
-      </select>
-    </div>`
-  }).join('');
+  list.innerHTML=filtered.map(getAdminOrderCardHTML).join('');
 }
 
 function filterAdminOrders(){adminOrderSearchTerm=document.getElementById('adminOrderSearch').value.trim();renderAdminOrdersList()}
@@ -1573,7 +1595,7 @@ function closeAdminNotifs(){document.getElementById('adminNotifModal').style.dis
 
 // ============ PRE-ORDERS ============
 function loadAdminPreOrders(){const list=document.getElementById('adminPreOrdersList');if(!list)return;if(unsubPreOrders)unsubPreOrders();unsubPreOrders=onSnapshot(collection(db,'pre_orders'),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No pre-orders</div>';return}let arr=snap.docs.map(d=>({id:d.id,...d.data()}));arr.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));allAdminPreOrdersCache=arr;updateAdminNotifBadge();renderAdminPreOrdersList()})}
-function renderAdminPreOrdersList(){const list=document.getElementById('adminPreOrdersList');let filtered=allAdminPreOrdersCache;if(adminPreOrderSearchTerm){const t=adminPreOrderSearchTerm.toLowerCase();filtered=filtered.filter(o=>(o.orderCode&&o.orderCode.toLowerCase().includes(t))||(o.phone&&o.phone.includes(t)))}if(filtered.length===0){list.innerHTML='<div class="loading-row">No pre-orders</div>';return}list.innerHTML=filtered.map(o=>{const date=o.date?new Date(o.date.toMillis()).toLocaleString():'Recent';const s=o.status||'Pending';const cls='status-'+s;let pricingHtml='';if(s==='Pending'){pricingHtml=`<div style="background:rgba(212,175,55,0.1);border:1px dashed var(--gold);padding:10px;border-radius:8px;margin-top:10px"><div style="font-size:12px;font-weight:800;color:var(--gold);margin-bottom:8px">💰 Price this Order</div><div style="font-size:12px;color:var(--success);margin-bottom:8px">Budget: ₹${o.budget||'N/A'}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px"><input type="number" id="pre-prod-${o.id}" placeholder="Product ₹" oninput="calculatePreOrderTotal('${o.id}')" style="padding:6px;font-size:12px;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:6px"><input type="number" id="pre-del-${o.id}" placeholder="Delivery ₹" oninput="calculatePreOrderTotal('${o.id}')" style="padding:6px;font-size:12px;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:6px"><input type="number" id="pre-plat-${o.id}" placeholder="Platform ₹" oninput="calculatePreOrderTotal('${o.id}')" style="padding:6px;font-size:12px;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:6px"><input type="number" id="pre-hand-${o.id}" placeholder="Handling ₹" oninput="calculatePreOrderTotal('${o.id}')" style="padding:6px;font-size:12px;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:6px"></div><div style="font-size:14px;font-weight:800;margin-bottom:8px">Total: ₹<span id="pre-total-${o.id}">0</span></div><button class="btn-small" style="background:var(--gold);color:#000;font-weight:800" onclick="sendPreOrderPrice('${o.id}')">📤 Send</button></div>`}else if(o.totalPrice){pricingHtml=`<div style="font-size:12px;padding:8px;background:var(--card2);border-radius:6px;margin-top:5px"><b>Total: <span style="color:var(--gold);font-size:14px">₹${o.totalPrice}</span></b></div>`}const dbHtml=(s!=='Pending'&&s!=='Priced')?`<div style="display:flex;gap:5px;margin-top:10px"><input type="text" id="pre-db-name-${o.id}" placeholder="Delivery Boy" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.name):''}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><input type="tel" id="pre-db-phone-${o.id}" placeholder="Phone" value="${o.deliveryBoy?escapeHtml(o.deliveryBoy.phone):''}" style="flex:1;padding:6px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px"><button class="btn-small" style="flex:0;padding:6px 10px" onclick="savePreOrderDeliveryBoy('${o.id}')">Save</button></div>`:'';return`<div class="order-card"><div style="display:flex;justify-content:space-between"><div><div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;margin-bottom:5px">#${o.orderCode||'Pending'}</div><h4>Pre-Order — ${date}</h4></div><button onclick="deletePreOrder('${o.id}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">🗑️</button></div><p>📞 ${escapeHtml(o.phone)} | 📍 ${escapeHtml(o.address)}</p><p>📝 ${escapeHtml(o.description)}</p>${o.photoUrl?`<p>📷 <a href="${o.photoUrl}" target="_blank" style="color:var(--gold)">View</a></p>`:''}${o.audioUrl?`<audio controls src="${o.audioUrl}" style="width:100%;margin-top:5px"></audio>`:''}${pricingHtml}${dbHtml}<div style="margin-top:15px"><span class="order-status ${cls}">${s}</span><select style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;float:right;margin-top:10px" onchange="updatePreOrderStatus('${o.id}',this.value)">${['Pending','Priced','Accepted','Processing','Packed','Shipped','Delivered','Cancelled'].map(opt=>`<option value="${opt}" ${s===opt?'selected':''}>${opt}</option>`).join('')}</select></div></div>`}).join('')}
+function renderAdminPreOrdersList(){const list=document.getElementById('adminPreOrdersList');let filtered=allAdminPreOrdersCache;if(adminPreOrderSearchTerm){const t=adminPreOrderSearchTerm.toLowerCase();filtered=filtered.filter(o=>(o.orderCode&&o.orderCode.toLowerCase().includes(t))||(o.phone&&o.phone.includes(t)))}if(filtered.length===0){list.innerHTML='<div class="loading-row">No pre-orders</div>';return}list.innerHTML=filtered.map(getAdminPreOrderCardHTML).join('')}
 function filterAdminPreOrders(){adminPreOrderSearchTerm=document.getElementById('adminPreOrderSearch').value.trim();renderAdminPreOrdersList()}
 function calculatePreOrderTotal(id){const p=parseFloat(document.getElementById('pre-prod-'+id).value)||0;const d=parseFloat(document.getElementById('pre-del-'+id).value)||0;const pf=parseFloat(document.getElementById('pre-plat-'+id).value)||0;const h=parseFloat(document.getElementById('pre-hand-'+id).value)||0;document.getElementById('pre-total-'+id).textContent=p+d+pf+h}
 async function sendPreOrderPrice(id){const p=parseFloat(document.getElementById('pre-prod-'+id).value)||0;const d=parseFloat(document.getElementById('pre-del-'+id).value)||0;const pf=parseFloat(document.getElementById('pre-plat-'+id).value)||0;const h=parseFloat(document.getElementById('pre-hand-'+id).value)||0;const total=p+d+pf+h;if(total<=0)return alert('Enter valid prices');showLoading();try{await updateDoc(doc(db,'pre_orders',id),{productPrice:p,deliveryFee:d,platformFee:pf,handlingFee:h,totalPrice:total,status:'Priced'});alert('✅ Price sent!')}catch(e){alert('Error: '+e.message)}hideLoading()}
@@ -1902,7 +1924,7 @@ function checkSpinWheel(){const last=localStorage.getItem('lastSpinDate');const 
 function closeSpinWheel(){document.getElementById('spinWheelModal').style.display='none'}
 function spinWheel(){const btn=document.getElementById('spinBtn');btn.disabled=true;const wheel=document.getElementById('wheelCanvas');const deg=Math.floor(Math.random()*360)+720;wheel.style.transform=`rotate(${deg}deg)`;setTimeout(()=>{if(couponsCache.length>0){const c=couponsCache[Math.floor(Math.random()*couponsCache.length)];document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML=`🎉 Won: <span style="color:var(--gold)">${c.code}</span> (${c.discountPercent}% OFF)`;localStorage.setItem('lastSpinDate',new Date().toDateString())}else{document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML='No coupons active'};btn.textContent='CLOSE';btn.onclick=closeSpinWheel;btn.disabled=false},3000)}
 
-const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab'];
+const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
