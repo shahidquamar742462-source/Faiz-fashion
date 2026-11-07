@@ -55,15 +55,15 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .box-sub{font-size:12px;color:var(--text-dim)}
 .header{display:flex;align-items:center;gap:14px;padding:8px 0 24px;border-bottom:1px solid var(--border);margin-bottom:24px}
 .header h2{font-size:20px;font-weight:800;background:var(--grad-fk);-webkit-background-clip:text;-webkit-text-fill-color:transparent;flex:1}
-.back-btn{background:var(--card);border:1px solid var(--border);color:var(--gold);width:40px;height:40px;border-radius:10px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm)}
+.back-btn{background:var(--card);border:1px solid var(--border);color:var(--text);width:40px;height:40px;border-radius:10px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm)}
 .form-container{max-width:420px;margin:0 auto}
 .input-group{margin-bottom:20px}
 .input-group label{display:block;font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase}
 .input-group input,.input-group textarea,.input-group select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;color:var(--text);font-size:15px;outline:none;box-shadow:0 2px 5px rgba(0,0,0,0.02)}
-.input-group input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,0.2)}
+.input-group input:focus{border-color:var(--text);box-shadow:0 0 0 3px rgba(0,0,0,0.1)}
 .btn-primary{width:100%;background:var(--grad-fk);color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 15px rgba(229,45,39,0.4);transition:transform 0.2s}
 .btn-primary:active{transform:scale(0.98)}
-.btn-link{display:block;width:100%;background:transparent;border:none;color:var(--gold-dark);font-size:14px;font-weight:700;padding:16px 0;cursor:pointer;text-decoration:underline}
+.btn-link{display:block;width:100%;background:transparent;border:none;color:var(--text);font-size:14px;font-weight:700;padding:16px 0;cursor:pointer;text-decoration:underline}
 .error-msg{color:var(--danger);font-size:14px;text-align:center;margin-top:12px;font-weight:700}
 .admin-header{display:block;padding:10px 0 20px;border-bottom:1px solid var(--border);margin-bottom:20px}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
@@ -72,7 +72,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .stat-label{font-size:12px;color:var(--text-dim);margin-top:4px;font-weight:600}
 .analytics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
 .analytics-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-sm)}
-.analytics-val{font-size:20px;font-weight:900;color:var(--gold-dark)}
+.analytics-val{font-size:20px;font-weight:900;color:var(--text)}
 .analytics-label{font-size:10px;color:var(--text-dim);margin-top:4px;text-transform:uppercase;font-weight:700}
 .category-list{display:grid;grid-template-columns:1fr;gap:16px;padding-bottom:40px}
 .category-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-sm)}
@@ -115,11 +115,18 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .timeline-text{font-size:9px;color:var(--text-dim);text-align:center;font-weight:700}
 .timeline-step.active .timeline-text{color:var(--danger)}
 .timeline-step.completed .timeline-text{color:var(--success)}
-.install-banner{background:var(--grad-gold);color:#000;padding:14px 18px;border-radius:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;font-weight:800;font-size:14px;box-shadow:var(--shadow-md)}
-.install-banner button{background:#000;color:#fff;border:none;padding:8px 16px;border-radius:10px;font-weight:800;font-size:12px;cursor:pointer}
 
-/* FLIPKART STYLE TOP BAR */
-.top-bar{background:var(--grad-fk);padding:16px 16px 12px;margin:-20px -20px 16px -20px;position:sticky;top:0;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+/* FLIPKART STYLE TOP BAR WITH GRADIENT */
+.top-bar{
+  /* Gradient from deep red to orange to light background */
+  background: linear-gradient(180deg, #8a0b0b 0%, #d32f2f 40%, #ff7043 75%, #f5f5f6 100%);
+  padding:16px 16px 12px;
+  margin:-20px -20px 16px -20px;
+  position:sticky;
+  top:0;
+  z-index:10;
+  box-shadow:0 4px 12px rgba(0,0,0,0.15)
+}
 .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .top-bar h2{font-size:20px;color:#fff;font-weight:900;letter-spacing:1px;text-shadow:0 1px 3px rgba(0,0,0,0.2)}
 .search-row{display:flex;gap:8px;position:relative}
@@ -134,10 +141,9 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .horizontal-scroll-row::-webkit-scrollbar{display:none}
 .cat-icon-item{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:60px;cursor:pointer;transition:transform .2s ease}
 .cat-icon-item:active{transform:scale(.9)}
-/* White transparent category icons for dark header */
 .cat-icon-box{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;background:rgba(255,255,255,0.15);backdrop-filter:blur(4px);color:#fff;border:1px solid rgba(255,255,255,0.3)}
 .cat-icon-item.active .cat-icon-box{background:#fff;color:#e52d27;border:2px solid #fff;transform:scale(1.05);box-shadow:0 4px 10px rgba(0,0,0,0.2)}
-.cat-icon-text{font-size:11px;font-weight:700;color:#fff}
+.cat-icon-text{font-size:11px;font-weight:700;color:#fff; text-shadow:0 1px 2px rgba(0,0,0,0.3)}
 
 .banner-container{width:100%;height:160px;margin-bottom:20px;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;scrollbar-width:none;border-radius:12px;position:relative;box-shadow:var(--shadow-sm)}
 .banner-container::-webkit-scrollbar{display:none}
@@ -256,8 +262,8 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .address-item .addr-name{font-weight:800;color:var(--text);margin-bottom:6px;font-size:15px}
 .address-item .addr-text{font-size:13px;color:var(--text-dim);line-height:1.5;font-weight:500}
 .address-item .addr-del{position:absolute;top:12px;right:12px;background:rgba(250,82,82,0.1);color:var(--danger);border:none;padding:6px;border-radius:6px;font-size:14px;cursor:pointer}
-.ref-card{background:linear-gradient(135deg,rgba(212,175,55,0.1),rgba(212,175,55,0.02));border:1px dashed var(--gold);border-radius:16px;padding:18px;margin-bottom:18px;box-shadow:var(--shadow-sm)}
-.ref-code{font-size:24px;font-weight:900;color:var(--gold-dark);letter-spacing:3px;font-family:monospace}
+.ref-card{background:linear-gradient(135deg,rgba(212,175,55,0.1),rgba(212,175,55,0.02));border:1px dashed var(--gold);border-radius:12px;padding:12px;margin-bottom:15px;box-shadow:var(--shadow-sm)}
+.ref-code{font-size:20px;font-weight:900;color:var(--gold-dark);letter-spacing:2px;font-family:monospace}
 .autocomplete-box{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:6px;max-height:280px;overflow-y:auto;z-index:100;display:none;box-shadow:var(--shadow-md)}
 .autocomplete-item{padding:12px 16px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--border);color:var(--text);display:flex;justify-content:space-between;align-items:center;font-weight:600}
 .autocomplete-item:hover{background:var(--card2);color:var(--text)}
@@ -617,14 +623,13 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 </div>
 
 <div id="screen-shop" class="screen">
-  <div class="install-banner"><span>📥 Install FAIZ FASHION</span><button onclick="installPWA()">Install</button></div>
   <div id="firstOrderBanner" class="first-order-banner">🎁 <b>Welcome!</b> First order par 10% OFF auto-apply ho gaya — code: WELCOME10</div>
   <div id="shopClosedNotice" style="display:none;background:#fff0f0;border:1px solid var(--danger);padding:15px;border-radius:12px;text-align:center;margin-bottom:15px">
     <h3 style="color:var(--danger);font-size:16px;margin-bottom:5px">🛑 Shop is Closed</h3>
     <p style="color:var(--text-dim);font-size:13px">Please visit early morning!</p>
   </div>
   
-  <!-- NEW FLIPKART STYLE TOP BAR -->
+  <!-- NEW FLIPKART STYLE TOP BAR WITH GRADIENT -->
   <div class="top-bar">
     <div class="top-row">
       <h2>FAIZ FASHION</h2>
@@ -699,26 +704,30 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 <div id="screen-customer-settings" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Account</h2></div>
   <div class="form-container" style="max-width: 500px;">
-    <div style="background: var(--card); padding: 15px; border-radius: 16px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid var(--border);">
+    
+    <!-- Profile Card - Clickable to open details -->
+    <div onclick="openProfileDetails()" style="background: var(--card); padding: 15px; border-radius: 16px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid var(--border); cursor: pointer;">
        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--grad-fk); display: flex; align-items: center; justify-content: center; font-size: 30px; color: #fff;">👤</div>
        <div style="flex: 1; overflow: hidden;">
          <div style="font-size: 18px; font-weight: 800; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="profileGreeting">Hey, User</div>
          <div style="font-size: 12px; color: var(--text-dim); word-break: break-all;" id="custLoginId">Loading...</div>
          <div style="font-size: 11px; color: var(--gold); font-weight: 700; margin-top:2px;" id="custLoginType">Loading...</div>
        </div>
+       <div style="font-size:20px; color:var(--text-dim);">›</div>
     </div>
 
-    <div class="ref-card" style="margin-bottom:15px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <!-- Compact Rewards & Wallet Panel -->
+    <div class="ref-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <div id="tierBadgeDisplay"></div>
-        <button class="btn-small" style="flex:0;padding:5px 10px;background:var(--text);color:#fff;font-weight:800;font-size:11px" onclick="showTierInfo()">ℹ️ Benefits</button>
+        <button class="btn-small" style="flex:0;padding:4px 8px;background:var(--text);color:#fff;font-weight:800;font-size:10px" onclick="showTierInfo()">ℹ️ Benefits</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-        <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase">Points</div><div style="font-size:22px;font-weight:800;color:var(--gold-dark)"><span id="userPointsDisplay">0</span> ⭐</div></div>
-        <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase">Wallet</div><div style="font-size:22px;font-weight:800;color:var(--success)">₹<span id="userWalletDisplay">0</span></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+        <div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase">Points</div><div style="font-size:18px;font-weight:800;color:var(--gold-dark)"><span id="userPointsDisplay">0</span> ⭐</div></div>
+        <div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase">Wallet</div><div style="font-size:18px;font-weight:800;color:var(--success)">₹<span id="userWalletDisplay">0</span></div></div>
       </div>
       <div style="display:flex;justify-content:flex-end">
-        <div style="text-align:right"><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase">Referral Code</div><div class="ref-code" id="userRefCodeDisplay">------</div><button class="btn-small" style="padding:6px 12px;margin-top:4px;background:var(--text);color:#fff;font-weight:800" onclick="shareReferralCode()">📤 Share</button></div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase">Referral Code</div><div class="ref-code" id="userRefCodeDisplay">------</div><button class="btn-small" style="padding:4px 10px;margin-top:4px;background:var(--text);color:#fff;font-weight:800;font-size:11px" onclick="shareReferralCode()">📤 Share</button></div>
       </div>
     </div>
 
@@ -760,10 +769,46 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <span style="font-size:24px" id="custThemeIcon">🌙</span>
       <div><div style="font-size:16px; font-weight:800;">Theme</div><div style="font-size:13px;color:var(--text-dim)">Switch Light/Dark Mode</div></div>
     </button>
+    
+    <!-- Share Location -->
     <button class="btn-primary" style="background:var(--card); border:1px solid var(--gold); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px;" onclick="requestGlobalLocation()">
       <span style="font-size:24px">📍</span>
       <div><div style="font-size:16px; font-weight:800;">Share Location</div><div style="font-size:13px;color:var(--text-dim)" id="globalLocStatus">Tap to allow GPS</div></div>
     </button>
+
+    <!-- NEW: Install App Button Moved Here -->
+    <button class="btn-primary" style="background:var(--card); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);" onclick="installPWA()">
+      <span style="font-size:24px">📥</span>
+      <div><div style="font-size:16px; font-weight:800;">Install App</div><div style="font-size:13px;color:var(--text-dim)">Add to Home Screen</div></div>
+    </button>
+
+  </div>
+</div>
+
+<!-- NEW: PROFILE DETAILS SCREEN -->
+<div id="screen-profile-details" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('customer-settings')">←</button><h2>Profile Details</h2></div>
+  <div class="form-container">
+    <div class="input-group"><label>First Name</label><input type="text" id="profFirstName" placeholder="Enter first name"></div>
+    <div class="input-group"><label>Last Name</label><input type="text" id="profLastName" placeholder="Enter last name"></div>
+    <div class="input-group"><label>Phone Number</label><input type="tel" id="profPhone" maxlength="10" placeholder="10-digit mobile number"></div>
+    <div class="input-group">
+      <label>Gender</label>
+      <select id="profGender">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="input-group"><label>Date of Birth</label><input type="date" id="profDob"></div>
+    <div class="input-group"><label>Address</label><textarea id="profAddress" rows="3" placeholder="Full address"></textarea></div>
+    
+    <button class="btn-primary" onclick="saveProfileDetails()">Save Details</button>
+    
+    <!-- Logout Button at bottom of profile -->
+    <div style="margin-top:30px; padding-top:20px; border-top:1px solid var(--border);">
+      <button class="btn-primary" style="background:var(--danger); color:#fff; box-shadow:none;" onclick="handleLogout()">🚪 Logout</button>
+    </div>
   </div>
 </div>
 
@@ -1131,7 +1176,6 @@ function renderDealsAndSuggested() {
   
   if(!dealsGrid || !sugGrid) return;
 
-  // 1. DEALS FOR YOU (Based on recently viewed category or top discounts)
   const recentIds = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
   const recentProducts = recentIds.map(id => categoriesCache.find(c => c.id === id)).filter(Boolean);
   
@@ -1140,7 +1184,6 @@ function renderDealsAndSuggested() {
     const lastCat = recentProducts[0].mainCategory;
     deals = categoriesCache.filter(c => c.mainCategory === lastCat && !recentIds.includes(c.id)).slice(0, 6);
   }
-  // Fallback: If no recent category or not enough deals, show top discounted items
   if (deals.length < 4) {
     deals = categoriesCache.filter(c => getDiscountPercent(c.originalPrice, c.discountPrice) > 0).sort((a,b) => getDiscountPercent(b.originalPrice, b.discountPrice) - getDiscountPercent(a.originalPrice, a.discountPrice)).slice(0, 6);
   }
@@ -1159,7 +1202,6 @@ function renderDealsAndSuggested() {
     dealsSec.style.display = 'none';
   }
 
-  // 2. SUGGESTED FOR YOU (Trending based on views, or random)
   const suggested = [...categoriesCache].sort((a,b) => (b.views || 0) - (a.views || 0)).slice(0, 6);
   if (suggested.length > 0) {
     sugSec.style.display = 'block';
@@ -1300,6 +1342,48 @@ async function checkFirstOrderBonus(){
       if(banner) banner.style.display = 'none';
     }
   }catch(e){}
+}
+
+// NEW: Open Profile Details
+async function openProfileDetails() {
+    if (!currentUid) return;
+    showScreen('profile-details');
+    try {
+        const snap = await getDoc(doc(db, 'users', currentUid));
+        if (snap.exists()) {
+            const d = snap.data();
+            document.getElementById('profFirstName').value = d.firstName || '';
+            document.getElementById('profLastName').value = d.lastName || '';
+            document.getElementById('profPhone').value = d.phone || '';
+            document.getElementById('profGender').value = d.gender || 'Male';
+            document.getElementById('profDob').value = d.dob || '';
+            document.getElementById('profAddress').value = d.address || '';
+        }
+    } catch (e) { console.log(e); }
+}
+
+// NEW: Save Profile Details
+async function saveProfileDetails() {
+    if (!currentUid) return;
+    showLoading();
+    try {
+        const firstName = document.getElementById('profFirstName').value.trim();
+        const lastName = document.getElementById('profLastName').value.trim();
+        const phone = document.getElementById('profPhone').value.trim();
+        const gender = document.getElementById('profGender').value;
+        const dob = document.getElementById('profDob').value;
+        const address = document.getElementById('profAddress').value.trim();
+
+        await setDoc(doc(db, 'users', currentUid), {
+            firstName, lastName, phone, gender, dob, address
+        }, { merge: true });
+        
+        alert('✅ Details saved successfully!');
+        showScreen('customer-settings');
+    } catch (e) {
+        alert('Error: ' + e.message);
+    }
+    hideLoading();
 }
 
 async function getSizeRecommendation(productId){
@@ -1693,16 +1777,38 @@ function updateCheckoutLocStatus(){const e=document.getElementById('checkoutLocS
 async function requestGlobalLocation(){showLoading();try{const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:10000,enableHighAccuracy:true}));userSavedLat=pos.coords.latitude;userSavedLng=pos.coords.longitude;await setDoc(doc(db,'users',currentUid),{savedLatitude:userSavedLat,savedLongitude:userSavedLng},{merge:true});updateGlobalLocStatus();alert('✅ Location saved!')}catch(e){alert('❌ GPS failed')}hideLoading()}
 async function requestCheckoutLocation(){const el=document.getElementById('checkoutLocStatus');el.textContent='Fetching...';try{const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:10000,enableHighAccuracy:true}));userSavedLat=pos.coords.latitude;userSavedLng=pos.coords.longitude;await setDoc(doc(db,'users',currentUid),{savedLatitude:userSavedLat,savedLongitude:userSavedLng},{merge:true});el.textContent='✅ Shared!';el.style.color='var(--success)'}catch(e){el.textContent='❌ Failed';el.style.color='var(--danger)'}}
 
+// FIXED: Voice Search functionality
 function startVoiceSearch(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('🎤 Not supported. Use Chrome.');return}
-  if(voiceRecognition){try{voiceRecognition.stop()}catch(e){}}
-  voiceRecognition=new SR();voiceRecognition.lang='hi-IN';voiceRecognition.interimResults=false;voiceRecognition.maxAlternatives=1;
-  const btn=document.getElementById('voiceSearchBtn');btn.textContent='🔴';btn.classList.add('recording');
-  const reset=()=>{btn.textContent='🎤';btn.classList.remove('recording');voiceRecognition=null};
-  voiceRecognition.onresult=(e)=>{const t=e.results[0][0].transcript;document.getElementById('shopSearch').value=t;onSearchInput(t)};
-  voiceRecognition.onerror=(e)=>{if(e.error!=='aborted')alert('Voice error: '+e.error);reset()};
-  voiceRecognition.onend=reset;
-  try{voiceRecognition.start()}catch(e){reset();alert('Error: '+e.message)}
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('🎤 Aapke browser me voice search supported nahi hai. Chrome use karein.'); return; }
+  if (voiceRecognition) { try { voiceRecognition.stop(); } catch(e){} }
+  voiceRecognition = new SR();
+  voiceRecognition.lang = 'hi-IN'; // Set language to Hindi/English mixed
+  voiceRecognition.interimResults = false;
+  voiceRecognition.maxAlternatives = 1;
+  
+  const btn = document.getElementById('voiceSearchBtn');
+  btn.textContent = '🔴';
+  btn.classList.add('recording');
+  
+  const reset = () => { btn.textContent = '🎤'; btn.classList.remove('recording'); voiceRecognition = null; };
+  
+  voiceRecognition.onresult = (e) => {
+    const t = e.results[0][0].transcript;
+    const searchInput = document.getElementById('shopSearch');
+    searchInput.value = t;
+    onSearchInput(t); // Trigger the search
+    setTimeout(() => { searchInput.blur(); }, 500); // Dismiss keyboard after search
+  };
+  
+  voiceRecognition.onerror = (e) => { 
+    if(e.error !== 'aborted') alert('Voice error: ' + e.error); 
+    reset(); 
+  };
+  
+  voiceRecognition.onend = reset;
+  
+  try { voiceRecognition.start(); } catch(e) { reset(); alert('Error: ' + e.message); }
 }
 
 function saveRecentSearch(q){if(!q||q.length<2)return;recentSearches=recentSearches.filter(x=>x.toLowerCase()!==q.toLowerCase());recentSearches.unshift(q);recentSearches=recentSearches.slice(0,10);localStorage.setItem('recentSearches',JSON.stringify(recentSearches))}
@@ -1901,7 +2007,6 @@ function renderShop(){
   if(items.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim)">No products found</div>';return}
   grid.innerHTML=items.map(c=>{const out=(c.times||0)<=0;const price=getEffectivePrice(c);const isFlash=isFlashActive(c);const off=getDiscountPercent(c.originalPrice,price);const liked=watchlistIds.has(c.id);const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const inCart=cartProductIds.has(c.id);const flashBadge=isFlash?`<div class="flash-badge">⚡ FLASH</div>`:'';const alerted=myStockAlerts.has(c.id);const actionBtn=out?`<button class="btn-notify" onclick="event.stopPropagation();${alerted?'':'requestStockAlert(\''+c.id+'\')'}">${alerted?'✅ Notified':'🔔 Notify Me'}</button>`:`<button class="btn-cart" onclick="event.stopPropagation();toggleCartFromCard('${c.id}')">${inCart?'✓ In Cart':'+ Cart'}</button>`;
   
-  // Fake rating for design (random 4.1 to 4.8)
   const fakeRating = (4.1 + (c.name.length % 8) * 0.1).toFixed(1);
 
   return`<div class="product-card" onclick="openProductDetails('${c.id}')"><div class="img-wrap"><img src="${optImg(img,400)}">
@@ -2238,7 +2343,7 @@ function checkSpinWheel(){const last=localStorage.getItem('lastSpinDate');const 
 function closeSpinWheel(){document.getElementById('spinWheelModal').style.display='none'}
 function spinWheel(){const btn=document.getElementById('spinBtn');btn.disabled=true;const wheel=document.getElementById('wheelCanvas');const deg=Math.floor(Math.random()*360)+720;wheel.style.transform=`rotate(${deg}deg)`;setTimeout(()=>{if(couponsCache.length>0){const c=couponsCache[Math.floor(Math.random()*couponsCache.length)];document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML=`🎉 Won: <span style="color:var(--text)">${c.code}</span> (${c.discountPercent}% OFF)`;localStorage.setItem('lastSpinDate',new Date().toDateString())}else{document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML='No coupons active'};btn.textContent='CLOSE';btn.onclick=closeSpinWheel;btn.disabled=false},3000)}
 
-const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail','requestStockAlert','checkFirstOrderBonus','getSizeRecommendation','updateSizeRecommendation','lookupPincodeDebounced','lookupPincode','selectPincode','trackProductView','trackCartAdd','loadProductAnalytics','loadAbandonedCarts','setLanguage','applyLanguage','renderNewArrivalsAndHot','renderDealsAndSuggested'];
+const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail','requestStockAlert','checkFirstOrderBonus','getSizeRecommendation','updateSizeRecommendation','lookupPincodeDebounced','lookupPincode','selectPincode','trackProductView','trackCartAdd','loadProductAnalytics','loadAbandonedCarts','setLanguage','applyLanguage','renderNewArrivalsAndHot','renderDealsAndSuggested','openProfileDetails','saveProfileDetails'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
