@@ -337,9 +337,10 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <button class="btn-small notif-bell" style="padding:10px 3px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9px;font-weight:700;margin:0;position:relative" onclick="showAdminNotifs()"><span style="font-size:16px">🔔</span>Alerts<span class="notif-badge" id="adminNotifBadge">0</span></button>
       <button class="btn-small" style="padding:10px 3px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9px;font-weight:700;margin:0" onclick="promptSettingsPassword()"><span style="font-size:16px">⚙️</span>Set</button>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px">
       <button class="btn-small" style="padding:10px 3px;font-size:10px;font-weight:700" onclick="showScreen('admin-qa')">❓ Q&A</button>
       <button class="btn-small" style="padding:10px 3px;font-size:10px;font-weight:700" onclick="showScreen('admin-chats')">💬 Support Chats</button>
+      <button class="btn-small" style="padding:10px 3px;font-size:10px;font-weight:700" onclick="showScreen('admin-ads')">📢 Ads</button>
     </div>
   </div>
   <div class="analytics-grid">
@@ -413,6 +414,30 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <div class="chat-input-row">
       <input type="text" id="adminChatInput" placeholder="Reply..." onkeypress="if(event.key==='Enter')sendAdminChatMsg()">
       <button onclick="sendAdminChatMsg()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW: ADMIN ADS MANAGEMENT SCREEN -->
+<div id="screen-admin-ads" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>📢 Advertising</h2></div>
+  <div class="form-container">
+    <div class="settings-section" style="border:1px solid var(--gold)">
+      <h3 style="color:var(--gold);margin-bottom:15px">➕ Add New Ad</h3>
+      <div class="input-group"><label>Title (optional)</label><input type="text" id="adTitle" placeholder="e.g. 50% OFF Sale"></div>
+      <div class="input-group">
+        <label>Ad Image</label>
+        <div class="photo-upload" onclick="document.getElementById('adImage').click()">
+          <input type="file" id="adImage" accept="image/*" hidden onchange="previewAdImage(event)">
+          <img id="adImagePreview" style="max-width:100%;max-height:120px;border-radius:8px;display:none;margin:0 auto">
+          <div id="adImagePlaceholder" style="color:var(--text-dim);font-size:14px">📷 Tap to select ad image</div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="addAd()">Save Ad</button>
+    </div>
+    <div class="settings-section">
+      <h3 style="margin-bottom:15px">📋 All Ads</h3>
+      <div id="adminAdsList"><div class="loading-row">Loading...</div></div>
     </div>
   </div>
 </div>
@@ -535,11 +560,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <div class="top-bar">
     <div class="top-row">
       <h2>FAIZ FASHION</h2>
-      <div style="display:flex;gap:8px">
-        <button class="icon-btn" onclick="showScreen('orders')">📦</button>
-        <button class="icon-btn" onclick="showScreen('cart')">🛒<span class="badge" id="shopCartBadge">0</span></button>
-        <!-- Gear icon removed from here as requested -->
-      </div>
     </div>
     <div class="search-row">
       <input type="text" class="search-bar" id="shopSearch" placeholder="Search..." autocomplete="off" oninput="onSearchInput(this.value)" onfocus="showRecentSearches()">
@@ -575,13 +595,19 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <div id="shopGrid" class="product-grid"></div>
 </div>
 
+<!-- NEW: SEPARATE WATCHLIST SCREEN -->
+<div id="screen-watchlist" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('customer-settings')">←</button><h2>❤️ My Watchlist</h2></div>
+  <div id="watchlistGrid" class="product-grid"></div>
+</div>
+
 <!-- NEW REDESIGNED CUSTOMER SETTINGS (ACCOUNT) SCREEN -->
 <div id="screen-customer-settings" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Account</h2></div>
   <div class="form-container" style="max-width: 500px;">
 
     <!-- COMPACT PROFILE CARD -->
-    <div style="background: var(--card); padding: 15px; border-radius: 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid var(--border);">
+    <div style="background: var(--card); padding: 15px; border-radius: 16px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid var(--border);">
        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 30px; color: #fff;">
          👤
        </div>
@@ -592,16 +618,31 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
        </div>
     </div>
 
-    <!-- ORDERS & WATCHLIST BUTTONS -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-      <button onclick="showScreen('orders')" style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-        <span style="font-size: 32px;">📦</span>
-        <span style="font-size: 14px; font-weight: 800; color: var(--text);">Orders</span>
+    <!-- REWARDS / WALLET / BENEFITS (moved from Orders page) -->
+    <div class="ref-card" style="margin-bottom:15px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div id="tierBadgeDisplay"></div>
+        <button class="btn-small" style="flex:0;padding:5px 10px;background:var(--gold);color:#000;font-weight:800;font-size:11px" onclick="showTierInfo()">ℹ️ Benefits</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase">Points</div><div style="font-size:22px;font-weight:800;color:var(--gold)"><span id="userPointsDisplay">0</span> ⭐</div></div>
+        <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase">Wallet</div><div style="font-size:22px;font-weight:800;color:var(--success)">₹<span id="userWalletDisplay">0</span></div></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end">
+        <div style="text-align:right"><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase">Referral Code</div><div class="ref-code" id="userRefCodeDisplay">------</div><button class="btn-small" style="padding:6px 12px;margin-top:4px;background:var(--gold);color:#000;font-weight:800" onclick="shareReferralCode()">📤 Share</button></div>
+      </div>
+    </div>
+
+    <!-- ORDERS & WATCHLIST BUTTONS (smaller, decent) -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+      <button onclick="showScreen('orders')" style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+        <span style="font-size: 24px;">📦</span>
+        <span style="font-size: 12px; font-weight: 800; color: var(--text);">Orders</span>
       </button>
       
-      <button onclick="setMainCategory('Watchlist'); showScreen('shop');" style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-        <span style="font-size: 32px; color: #ff4d6d;">❤️</span>
-        <span style="font-size: 14px; font-weight: 800; color: var(--text);">Watchlist</span>
+      <button onclick="showScreen('watchlist')" style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+        <span style="font-size: 24px; color: #ff4d6d;">❤️</span>
+        <span style="font-size: 12px; font-weight: 800; color: var(--text);">Watchlist</span>
       </button>
     </div>
 
@@ -707,6 +748,12 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <button style="background:var(--card2);color:var(--text);border:1px solid var(--border)" onclick="addToCartDetails()">Add to Cart</button>
     <button style="background:var(--gold);color:#000" onclick="buyNowDetails()">Buy Now</button>
   </div>
+</div>
+
+<!-- NEW: ORDER DETAIL SCREEN -->
+<div id="screen-order-detail" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('orders')">←</button><h2>Order Details</h2></div>
+  <div id="orderDetailContent"><div class="loading-row">Loading...</div></div>
 </div>
 
 <div id="imageZoomModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);z-index:9999;align-items:center;justify-content:center" onclick="closeImageZoom()">
@@ -886,21 +933,15 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
 </div>
 
+<!-- REDESIGNED ORDERS SCREEN (no ref-card, ads carousel added, new card design) -->
 <div id="screen-orders" class="screen" style="padding-bottom:100px">
   <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>My Orders</h2></div>
-  <div class="ref-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <div id="tierBadgeDisplay"></div>
-      <button class="btn-small" style="flex:0;padding:5px 10px;background:var(--gold);color:#000;font-weight:800;font-size:11px" onclick="showTierInfo()">ℹ️ Benefits</button>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-      <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase">Points</div><div style="font-size:22px;font-weight:800;color:var(--gold)"><span id="userPointsDisplay">0</span> ⭐</div></div>
-      <div><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase">Wallet</div><div style="font-size:22px;font-weight:800;color:var(--success)">₹<span id="userWalletDisplay">0</span></div></div>
-    </div>
-    <div style="display:flex;justify-content:flex-end">
-      <div style="text-align:right"><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase">Referral Code</div><div class="ref-code" id="userRefCodeDisplay">------</div><button class="btn-small" style="padding:6px 12px;margin-top:4px;background:var(--gold);color:#000;font-weight:800" onclick="shareReferralCode()">📤 Share</button></div>
-    </div>
+  
+  <!-- NEW: ADS CAROUSEL (admin-controlled, auto-rotating every 3 seconds) -->
+  <div id="ordersAdsCarousel" style="display:none;position:relative;border-radius:12px;overflow:hidden;margin-bottom:15px;height:140px;background:var(--card2)">
+    <!-- Filled by JS -->
   </div>
+  
   <button onclick="showScreen('my-preorders')" style="width:100%;margin-bottom:15px;background:var(--card2);border:1px solid var(--gold);color:var(--gold);padding:12px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">📋 My Pre-Orders</button>
   <div style="display:flex;gap:8px;margin-bottom:15px;overflow-x:auto">
     <div class="filter-chip active" id="filterAll" onclick="setOrderFilter('all')">All</div>
@@ -916,7 +957,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 <div id="bottomNav" class="bottom-nav">
   <button class="nav-item active" data-screen="shop" onclick="showScreen('shop')"><span class="nav-icon">🏠</span>Shop</button>
   <button class="nav-item" data-screen="preorder" onclick="showScreen('preorder')"><span class="nav-icon">📝</span>Pre-Order</button>
-  <button class="nav-item" data-screen="orders" onclick="showScreen('orders')"><span class="nav-icon">📦</span>Orders</button>
   <button class="nav-item" data-screen="cart" onclick="showScreen('cart')"><span class="nav-icon">🛒</span>Cart<span class="badge" id="navCartBadge" style="top:-2px">0</span></button>
   <button class="nav-item" data-screen="customer-settings" onclick="showScreen('customer-settings')"><span class="nav-icon">👤</span>Account</button>
 </div>
@@ -938,7 +978,7 @@ let discountPercent=0,appliedCoupon='',currentDetailProduct=null,bannerUrl='',sa
 let deliveryCharge=50,freeDeliveryAbove=1000,platformFee=10,handlingCharge=20;
 let editingCouponCode=null,editingId=null,currentPhotoFiles=[],existingPhotoUrls=[];
 let currentPrePhotoFile=null,mediaRecorder=null,audioChunks=[],audioBlob=null;
-let unsubCategories,unsubConfig,unsubCart,unsubOrders,unsubWatchlist,unsubCoupons,unsubReviews,unsubAdminOrders,unsubPreOrders,unsubMyPreOrders,unsubAdminReviews,unsubQA,unsubAdminQA,unsubChat,unsubAdminChats,unsubAdminChat;
+let unsubCategories,unsubConfig,unsubCart,unsubOrders,unsubWatchlist,unsubCoupons,unsubReviews,unsubAdminOrders,unsubPreOrders,unsubMyPreOrders,unsubAdminReviews,unsubQA,unsubAdminQA,unsubChat,unsubAdminChats,unsubAdminChat,unsubAds,unsubAdminAds;
 let previousScreenForDetails='shop';
 let orderFilter='all',savedAddressesCache=[],allOrdersCache=[],allAdminOrdersCache=[],allAdminPreOrdersCache=[],countdownInterval=null;
 let filterInStock=false,filterMaxPrice=null;
@@ -959,14 +999,18 @@ let customerOrdersCache=[];
 let customerPreOrdersCache=[];
 let dashboardUsersCache=[];
 
-const ADMIN_SCREENS=['admin','admin-orders','admin-preorders','admin-reviews','category-form','settings','admin-dashboard','admin-qa','admin-chats','admin-chat-view','admin-customer-orders'];
+// NEW AD SYSTEM
+let adsCache=[], adRotationInterval=null, adPendingFile=null;
+// NEW ORDER DETAIL
+let currentOrderDetailId=null;
+
+const ADMIN_SCREENS=['admin','admin-orders','admin-preorders','admin-reviews','category-form','settings','admin-dashboard','admin-qa','admin-chats','admin-chat-view','admin-customer-orders','admin-ads'];
 
 function escapeHtml(str){return String(str??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function optImg(url,w){if(!url)return '';if(!url.includes('cloudinary.com')||!url.includes('/upload/'))return url;return url.replace('/upload/',`/upload/q_auto:eco,f_auto,w_${w||400}/`)}
 function showLoading(){document.getElementById('loadingOverlay').style.display='flex'}
 function hideLoading(){document.getElementById('loadingOverlay').style.display='none'}
 function initTheme(){
-  // DEFAULT TO LIGHT
   const s=localStorage.getItem('theme')||'light'; 
   const adminT=document.getElementById('adminThemeIcon');
   const custT=document.getElementById('custThemeIcon');
@@ -1008,20 +1052,22 @@ function showScreen(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const el=document.getElementById('screen-'+name);if(!el)return;el.classList.add('active');
   const nav=document.getElementById('bottomNav');
-  nav.style.display=['shop','cart','orders','preorder','my-preorders','customer-settings'].includes(name)?'flex':'none';
+  nav.style.display=['shop','cart','orders','preorder','my-preorders','customer-settings','watchlist'].includes(name)?'flex':'none';
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.screen===name));
   
   if(name==='shop'){renderShop();renderRecentlyViewed();checkSpinWheel()}
   if(name==='cart'){renderCart();loadSavedAddresses()}
-  if(name==='orders'){loadCustomerOrders();updateRewardsDisplay()}
+  if(name==='orders'){loadCustomerOrders();updateRewardsDisplay();renderAdsCarousel()}
   if(name==='my-preorders')loadMyPreOrders();
   if(name==='addresses')renderAddressesScreen();
+  if(name==='watchlist'){renderWatchlistGrid()}
   if(name==='admin-orders')loadAdminOrders();
   if(name==='admin-preorders')loadAdminPreOrders();
   if(name==='admin-reviews')loadAdminReviews();
   if(name==='admin-dashboard')loadDashboard();
   if(name==='admin-qa')loadAdminQA();
   if(name==='admin-chats')loadAdminChats();
+  if(name==='admin-ads')loadAdminAds();
   if(name==='settings'&&isAdminUser)renderAdminCoupons();
   
   if(name==='customer-settings'){
@@ -1045,6 +1091,7 @@ function showScreen(name){
       }
     }
     renderSettingsRecentlyViewed();
+    updateRewardsDisplay();
   }
   
   if(name==='checkout')updateCheckoutLocStatus();
@@ -1389,12 +1436,12 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPro
 function installPWA(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null})}else{alert("📱 Share > Add to Home Screen")}}
 
 onAuthStateChanged(auth,async(user)=>{
-  [unsubCategories,unsubConfig,unsubCart,unsubOrders,unsubWatchlist,unsubCoupons,unsubAdminOrders,unsubPreOrders,unsubMyPreOrders,unsubAdminReviews,unsubReviews,unsubQA,unsubAdminQA,unsubChat,unsubAdminChats,unsubAdminChat].forEach(u=>{if(u)u()});
+  [unsubCategories,unsubConfig,unsubCart,unsubOrders,unsubWatchlist,unsubCoupons,unsubAdminOrders,unsubPreOrders,unsubMyPreOrders,unsubAdminReviews,unsubReviews,unsubQA,unsubAdminQA,unsubChat,unsubAdminChats,unsubAdminChat,unsubAds,unsubAdminAds].forEach(u=>{if(u)u()});
   watchlistIds=new Set();cartItems=[];cartProductIds=new Set();couponsCache=[];unlockedOtps=[];
   if(!user){currentUid=null;showScreen('landing');return}
   currentUid=user.uid;
   isAdminUser=user.email===ADMIN_EMAIL;
-  listenCategories();listenConfig();listenCoupons();
+  listenCategories();listenConfig();listenCoupons();listenAds();
   if(isAdminUser){showScreen('admin');renderAdminCategories()}
   else{listenCart();listenWatchlist();showScreen('shop');try{await initUserRewards()}catch(e){console.log(e)}}
 });
@@ -1434,6 +1481,47 @@ function listenConfig(){
   });
 }
 
+// NEW: LISTEN ADS
+function listenAds(){
+  if(unsubAds)unsubAds();
+  unsubAds=onSnapshot(collection(db,'ads'),snap=>{
+    adsCache=snap.docs.map(d=>({id:d.id,...d.data()})).filter(a=>a.active!==false);
+    adsCache.sort((a,b)=>(a.order||0)-(b.order||0));
+    renderAdsCarousel();
+  });
+}
+
+// NEW: RENDER ADS CAROUSEL ON ORDERS PAGE
+function renderAdsCarousel(){
+  const el=document.getElementById('ordersAdsCarousel');
+  if(!el)return;
+  if(adsCache.length===0){
+    el.style.display='none';
+    if(adRotationInterval){clearInterval(adRotationInterval);adRotationInterval=null;}
+    return;
+  }
+  el.style.display='block';
+  el.innerHTML=adsCache.map((a,i)=>`
+    <div class="ad-slide" style="position:absolute;inset:0;opacity:${i===0?'1':'0'};transition:opacity 0.6s ease;">
+      <img src="${a.imageUrl}" style="width:100%;height:100%;object-fit:cover;">
+      ${a.title?`<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:10px;color:#fff;font-size:13px;font-weight:700">${escapeHtml(a.title)}</div>`:''}
+    </div>
+  `).join('');
+  
+  if(adRotationInterval){clearInterval(adRotationInterval);adRotationInterval=null;}
+  if(adsCache.length>1){
+    let idx=0;
+    adRotationInterval=setInterval(()=>{
+      const screen=document.getElementById('screen-orders');
+      if(!screen||!screen.classList.contains('active'))return;
+      const slides=el.querySelectorAll('.ad-slide');
+      if(slides.length<=1)return;
+      idx=(idx+1)%slides.length;
+      slides.forEach((s,i)=>{s.style.opacity=i===idx?'1':'0';});
+    },3000);
+  }
+}
+
 function updateShopStatusUI(){
   const a=document.getElementById('shopStatusBtn');
   if(a){a.textContent=isShopOpen?'🟢 Shop is OPEN':'🔴 Shop is CLOSED';a.style.background=isShopOpen?'var(--success)':'var(--danger)';a.style.color=isShopOpen?'#000':'#fff'}
@@ -1463,9 +1551,9 @@ function renderFlashSaleBanner(){
 
 function startCountdown(){if(countdownInterval)clearInterval(countdownInterval);if(!saleEndTime){const b=document.getElementById('countdownBadge');if(b)b.style.display='none';return}const endMs=saleEndTime.seconds?saleEndTime.seconds*1000:new Date(saleEndTime).getTime();const update=()=>{const diff=endMs-Date.now();const b=document.getElementById('countdownBadge');const t=document.getElementById('countdownText');if(!b||!t)return;if(diff<=0){b.style.display='none';clearInterval(countdownInterval);return}const d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);const str=d>0?`${d}d ${h}h`:`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;t.textContent=str;b.style.display='block'};update();countdownInterval=setInterval(update,1000)}
 
-function listenCategories(){unsubCategories=onSnapshot(collection(db,'categories'),snap=>{categoriesCache=snap.docs.map(d=>({id:d.id,...d.data()}));renderAdminCategories();renderShop();renderFlashSaleBanner();if(document.getElementById('screen-cart').classList.contains('active'))renderCart();if(document.getElementById('screen-product-details').classList.contains('active')&&currentDetailProduct)loadFrequentlyBought(currentDetailProduct);})}
-function listenCart(){unsubCart=onSnapshot(collection(db,'users',currentUid,'cart'),snap=>{cartItems=snap.docs.map(d=>({cartId:d.id,...d.data()}));cartProductIds=new Set(cartItems.map(i=>i.productId));renderShop();renderCart();const c=cartItems.reduce((s,i)=>s+(i.qty||1),0);document.getElementById('shopCartBadge').textContent=c;document.getElementById('navCartBadge').textContent=c})}
-function listenWatchlist(){unsubWatchlist=onSnapshot(collection(db,'users',currentUid,'watchlist'),snap=>{watchlistIds=new Set(snap.docs.map(d=>d.id));renderShop();if(document.getElementById('screen-product-details').classList.contains('active'))updateDetailLikeBtn()})}
+function listenCategories(){unsubCategories=onSnapshot(collection(db,'categories'),snap=>{categoriesCache=snap.docs.map(d=>({id:d.id,...d.data()}));renderAdminCategories();renderShop();renderWatchlistGrid();renderFlashSaleBanner();if(document.getElementById('screen-cart').classList.contains('active'))renderCart();if(document.getElementById('screen-product-details').classList.contains('active')&&currentDetailProduct)loadFrequentlyBought(currentDetailProduct);})}
+function listenCart(){unsubCart=onSnapshot(collection(db,'users',currentUid,'cart'),snap=>{cartItems=snap.docs.map(d=>({cartId:d.id,...d.data()}));cartProductIds=new Set(cartItems.map(i=>i.productId));renderShop();renderCart();renderWatchlistGrid();const c=cartItems.reduce((s,i)=>s+(i.qty||1),0);const scb=document.getElementById('shopCartBadge');if(scb)scb.textContent=c;const ncb=document.getElementById('navCartBadge');if(ncb)ncb.textContent=c})}
+function listenWatchlist(){unsubWatchlist=onSnapshot(collection(db,'users',currentUid,'watchlist'),snap=>{watchlistIds=new Set(snap.docs.map(d=>d.id));renderShop();renderWatchlistGrid();if(document.getElementById('screen-product-details').classList.contains('active'))updateDetailLikeBtn()})}
 function listenCoupons(){unsubCoupons=onSnapshot(collection(db,'coupons'),snap=>{couponsCache=snap.docs.map(d=>({id:d.id,...d.data()}));if(isAdminUser&&document.getElementById('screen-settings').classList.contains('active'))renderAdminCoupons()})}
 
 async function initUserRewards(){
@@ -1627,7 +1715,73 @@ async function saveSettings(){
   hideLoading();
 }
 
-// ============ ADMIN ORDERS (WITH IMAGES & RETURN & OTP FIX) ============
+// NEW: ADMIN ADS MANAGEMENT
+function previewAdImage(e){
+  const f=e.target.files[0];if(!f)return;adPendingFile=f;
+  document.getElementById('adImagePreview').src=URL.createObjectURL(f);
+  document.getElementById('adImagePreview').style.display='block';
+  document.getElementById('adImagePlaceholder').style.display='none';
+}
+
+async function addAd(){
+  const title=document.getElementById('adTitle').value.trim();
+  if(!adPendingFile){alert('Select an image');return}
+  showLoading();
+  try{
+    const fd=new FormData();
+    fd.append('file',adPendingFile);
+    fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);
+    const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});
+    const data=await res.json();
+    if(!data.secure_url)throw new Error('Upload failed');
+    const count=(await getDocs(collection(db,'ads'))).size;
+    await addDoc(collection(db,'ads'),{imageUrl:data.secure_url,title,active:true,order:count,createdAt:serverTimestamp()});
+    document.getElementById('adTitle').value='';
+    document.getElementById('adImage').value='';
+    document.getElementById('adImagePreview').style.display='none';
+    document.getElementById('adImagePlaceholder').style.display='block';
+    adPendingFile=null;
+    alert('✅ Ad added!');
+  }catch(e){alert('Error: '+e.message)}
+  hideLoading();
+}
+
+function loadAdminAds(){
+  const list=document.getElementById('adminAdsList');
+  if(!list)return;
+  if(unsubAdminAds)unsubAdminAds();
+  unsubAdminAds=onSnapshot(collection(db,'ads'),snap=>{
+    const arr=snap.docs.map(d=>({id:d.id,...d.data()}));
+    arr.sort((a,b)=>(a.order||0)-(b.order||0));
+    if(arr.length===0){list.innerHTML='<div class="loading-row">No ads yet</div>';return}
+    list.innerHTML=arr.map(a=>`
+      <div class="order-card">
+        <img src="${a.imageUrl}" style="width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="flex:1;min-width:0">
+            <b style="font-size:14px">${escapeHtml(a.title||'Untitled')}</b>
+            <div style="font-size:11px;color:${a.active!==false?'var(--success)':'var(--text-dim)'};font-weight:700">${a.active!==false?'✅ Active':'⏸️ Inactive'}</div>
+          </div>
+          <div style="display:flex;gap:5px">
+            <button class="btn-small" style="flex:0;padding:6px 10px;font-size:11px" onclick="toggleAdActive('${a.id}',${a.active!==false})">${a.active!==false?'Disable':'Enable'}</button>
+            <button class="btn-small" style="flex:0;padding:6px 10px;font-size:11px;color:var(--danger)" onclick="deleteAd('${a.id}')">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  });
+}
+
+async function toggleAdActive(id,current){
+  try{await updateDoc(doc(db,'ads',id),{active:!current})}catch(e){alert('Error: '+e.message)}
+}
+
+async function deleteAd(id){
+  if(!confirm('Delete this ad?'))return;
+  try{await deleteDoc(doc(db,'ads',id));alert('✅ Deleted')}catch(e){alert('Error: '+e.message)}
+}
+
+// ============ ADMIN ORDERS ============
 function loadAdminOrders(){const list=document.getElementById('adminOrdersList');if(!list)return;if(unsubAdminOrders)unsubAdminOrders();unsubAdminOrders=onSnapshot(collection(db,'orders'),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders</div>';return}let arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.deletedByAdmin!==true);arr.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));allAdminOrdersCache=arr;updateAdminNotifBadge();document.getElementById('statReturns').textContent=arr.filter(o=>o.returnStatus==='Requested').length;renderAdminOrdersList();})}
 
 function renderAdminOrdersList(){
@@ -1723,6 +1877,25 @@ function renderShop(){
 }
 function shareProductCard(id){const c=categoriesCache.find(x=>x.id===id);if(!c)return;window.open(`https://wa.me/?text=${encodeURIComponent(`Check out ${c.name} at ₹${getEffectivePrice(c)} on FAIZ FASHION!\n${window.location.origin}${window.location.pathname}`)}`,'_blank')}
 
+// NEW: WATCHLIST RENDER
+function renderWatchlistGrid(){
+  const grid=document.getElementById('watchlistGrid');
+  if(!grid)return;
+  const items=categoriesCache.filter(c=>watchlistIds.has(c.id));
+  if(items.length===0){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-dim)"><div style="font-size:48px;margin-bottom:10px">💔</div><div style="font-size:15px;font-weight:700">Your watchlist is empty</div><div style="font-size:12px;margin-top:5px">Like products to save them here</div></div>';
+    return;
+  }
+  grid.innerHTML=items.map(c=>{
+    const out=(c.times||0)<=0;const price=getEffectivePrice(c);const isFlash=isFlashActive(c);const off=getDiscountPercent(c.originalPrice,price);const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const inCart=cartProductIds.has(c.id);const flashBadge=isFlash?`<div class="flash-badge">⚡ FLASH</div>`:'';
+    return `<div class="product-card" onclick="openProductDetails('${c.id}')"><div class="img-wrap"><img src="${optImg(img,400)}">
+      <button class="share-card-btn" onclick="event.stopPropagation(); shareProductCard('${c.id}')" style="background:#25D366;border:none;color:#fff;display:flex;align-items:center;justify-content:center">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      </button>
+      <button class="heart-btn liked" onclick="event.stopPropagation();toggleWatchlist('${c.id}')">❤️</button>${flashBadge}${out?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;color:var(--danger);font-weight:800;z-index:2">OUT OF STOCK</div>':''}</div><div class="product-info"><div class="pname">${escapeHtml(c.name)}</div><div class="price-line"><span class="disc" style="${isFlash?'color:#ff6b6b':''}">₹${price}</span><span style="text-decoration:line-through;font-size:11px;color:var(--text-dim)">₹${c.originalPrice}</span>${off>0?`<span style="color:${isFlash?'#ff6b6b':'var(--success)'};font-size:11px;font-weight:800">${off}% OFF</span>`:''}</div><div class="product-actions"><button class="btn-cart" onclick="event.stopPropagation();toggleCartFromCard('${c.id}')">${inCart?'✓ In Cart':'+ Cart'}</button></div></div></div>`;
+  }).join('');
+}
+
 function goBackFromDetails(){showScreen(previousScreenForDetails||'shop')}
 function openProductDetails(id){
   const fromScreen=document.querySelector('.screen.active')?.id?.replace('screen-','');if(fromScreen&&fromScreen!=='product-details')previousScreenForDetails=fromScreen;
@@ -1764,7 +1937,7 @@ function closeImageZoom(){document.getElementById('imageZoomModal').style.displa
 // ============ CART ============
 function renderCart(){const list=document.getElementById('cartList');if(!list)return;if(cartItems.length===0){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-dim)">Cart is empty</div>';['cartSubtotal','cartDelivery','cartPlatformFee','cartHandlingFee','cartTotal'].forEach(id=>document.getElementById(id).textContent='₹0');document.getElementById('couponRow').style.display='none';return}list.innerHTML=cartItems.map(item=>{const c=categoriesCache.find(x=>x.id===item.productId);if(!c)return'';const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const v=[item.size?`Size: ${item.size}`:'',item.color?`Color: ${item.color}`:''].filter(Boolean).join(' | ');const qty=item.qty||1;const wsActive=c.wholesalePrice>0&&c.wholesaleMinQty>0&&qty>=c.wholesaleMinQty;return`<div class="cart-item"><img src="${optImg(img,120)}"><div class="ci-info"><div class="ci-name">${escapeHtml(c.name)}</div>${v?`<div class="ci-variant">${v}</div>`:''}<div class="ci-price">₹${calculateItemPrice(item,c)} ${wsActive?'<span style="color:var(--success);font-size:10px">(Wholesale)</span>':''}</div><div class="qty-row"><button class="qty-btn" onclick="updateCartQty('${item.cartId}',${qty-1})">−</button><span class="qty-val">${qty}</span><button class="qty-btn" onclick="updateCartQty('${item.cartId}',${qty+1})">+</button></div>${wsActive?'':(c.wholesalePrice>0&&c.wholesaleMinQty>0&&qty<c.wholesaleMinQty?`<div style="font-size:10px;color:var(--success);margin-top:3px">Add ${c.wholesaleMinQty-qty} more for wholesale ₹${c.wholesalePrice}/unit</div>`:'')}</div><button class="ci-remove" onclick="removeCartItem('${item.cartId}')">✕</button></div>`}).join('');calculateTotal()}
 function removeCoupon(){discountPercent=0;appliedCoupon='';document.getElementById('couponInput').value='';calculateTotal()}
-function calculateTotal(){let subtotal=cartItems.reduce((s,item)=>{const c=categoriesCache.find(x=>x.id===item.productId);return s+(c?calculateItemPrice(item,c):0)},0);const cd=discountPercent>0?Math.round(subtotal*discountPercent/100):0;const ac=subtotal-cd;let del=(ac>0&&ac<freeDeliveryAbove)?deliveryCharge:0;let pf=ac>0?platformFee:0,hc=ac>0?handlingCharge:0;const rEl=document.getElementById('chkRedeemPoints');let rp=rEl?(parseInt(rEl.value)||0):0;const maxR=Math.min(userPoints,Math.floor(ac*0.5));if(rp>maxR)rp=maxR;const afterPoints=Math.max(0,ac+del+pf+hc-rp);const wEl=document.getElementById('chkWalletAmount');let wp=wEl?(parseFloat(wEl.value)||0):0;const maxW=Math.min(userWallet,afterPoints);if(wp>maxW)wp=maxW;const ft=Math.max(0,afterPoints-wp);document.getElementById('cartSubtotal').textContent='₹'+Math.round(subtotal);document.getElementById('cartDelivery').textContent=del===0&&ac>0?'FREE':'₹'+del;document.getElementById('cartPlatformFee').textContent='₹'+pf;document.getElementById('cartHandlingFee').textContent='₹'+hc;document.getElementById('cartTotal').textContent='₹'+Math.round(ft);document.getElementById('chkTotal').textContent='₹'+Math.round(ft);const cr=document.getElementById('couponRow');if(cd>0){cr.style.display='flex';document.getElementById('couponCodeLabel').textContent=appliedCoupon;document.getElementById('couponDiscountAmt').textContent='-₹'+cd}else cr.style.display='none'}
+function calculateTotal(){let subtotal=cartItems.reduce((s,item)=>{const c=categoriesCache.find(x=>x.id===item.productId);return s+(c?calculateItemPrice(item,c):0)},0);const cd=discountPercent>0?Math.round(subtotal*discountPercent/100):0;const ac=subtotal-cd;let del=(ac>0&&ac<freeDeliveryAbove)?deliveryCharge:0;let pf=ac>0?platformFee:0,hc=ac>0?handlingCharge:0;const rEl=document.getElementById('chkRedeemPoints');let rp=rEl?(parseInt(rEl.value)||0):0;const maxR=Math.min(userPoints,Math.floor(ac*0.5));if(rp>maxR)rp=maxR;const afterPoints=Math.max(0,ac+del+pf+hc-rp);const wEl=document.getElementById('chkWalletAmount');let wp=wEl?(parseFloat(wEl.value)||0):0;const maxW=Math.min(userWallet,afterPoints);if(wp>maxW)wp=maxW;const ft=Math.max(0,afterPoints-wp);document.getElementById('cartSubtotal').textContent='₹'+Math.round(subtotal);document.getElementById('cartDelivery').textContent=del===0&&ac>0?'FREE':'₹'+del;document.getElementById('cartPlatformFee').textContent='₹'+pf;document.getElementById('cartHandlingFee').textContent='₹'+hc;document.getElementById('cartTotal').textContent='₹'+Math.round(ft);document.getElementById('chkTotal').textContent='₹'+Math.round(ft);const cr=document.getElementById('couponRow');if(cd>0){cr.style.display='flex';document.getElementById('couponDiscountAmt').textContent='-₹'+cd}else cr.style.display='none'}
 function calculateRedemption(){const inp=parseInt(document.getElementById('chkRedeemPoints').value)||0;let subtotal=cartItems.reduce((s,item)=>{const c=categoriesCache.find(x=>x.id===item.productId);return s+(c?calculateItemPrice(item,c):0)},0);const cd=discountPercent>0?Math.round(subtotal*discountPercent/100):0;const ac=subtotal-cd;const maxR=Math.min(userPoints,Math.floor(ac*0.5));if(inp>maxR)document.getElementById('chkRedeemPoints').value=maxR;calculateTotal()}
 function useMaxPoints(){let subtotal=cartItems.reduce((s,item)=>{const c=categoriesCache.find(x=>x.id===item.productId);return s+(c?calculateItemPrice(item,c):0)},0);const cd=discountPercent>0?Math.round(subtotal*discountPercent/100):0;const ac=subtotal-cd;const maxR=Math.min(userPoints,Math.floor(ac*0.5));document.getElementById('chkRedeemPoints').value=maxR;calculateTotal()}
 function calculateWalletRedemption(){calculateTotal()}
@@ -1843,54 +2016,161 @@ function showAddAddressForm(){document.getElementById('addAddressForm').style.di
 async function saveNewAddress(){const n=document.getElementById('addrName').value.trim(),p=document.getElementById('addrPhone').value.trim(),b=document.getElementById('addrBuilding').value.trim(),a=document.getElementById('addrText').value.trim(),l=document.getElementById('addrLandmark').value.trim();if(!n||!p||!a){alert('Required fields');return}if(!/^\d{10}$/.test(p)){alert('10 digit phone');return}await setDoc(doc(db,'users',currentUid,'addresses',Date.now().toString()),{name:n,phone:p,building:b,address:a,landmark:l});alert('✅ Saved!');['addrName','addrPhone','addrBuilding','addrText','addrLandmark'].forEach(id=>document.getElementById(id).value='');document.getElementById('addAddressForm').style.display='none';renderAddressesScreen()}
 async function deleteAddress(id){if(!confirm('Delete?'))return;await deleteDoc(doc(db,'users',currentUid,'addresses',id));renderAddressesScreen()}
 
-// ============ CUSTOMER ORDERS ============
+// ============ CUSTOMER ORDERS (REDESIGNED) ============
 function setOrderFilter(f){orderFilter=f;['all','active','delivered','cancelled'].forEach(k=>{const el=document.getElementById('filter'+k.charAt(0).toUpperCase()+k.slice(1));if(el)el.classList.toggle('active',k===f)});renderCustomerOrders()}
+
+// NEW: Open order detail page
+function openOrderDetail(orderId){
+  currentOrderDetailId=orderId;
+  showScreen('order-detail');
+  renderOrderDetail();
+}
+
+// NEW: Render order detail (timeline, return, cancel, WhatsApp, per-item rate)
+function renderOrderDetail(){
+  const order=allOrdersCache.find(o=>o.id===currentOrderDetailId);
+  const cont=document.getElementById('orderDetailContent');
+  if(!order){cont.innerHTML='<div class="loading-row">Order not found</div>';return}
+  
+  const date=order.date?new Date(order.date.toMillis()).toLocaleDateString():'';
+  
+  const itemsHtml=order.items.map((i,idx)=>{
+    const v=[i.size?`Size: ${i.size}`:'',i.color?`Color: ${i.color}`:''].filter(Boolean).join(' | ');
+    const isCancelled=order.cancelledItems&&order.cancelledItems.includes(idx);
+    const rateBtn=(order.status==='Delivered'&&!isCancelled)?`<button class="btn-small" style="flex:0;padding:4px 8px;font-size:10px;background:var(--gold);color:#000;font-weight:800;cursor:pointer" onclick="event.stopPropagation();openReviewForProduct('${i.productId}')">⭐ Rate</button>`:'';
+    return `<div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;background:var(--card2);padding:8px;border-radius:8px;${isCancelled?'opacity:0.5;text-decoration:line-through;':''}">
+      <img src="${optImg(i.img,120)}" style="width:60px;height:60px;object-fit:cover;border-radius:8px">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:13px">${escapeHtml(i.name)}</div>
+        <div style="font-size:11px;color:var(--text-dim)">${v}</div>
+        <div style="font-size:12px;color:var(--gold);font-weight:800">₹${i.price} × ${i.qty||1}</div>
+      </div>
+      ${rateBtn}
+    </div>`;
+  }).join('');
+  
+  const steps=['Pending','Processing','Shipped','Out for Delivery','Delivered'];
+  let ci=steps.indexOf(order.status);
+  if(order.status==='Cancelled')ci=-1;
+  let timelineHtml='';
+  if(order.status!=='Cancelled'){
+    timelineHtml=`<div class="timeline">${steps.map((step,idx)=>{
+      let cls='';
+      if(idx<ci)cls='completed';
+      else if(idx===ci)cls='active';
+      const icons={Pending:'📝',Processing:'📦',Shipped:'🚚','Out for Delivery':'🛵',Delivered:'🏠'};
+      const icon=cls==='completed'?'✓':icons[step];
+      return `<div class="timeline-step ${cls}"><div class="timeline-dot">${icon}</div><div class="timeline-text">${step}</div></div>`;
+    }).join('')}</div>`;
+  } else {
+    timelineHtml=`<div style="text-align:center;padding:15px;background:rgba(231,76,60,0.1);border:1px dashed var(--danger);border-radius:8px;margin:10px 0"><span style="color:var(--danger);font-weight:800">❌ Order Cancelled</span>${order.cancelReason?`<div style="font-size:11px;color:var(--text-dim);margin-top:4px">Reason: ${escapeHtml(order.cancelReason)}</div>`:''}</div>`;
+  }
+  
+  let otpHtml='';
+  if(order.deliveryOtp && ['Shipped','Out for Delivery'].includes(order.status)){
+    otpHtml=`<div style="background:rgba(46,204,113,0.1);border:1px dashed var(--success);padding:12px;border-radius:8px;margin:10px 0;text-align:center">
+      <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:700">Delivery OTP</div>
+      <div style="font-size:28px;font-weight:900;color:var(--success);letter-spacing:8px;font-family:monospace">${order.deliveryOtp}</div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:3px">Delivery boy ko ye code batayein</div>
+    </div>`;
+  }
+  
+  let actionsHtml='';
+  if(['Pending','Processing'].includes(order.status)){
+    actionsHtml += `<button class="btn-small" style="background:rgba(231,76,60,0.1);border:1px solid var(--danger);color:var(--danger);width:100%;margin-bottom:8px;font-weight:800" onclick="openCancelModal('${order.id}')">❌ Cancel Order</button>`;
+  }
+  if(order.status==='Delivered' && !order.returnStatus){
+    const deliveredTime=order.deliveredAt?order.deliveredAt.toMillis():(order.date?order.date.toMillis():Date.now());
+    const daysPassed=(Date.now()-deliveredTime)/(1000*60*60*24);
+    if(daysPassed<=7){
+      const retItems=order.items.filter(i=>{const p=categoriesCache.find(c=>c.id===i.productId);return p&&p.returnPolicy!=='No Return Policy'});
+      if(retItems.length>0){
+        actionsHtml += `<button class="btn-small" style="background:var(--card);border:1px solid var(--gold);color:var(--gold);width:100%;margin-bottom:8px;font-weight:800" onclick="openReturnModal('${order.id}')">🔄 Return / Exchange</button>`;
+      }
+    }
+  }
+  if(order.returnStatus){
+    actionsHtml += `<div style="font-size:12px;color:var(--gold);padding:10px;background:var(--card2);border-radius:8px;margin-bottom:8px;text-align:center;font-weight:700"><b>Return Status: ${order.returnStatus}</b></div>`;
+  }
+  actionsHtml += `<button class="btn-small" style="background:#25D366;color:#fff;border:none;width:100%;margin-bottom:8px;font-weight:800" onclick="contactWhatsApp('Order ID: #${order.orderCode || order.id.slice(-8).toUpperCase()} - Status: ${order.status}')">💬 WhatsApp Support</button>`;
+  
+  cont.innerHTML=`
+    <div class="settings-section">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:5px">
+        <div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800">#${order.orderCode||order.id.slice(-8).toUpperCase()}</div>
+        <span style="color:var(--gold);font-weight:800;font-size:16px">₹${order.total}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-bottom:10px">${date}</div>
+      ${timelineHtml}
+      ${otpHtml}
+      <div style="margin:10px 0">${itemsHtml}</div>
+      <div style="margin-top:10px"><span class="order-status status-${order.status||'Pending'}">${order.status||'Pending'}</span></div>
+      <div style="margin-top:15px">${actionsHtml}</div>
+    </div>
+  `;
+}
+
+// NEW: Rate a specific product from order detail
+function openReviewForProduct(productId){
+  const p=categoriesCache.find(c=>c.id===productId);
+  if(!p)return alert('Product not available');
+  currentDetailProduct=p;
+  openReviewForm();
+}
+
 function renderCustomerOrders(){
-  const list=document.getElementById('ordersList');let filtered=allOrdersCache.filter(o=>o.deletedByCustomer!==true);
+  const list=document.getElementById('ordersList');
+  let filtered=allOrdersCache.filter(o=>o.deletedByCustomer!==true);
   if(orderFilter==='active')filtered=filtered.filter(o=>['Pending','Processing','Shipped','Out for Delivery'].includes(o.status));
   else if(orderFilter==='delivered')filtered=filtered.filter(o=>o.status==='Delivered');
   else if(orderFilter==='cancelled')filtered=filtered.filter(o=>o.status==='Cancelled');
+  
   if(filtered.length===0){list.innerHTML='<div class="loading-row">No orders</div>';return}
+  
   list.innerHTML=filtered.map(o=>{
-    const date=o.date?new Date(o.date.toMillis()).toLocaleDateString():'Recent';const sc='status-'+(o.status||'Pending');
+    const firstItem=o.items[0]||{};
+    const img=firstItem.img||'';
+    const variant=[firstItem.size?`Size: ${firstItem.size}`:'',firstItem.color?`Color: ${firstItem.color}`:''].filter(Boolean).join(' | ');
     
-    const itemsHtml=o.items.map((i, idx)=>{
-      const v=[i.size?`Size: ${i.size}`:'',i.color?`Color: ${i.color}`:''].filter(Boolean).join(' | ');
-      const isCancelled = o.cancelledItems && o.cancelledItems.includes(idx);
-      return`<li style="${isCancelled?'opacity:0.5;text-decoration:line-through;':''}">${escapeHtml(i.name)} ${v?`<span style="color:var(--gold);font-size:11px">[${v}]</span>`:''} × ${i.qty||1} — ₹${i.price*(i.qty||1)} ${isCancelled?'(Cancelled)':''}</li>`;
-    }).join('');
-    
-    const steps=['Pending','Processing','Shipped','Out for Delivery','Delivered'];let ci=steps.indexOf(o.status);if(o.status==='Cancelled')ci=-1;
-    let timelineHtml='';
-    if(o.status!=='Cancelled'){timelineHtml=`<div class="timeline">${steps.map((step,idx)=>{let cls='';if(idx<ci)cls='completed';else if(idx===ci)cls='active';const icons={Pending:'📝',Processing:'📦',Shipped:'🚚','Out for Delivery':'🛵',Delivered:'🏠'};const icon=cls==='completed'?'✓':icons[step];return`<div class="timeline-step ${cls}"><div class="timeline-dot">${icon}</div><div class="timeline-text">${step}</div></div>`}).join('')}</div>`}else timelineHtml=`<div style="text-align:center;padding:10px;background:rgba(231,76,60,0.1);border:1px dashed var(--danger);border-radius:8px;margin:10px 0"><span style="color:var(--danger);font-weight:800">❌ Cancelled</span>${o.cancelReason?`<div style="font-size:11px;color:var(--text-dim);margin-top:4px">Reason: ${escapeHtml(o.cancelReason)}</div>`:''}</div>`;
-    let otpHtml='';if(o.deliveryOtp&&['Shipped','Out for Delivery'].includes(o.status)){otpHtml=`<div style="background:rgba(46,204,113,0.1);border:1px dashed var(--success);padding:10px;border-radius:8px;margin:10px 0;text-align:center"><div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;font-weight:700">Delivery OTP</div><div style="font-size:28px;font-weight:900;color:var(--success);letter-spacing:8px;font-family:monospace">${o.deliveryOtp}</div><div style="font-size:10px;color:var(--text-dim);margin-top:3px">Delivery boy ko ye code batayein</div></div>`}
-    
-    let cancelBtn='';if(['Pending','Processing'].includes(o.status)){cancelBtn=`<button class="btn-small" style="margin-top:8px;background:rgba(231,76,60,0.1);border:1px solid var(--danger);color:var(--danger);width:100%" onclick="openCancelModal('${o.id}')">❌ Cancel Order</button>`}
-    let payHtml='';if(o.paymentStatus==='Paid')payHtml=`<span style="background:var(--success);color:#000;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800">💳 PAID</span>`;else if(o.paymentStatus==='Pending Verification')payHtml=`<span style="background:#f39c12;color:#000;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800">⏳ VERIFYING</span>`;else if(o.paymentMethod&&o.paymentMethod!=='cod')payHtml=`<span style="background:#f39c12;color:#000;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800">💳 ${o.paymentMethod.toUpperCase()}</span>`;else payHtml=`<span style="background:#f39c12;color:#000;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800">💵 COD</span>`;
-    const orderCodeBadge=`<div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800">#${o.orderCode||o.id.slice(-8).toUpperCase()}</div>`;
-    
-    let retBtn='';
-    if(o.status==='Delivered' && !o.returnStatus){
-      const deliveredTime = o.deliveredAt ? o.deliveredAt.toMillis() : (o.date ? o.date.toMillis() : Date.now());
-      const daysPassed = (Date.now() - deliveredTime) / (1000 * 60 * 60 * 24);
-      const daysLeft = 7 - Math.floor(daysPassed);
-
-      const retItems = o.items.filter(i => { const p = categoriesCache.find(c => c.id === i.productId); return p && p.returnPolicy !== 'No Return Policy'; });
-
-      if (retItems.length > 0) {
-        if (daysPassed <= 7) {
-          retBtn = `<button class="btn-small" style="margin-top:8px;background:var(--card);border:1px solid var(--gold);color:var(--gold);width:100%" onclick="openReturnModal('${o.id}')">🔄 Return / Exchange (${daysLeft} days left)</button>`;
-        } else {
-           retBtn = ''; 
-        }
-      }
-    } else if(o.returnStatus){
-      retBtn = `<div style="font-size:12px;color:var(--gold);margin-top:10px;padding:8px;background:var(--card2);border-radius:6px"><b>Return: ${o.returnStatus}</b></div>`;
+    // Delivery date
+    let deliveryDate='';
+    if(o.status==='Delivered'&&o.deliveredAt){
+      deliveryDate='Delivered on '+new Date(o.deliveredAt.toMillis()).toLocaleDateString();
+    } else if(o.status==='Cancelled'){
+      deliveryDate='Order cancelled';
+    } else if(o.date){
+      const est=new Date(o.date.toMillis()+6*24*60*60*1000);
+      deliveryDate='Expected by '+est.toLocaleDateString();
     }
-
-    const waBtn = `<button class="btn-small" style="margin-top:8px;background:#25D366;color:#fff;border:none;width:100%;display:flex;align-items:center;justify-content:center;gap:5px" onclick="contactWhatsApp('Order ID: #${o.orderCode || o.id.slice(-8).toUpperCase()} - Status: ${o.status}')"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp Update</button>`;
-
-    return`<div class="category-card" style="padding:15px"><div style="display:flex;justify-content:space-between;margin-bottom:5px;align-items:center;flex-wrap:wrap;gap:5px">${orderCodeBadge}${payHtml}<span style="color:var(--gold);font-weight:800">₹${o.total}</span></div><div style="font-size:11px;color:var(--text-dim);margin-bottom:5px">${date}</div>${timelineHtml}${otpHtml}<ul style="font-size:13px;margin-bottom:5px;padding-left:15px">${itemsHtml}</ul><div><span class="order-status ${sc}">${o.status||'Pending'}</span></div>${retBtn}${cancelBtn}${waBtn}</div>`;
+    
+    // Review button (only for delivered)
+    let reviewBtn='';
+    if(o.status==='Delivered'){
+      reviewBtn=`<button class="btn-small" style="flex:0;padding:6px 12px;background:var(--gold);color:#000;font-weight:800;font-size:11px;cursor:pointer" onclick="event.stopPropagation();openOrderDetail('${o.id}')">✍️ Write Review</button>`;
+    }
+    
+    const itemCount=o.items.length;
+    const moreItems=itemCount>1?`<div style="font-size:11px;color:var(--text-dim);margin-top:4px">+ ${itemCount-1} more item(s)</div>`:'';
+    
+    return `<div class="order-card" style="cursor:pointer;padding:12px" onclick="openOrderDetail('${o.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="display:inline-block;background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:800">#${o.orderCode||o.id.slice(-8).toUpperCase()}</div>
+        <span class="order-status status-${o.status||'Pending'}" style="margin:0;padding:4px 10px;font-size:10px">${o.status||'Pending'}</span>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <img src="${optImg(img,160)}" style="width:80px;height:80px;object-fit:cover;border-radius:10px;flex-shrink:0">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:13px;margin-bottom:3px">${escapeHtml(firstItem.name||'Item')}</div>
+          <div style="font-size:10px;color:var(--text-dim);margin-bottom:3px">${variant}</div>
+          <div style="font-size:11px;color:var(--success);font-weight:700">📅 ${deliveryDate}</div>
+          ${moreItems}
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+        <div style="font-size:13px;font-weight:800;color:var(--gold)">₹${o.total}</div>
+        ${reviewBtn}
+      </div>
+    </div>`;
   }).join('');
 }
 
@@ -1947,7 +2227,7 @@ async function confirmCancelOrder(){
 }
 
 async function deleteCustomerOrder(id){if(confirm('Delete from your list?')){try{await updateDoc(doc(db,'orders',id),{deletedByCustomer:true});alert('✅ Deleted')}catch(e){alert('Error: '+e.message)}}}
-function loadCustomerOrders(){const list=document.getElementById('ordersList');if(!list)return;list.innerHTML='<div class="loading-row">Loading...</div>';if(unsubOrders)unsubOrders();unsubOrders=onSnapshot(query(collection(db,'orders'),where('userId','==',currentUid)),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders yet</div>';return}allOrdersCache=snap.docs.map(d=>({id:d.id,...d.data()}));allOrdersCache.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));renderCustomerOrders()})}
+function loadCustomerOrders(){const list=document.getElementById('ordersList');if(!list)return;list.innerHTML='<div class="loading-row">Loading...</div>';if(unsubOrders)unsubOrders();unsubOrders=onSnapshot(query(collection(db,'orders'),where('userId','==',currentUid)),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders yet</div>';return}allOrdersCache=snap.docs.map(d=>({id:d.id,...d.data()}));allOrdersCache.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));renderCustomerOrders();if(document.getElementById('screen-order-detail').classList.contains('active')&&currentOrderDetailId){renderOrderDetail()}})}
 
 function loadReviews(pid){const list=document.getElementById('reviewList');list.innerHTML='<div class="loading-row">Loading...</div>';if(unsubReviews)unsubReviews();unsubReviews=onSnapshot(query(collection(db,'reviews'),where('productId','==',pid)),snap=>{if(snap.empty){list.innerHTML='<div style="color:var(--text-dim);font-size:13px">No reviews yet</div>';return}let revs=snap.docs.map(d=>d.data());revs.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));list.innerHTML=revs.map(r=>{let stars='';for(let i=0;i<5;i++)stars+=i<r.rating?'★':'☆';const photosHtml=(r.photos&&r.photos.length>0)?`<div class="review-photos">${r.photos.map(p=>`<img src="${p}" onclick="window.open('${p}','_blank')">`).join('')}</div>`:'';return`<div class="review-card"><div class="review-stars">${stars}</div><div class="review-text">${escapeHtml(r.text)}</div>${photosHtml}<div class="review-name">- ${escapeHtml(r.name)}</div></div>`}).join('')})}
 function openReviewForm(){document.getElementById('reviewModal').style.display='flex'}
@@ -1992,7 +2272,7 @@ function checkSpinWheel(){const last=localStorage.getItem('lastSpinDate');const 
 function closeSpinWheel(){document.getElementById('spinWheelModal').style.display='none'}
 function spinWheel(){const btn=document.getElementById('spinBtn');btn.disabled=true;const wheel=document.getElementById('wheelCanvas');const deg=Math.floor(Math.random()*360)+720;wheel.style.transform=`rotate(${deg}deg)`;setTimeout(()=>{if(couponsCache.length>0){const c=couponsCache[Math.floor(Math.random()*couponsCache.length)];document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML=`🎉 Won: <span style="color:var(--gold)">${c.code}</span> (${c.discountPercent}% OFF)`;localStorage.setItem('lastSpinDate',new Date().toDateString())}else{document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML='No coupons active'};btn.textContent='CLOSE';btn.onclick=closeSpinWheel;btn.disabled=false},3000)}
 
-const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed'];
+const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
