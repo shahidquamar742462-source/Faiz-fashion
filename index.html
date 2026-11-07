@@ -629,7 +629,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <p style="color:var(--text-dim);font-size:13px">Please visit early morning!</p>
   </div>
   
-  <!-- NEW FLIPKART STYLE TOP BAR WITH GRADIENT -->
   <div class="top-bar">
     <div class="top-row">
       <h2>FAIZ FASHION</h2>
@@ -658,6 +657,11 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <div class="filter-chip" id="inStockFilterBtn" onclick="toggleInStockFilter()">✅ In Stock</div>
     <div class="filter-chip" onclick="openPriceRange()" id="priceFilterBtn">💰 Price</div>
     <div class="filter-chip" onclick="clearAllFilters()" id="clearFilterBtn" style="display:none;color:var(--danger);border-color:var(--danger)">❌ Clear</div>
+  </div>
+
+  <!-- NEW SEARCH FILTER BAR (Brand, Size, Color, Top Deals) -->
+  <div id="searchFilterBar" style="display:none; margin-bottom:15px; overflow-x:auto; white-space:nowrap; padding: 10px 0 5px 0; border-bottom: 1px solid var(--border);">
+      <!-- Injected Dynamically -->
   </div>
 
   <div class="banner-container" id="shopBanner" style="display:none"></div>
@@ -1130,6 +1134,12 @@ let adsCache=[], adRotationInterval=null, adPendingFile=null;
 let currentOrderDetailId=null;
 let myStockAlerts=new Set(); 
 
+// NEW: Search Filter Variables
+let searchFilterBrand = '';
+let searchFilterSize = '';
+let searchFilterColor = '';
+let searchFilterDeal = false;
+
 let currentLang = localStorage.getItem('lang') || 'en';
 const LANG = { shop: {en:'Shop', hi:'दुकान'}, preorder: {en:'Pre-Order', hi:'प्री-ऑर्डर'}, cart: {en:'Cart', hi:'कार्ट'}, account: {en:'Account', hi:'खाता'} };
 function t(key){ return (LANG[key] && LANG[key][currentLang]) || key; }
@@ -1165,6 +1175,61 @@ function renderSettingsRecentlyViewed() {
   grid.innerHTML = items.map(c=>{ const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:c.photoUrl;
     return `<div class="recent-card" style="min-width: 100px;" onclick="openProductDetails('${c.id}')"><img src="${optImg(img,200)}" style="width:100px; height:100px; object-fit:cover; border-radius:10px;"><p style="font-size:12px; font-weight:700; margin-top:5px; color:var(--text);">${escapeHtml(c.name)}</p><p style="color:var(--text); font-size:12px; font-weight:800;">₹${getEffectivePrice(c)}</p></div>`;
   }).join('');
+}
+
+// NEW: Render Search Filters dynamically
+function renderSearchFilters() {
+  const bar = document.getElementById('searchFilterBar');
+  if(!bar || !searchQuery) return;
+  
+  const matched = categoriesCache.filter(c => c.name.toLowerCase().includes(searchQuery) || (c.description || '').toLowerCase().includes(searchQuery));
+  
+  let sizes = new Set();
+  let colors = new Set();
+  let brands = new Set();
+  
+  matched.forEach(c => {
+    if(c.sizes) c.sizes.forEach(s => sizes.add(s));
+    if(c.colors) c.colors.forEach(col => colors.add(col));
+    const brand = c.name.split(' ')[0];
+    if(brand.length > 2) brands.add(brand);
+  });
+  
+  let html = '';
+  
+  // Top Deal chip
+  html += `<div class="filter-chip ${searchFilterDeal ? 'active' : ''}" onclick="toggleSearchFilter('deal')" style="margin-right:8px; display:inline-block;">🔥 Top Deals</div>`;
+  
+  // Brand chips
+  if(brands.size > 0) {
+    Array.from(brands).slice(0, 4).forEach(b => {
+      html += `<div class="filter-chip ${searchFilterBrand === b ? 'active' : ''}" onclick="toggleSearchFilter('brand', '${b}')" style="margin-right:8px; display:inline-block;">${b}</div>`;
+    });
+  }
+  
+  // Size chips
+  if(sizes.size > 0) {
+    Array.from(sizes).forEach(s => {
+      html += `<div class="filter-chip ${searchFilterSize === s ? 'active' : ''}" onclick="toggleSearchFilter('size', '${s}')" style="margin-right:8px; display:inline-block;">Size: ${s}</div>`;
+    });
+  }
+  
+  // Color chips
+  if(colors.size > 0) {
+    Array.from(colors).forEach(col => {
+      html += `<div class="filter-chip ${searchFilterColor === col ? 'active' : ''}" onclick="toggleSearchFilter('color', '${col}')" style="margin-right:8px; display:inline-block;">${col}</div>`;
+    });
+  }
+  
+  bar.innerHTML = html;
+}
+
+function toggleSearchFilter(type, value) {
+  if(type === 'deal') searchFilterDeal = !searchFilterDeal;
+  if(type === 'brand') searchFilterBrand = searchFilterBrand === value ? '' : value;
+  if(type === 'size') searchFilterSize = searchFilterSize === value ? '' : value;
+  if(type === 'color') searchFilterColor = searchFilterColor === value ? '' : value;
+  renderShop();
 }
 
 // NEW: Render "Deals for You" & "Suggested for You"
@@ -1774,6 +1839,8 @@ function shareReferralCode(){if(!userRefCode)return;const link=`${window.locatio
 
 function updateGlobalLocStatus(){const e=document.getElementById('globalLocStatus');if(!e)return;if(userSavedLat&&userSavedLng){e.textContent='✅ Shared';e.style.color='var(--success)'}else{e.textContent='Tap to allow GPS';e.style.color='var(--text-dim)'}}
 function updateCheckoutLocStatus(){const e=document.getElementById('checkoutLocStatus');if(!e)return;if(userSavedLat&&userSavedLng){e.textContent='✅ Shared';e.style.color='var(--success)'}else{e.textContent='Not shared';e.style.color='var(--danger)'}}
+
+// UPDATED: Global Location share now applies to pending orders too
 async function requestGlobalLocation(){
   showLoading();
   try{
@@ -1811,40 +1878,19 @@ async function requestGlobalLocation(){
   }
   hideLoading();
 }
+
 async function requestCheckoutLocation(){const el=document.getElementById('checkoutLocStatus');el.textContent='Fetching...';try{const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:10000,enableHighAccuracy:true}));userSavedLat=pos.coords.latitude;userSavedLng=pos.coords.longitude;await setDoc(doc(db,'users',currentUid),{savedLatitude:userSavedLat,savedLongitude:userSavedLng},{merge:true});el.textContent='✅ Shared!';el.style.color='var(--success)'}catch(e){el.textContent='❌ Failed';el.style.color='var(--danger)'}}
 
-// FIXED: Voice Search functionality
 function startVoiceSearch(){
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('🎤 Aapke browser me voice search supported nahi hai. Chrome use karein.'); return; }
-  if (voiceRecognition) { try { voiceRecognition.stop(); } catch(e){} }
-  voiceRecognition = new SR();
-  voiceRecognition.lang = 'hi-IN'; // Set language to Hindi/English mixed
-  voiceRecognition.interimResults = false;
-  voiceRecognition.maxAlternatives = 1;
-  
-  const btn = document.getElementById('voiceSearchBtn');
-  btn.textContent = '🔴';
-  btn.classList.add('recording');
-  
-  const reset = () => { btn.textContent = '🎤'; btn.classList.remove('recording'); voiceRecognition = null; };
-  
-  voiceRecognition.onresult = (e) => {
-    const t = e.results[0][0].transcript;
-    const searchInput = document.getElementById('shopSearch');
-    searchInput.value = t;
-    onSearchInput(t); // Trigger the search
-    setTimeout(() => { searchInput.blur(); }, 500); // Dismiss keyboard after search
-  };
-  
-  voiceRecognition.onerror = (e) => { 
-    if(e.error !== 'aborted') alert('Voice error: ' + e.error); 
-    reset(); 
-  };
-  
-  voiceRecognition.onend = reset;
-  
-  try { voiceRecognition.start(); } catch(e) { reset(); alert('Error: ' + e.message); }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('🎤 Not supported. Use Chrome.');return}
+  if(voiceRecognition){try{voiceRecognition.stop()}catch(e){}}
+  voiceRecognition=new SR();voiceRecognition.lang='hi-IN';voiceRecognition.interimResults=false;voiceRecognition.maxAlternatives=1;
+  const btn=document.getElementById('voiceSearchBtn');btn.textContent='🔴';btn.classList.add('recording');
+  const reset=()=>{btn.textContent='🎤';btn.classList.remove('recording');voiceRecognition=null};
+  voiceRecognition.onresult=(e)=>{const t=e.results[0][0].transcript;document.getElementById('shopSearch').value=t;onSearchInput(t)};
+  voiceRecognition.onerror=(e)=>{if(e.error!=='aborted')alert('Voice error: '+e.error);reset()};
+  voiceRecognition.onend=reset;
+  try{voiceRecognition.start()}catch(e){reset();alert('Error: '+e.message)}
 }
 
 function saveRecentSearch(q){if(!q||q.length<2)return;recentSearches=recentSearches.filter(x=>x.toLowerCase()!==q.toLowerCase());recentSearches.unshift(q);recentSearches=recentSearches.slice(0,10);localStorage.setItem('recentSearches',JSON.stringify(recentSearches))}
@@ -2025,22 +2071,97 @@ async function openAdminChat(uid,name){currentAdminChatUid=uid;currentAdminChatU
 async function sendAdminChatMsg(){const inp=document.getElementById('adminChatInput');const text=inp.value.trim();if(!text||!currentAdminChatUid)return;inp.value='';try{await addDoc(collection(db,'support_chats',currentAdminChatUid,'messages'),{sender:'admin',text,date:serverTimestamp()});await updateDoc(doc(db,'support_chats',currentAdminChatUid),{lastMessage:text,lastMessageAt:serverTimestamp(),unreadCustomer:increment(1)})}catch(e){alert('Error: '+e.message)}}
 
 function setMainCategory(cat){mainCategory=cat;document.querySelectorAll('.cat-icon-item').forEach(item=>{item.classList.toggle('active',item.getAttribute('onclick').includes(`'${cat}'`))});renderShop()}
-function onSearchInput(q){searchQuery=q.toLowerCase();const box=document.getElementById('autocompleteBox');if(!q||q.length<2){box.style.display='none';renderShop();return}const matches=categoriesCache.filter(c=>c.name.toLowerCase().includes(q.toLowerCase())).slice(0,6);if(matches.length===0){box.style.display='none'}else{box.innerHTML=matches.map(m=>`<div class="autocomplete-item" onmousedown="selectAutocomplete('${escapeHtml(m.name)}')">${escapeHtml(m.name)} — <span style="color:var(--text);font-weight:800;">₹${getEffectivePrice(m)}</span></div>`).join('');box.style.display='block'}if(q.length>=2)saveRecentSearch(q);renderShop()}
+
+// UPDATED onSearchInput
+function onSearchInput(q){
+  searchQuery = q.toLowerCase().trim();
+  
+  if(q.trim() === '') {
+      searchFilterBrand = '';
+      searchFilterSize = '';
+      searchFilterColor = '';
+      searchFilterDeal = false;
+  }
+  
+  const box = document.getElementById('autocompleteBox');
+  if(!q || q.length < 2){
+    box.style.display = 'none';
+    renderShop();
+    return;
+  }
+  const matches = categoriesCache.filter(c => c.name.toLowerCase().includes(q.toLowerCase())).slice(0, 6);
+  if(matches.length === 0) {
+    box.style.display = 'none';
+  } else {
+    box.innerHTML = matches.map(m => `<div class="autocomplete-item" onmousedown="selectAutocomplete('${escapeHtml(m.name)}')">${escapeHtml(m.name)} — <span style="color:var(--text);font-weight:800;">₹${getEffectivePrice(m)}</span></div>`).join('');
+    box.style.display = 'block';
+  }
+  if(q.length >= 2) saveRecentSearch(q);
+  renderShop();
+}
+
 function selectAutocomplete(name){document.getElementById('shopSearch').value=name;searchQuery=name.toLowerCase();document.getElementById('autocompleteBox').style.display='none';saveRecentSearch(name);renderShop()}
 function sortProducts(order){sortOrder=order;renderShop()}
 function toggleInStockFilter(){filterInStock=!filterInStock;document.getElementById('inStockFilterBtn').classList.toggle('active',filterInStock);updateClearFilterBtn();renderShop()}
 function openPriceRange(){const input=prompt('Max price (₹):',filterMaxPrice||'');if(input===null)return;filterMaxPrice=input.trim()?parseFloat(input):null;document.getElementById('priceFilterBtn').classList.toggle('active',filterMaxPrice!==null);updateClearFilterBtn();renderShop()}
-function clearAllFilters(){filterInStock=false;filterMaxPrice=null;document.getElementById('inStockFilterBtn').classList.remove('active');document.getElementById('priceFilterBtn').classList.remove('active');updateClearFilterBtn();renderShop()}
+function clearAllFilters(){
+    filterInStock=false;
+    filterMaxPrice=null;
+    document.getElementById('inStockFilterBtn').classList.remove('active');
+    document.getElementById('priceFilterBtn').classList.remove('active');
+    updateClearFilterBtn();
+    
+    // Clear search filters too
+    searchFilterBrand = '';
+    searchFilterSize = '';
+    searchFilterColor = '';
+    searchFilterDeal = false;
+    renderShop();
+}
 function updateClearFilterBtn(){document.getElementById('clearFilterBtn').style.display=(filterInStock||filterMaxPrice!==null)?'inline-block':'none'}
 
+// UPDATED renderShop
 function renderShop(){
-  const grid=document.getElementById('shopGrid');if(!grid)return;let items=[...categoriesCache];
+  const grid=document.getElementById('shopGrid');if(!grid)return;
+  
+  const isSearching = searchQuery.length > 0;
+  
+  // Hide extra sections if searching
+  const sections = ['recentlyViewedSection', 'dealsForYouSection', 'suggestedForYouSection', 'newArrivalsSection', 'hotItemsSection'];
+  if(isSearching) {
+      sections.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
+  } else {
+      renderRecentlyViewed();
+      renderDealsAndSuggested();
+      renderNewArrivalsAndHot();
+  }
+  
+  // Show/Hide search filter bar
+  const filterBar = document.getElementById('searchFilterBar');
+  if(filterBar) {
+      filterBar.style.display = isSearching ? 'block' : 'none';
+      if(isSearching) renderSearchFilters();
+  }
+  
+  let items=[...categoriesCache];
   if(mainCategory==='Watchlist')items=items.filter(c=>watchlistIds.has(c.id));else if(mainCategory!=='All')items=items.filter(c=>c.mainCategory===mainCategory);
-  if(searchQuery)items=items.filter(c=>c.name.toLowerCase().includes(searchQuery)||(c.description||'').toLowerCase().includes(searchQuery));
+  
+  if(searchQuery) {
+      items = items.filter(c => c.name.toLowerCase().includes(searchQuery) || (c.description || '').toLowerCase().includes(searchQuery));
+      
+      if(searchFilterBrand) items = items.filter(c => c.name.toLowerCase().startsWith(searchFilterBrand.toLowerCase()));
+      if(searchFilterSize) items = items.filter(c => (c.sizes || []).includes(searchFilterSize));
+      if(searchFilterColor) items = items.filter(c => (c.colors || []).includes(searchFilterColor));
+      if(searchFilterDeal) items = items.filter(c => getDiscountPercent(c.originalPrice, c.discountPrice) >= 20);
+  }
+  
   if(filterInStock)items=items.filter(c=>(c.times||0)>0);
   if(filterMaxPrice!==null)items=items.filter(c=>getEffectivePrice(c)<=filterMaxPrice);
+  
   if(sortOrder==='low-high')items.sort((a,b)=>getEffectivePrice(a)-getEffectivePrice(b));else if(sortOrder==='high-low')items.sort((a,b)=>getEffectivePrice(b)-getEffectivePrice(a));else items.sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));
-  if(items.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim)">No products found</div>';return}
+  
+  if(items.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim)">No products found for your search/filters</div>';return}
+  
   grid.innerHTML=items.map(c=>{const out=(c.times||0)<=0;const price=getEffectivePrice(c);const isFlash=isFlashActive(c);const off=getDiscountPercent(c.originalPrice,price);const liked=watchlistIds.has(c.id);const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const inCart=cartProductIds.has(c.id);const flashBadge=isFlash?`<div class="flash-badge">⚡ FLASH</div>`:'';const alerted=myStockAlerts.has(c.id);const actionBtn=out?`<button class="btn-notify" onclick="event.stopPropagation();${alerted?'':'requestStockAlert(\''+c.id+'\')'}">${alerted?'✅ Notified':'🔔 Notify Me'}</button>`:`<button class="btn-cart" onclick="event.stopPropagation();toggleCartFromCard('${c.id}')">${inCart?'✓ In Cart':'+ Cart'}</button>`;
   
   const fakeRating = (4.1 + (c.name.length % 8) * 0.1).toFixed(1);
@@ -2379,7 +2500,7 @@ function checkSpinWheel(){const last=localStorage.getItem('lastSpinDate');const 
 function closeSpinWheel(){document.getElementById('spinWheelModal').style.display='none'}
 function spinWheel(){const btn=document.getElementById('spinBtn');btn.disabled=true;const wheel=document.getElementById('wheelCanvas');const deg=Math.floor(Math.random()*360)+720;wheel.style.transform=`rotate(${deg}deg)`;setTimeout(()=>{if(couponsCache.length>0){const c=couponsCache[Math.floor(Math.random()*couponsCache.length)];document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML=`🎉 Won: <span style="color:var(--text)">${c.code}</span> (${c.discountPercent}% OFF)`;localStorage.setItem('lastSpinDate',new Date().toDateString())}else{document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML='No coupons active'};btn.textContent='CLOSE';btn.onclick=closeSpinWheel;btn.disabled=false},3000)}
 
-const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail','requestStockAlert','checkFirstOrderBonus','getSizeRecommendation','updateSizeRecommendation','lookupPincodeDebounced','lookupPincode','selectPincode','trackProductView','trackCartAdd','loadProductAnalytics','loadAbandonedCarts','setLanguage','applyLanguage','renderNewArrivalsAndHot','renderDealsAndSuggested','openProfileDetails','saveProfileDetails'];
+const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail','requestStockAlert','checkFirstOrderBonus','getSizeRecommendation','updateSizeRecommendation','lookupPincodeDebounced','lookupPincode','selectPincode','trackProductView','trackCartAdd','loadProductAnalytics','loadAbandonedCarts','setLanguage','applyLanguage','renderNewArrivalsAndHot','renderDealsAndSuggested','openProfileDetails','saveProfileDetails','toggleSearchFilter','renderSearchFilters'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
