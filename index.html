@@ -36,7 +36,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .top-bar h2{font-size:20px;color:#fff;font-weight:900;letter-spacing:1px;text-shadow:0 1px 3px rgba(0,0,0,0.2)}
 
-/* NEW ADDRESS PANEL */
+/* ADDRESS PANEL */
 .address-panel {
   background: rgba(0,0,0,0.15);
   border-radius: 8px;
@@ -58,9 +58,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .search-bar{flex:1; background:transparent; border:none; padding:12px 8px; color:#333; font-size:14px; font-weight:600; outline:none;}
 .search-mic-btn{background:transparent; border:none; font-size:18px; cursor:pointer; padding:5px; color: #333;}
 .search-mic-btn.recording{color:var(--danger); animation:pulse 1.5s infinite;}
-
-/* GREEN SORT BUTTON */
-.sort-select{background:var(--success); color:#fff; border:none; border-radius:8px; padding:10px; font-size:13px; font-weight:800; outline:none; box-shadow:0 2px 5px rgba(0,0,0,0.1); cursor:pointer;}
 
 .icon-btn{background:#fff;border:none;color:#e52d27;width:40px;height:40px;border-radius:8px;font-size:16px;position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
 
@@ -92,10 +89,12 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .ref-card-compact { background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.02)); border:1px dashed var(--gold); border-radius:12px; padding:10px; margin-bottom:15px; box-shadow:var(--shadow-sm); }
 .ref-card-compact .ref-code { font-size:16px; font-weight:900; color:var(--gold-dark); letter-spacing:1px; font-family:monospace; }
 
-/* EXISTING STYLES */
-.banner-container{width:100%;height:160px;margin-bottom:20px;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;scrollbar-width:none;border-radius:12px;position:relative;box-shadow:var(--shadow-sm)}
-.banner-slide{min-width:100%;height:100%;scroll-snap-align:center;border-radius:12px;overflow:hidden}
-.banner-slide img{width:100%;height:100%;object-fit:cover}
+/* BANNER FIX */
+.banner-container{width:100%;height:180px;max-height:180px;margin-bottom:20px;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;scrollbar-width:none;border-radius:12px;position:relative;box-shadow:var(--shadow-sm)}
+.banner-container::-webkit-scrollbar{display:none}
+.banner-slide{min-width:100%;height:180px;max-height:180px;scroll-snap-align:center;border-radius:12px;overflow:hidden}
+.banner-slide img{width:100%;height:100%;object-fit:cover;display:block}
+
 .filter-tabs{display:flex;gap:10px;overflow-x:auto;padding-bottom:5px;margin-top:10px;scrollbar-width:none}
 .filter-chip{background:var(--card);border:1px solid var(--border);color:var(--text);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow-sm)}
 .filter-chip.active{background:var(--grad-gold);color:#000;border:none;box-shadow:0 4px 12px rgba(212,175,55,0.4)}
@@ -126,7 +125,8 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .form-container{max-width:420px;margin:0 auto}
 .input-group{margin-bottom:20px}
 .input-group label{display:block;font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase}
-.input-group input,.input-group textarea,.input-group select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;color:var(--text);font-size:15px;outline:none;box-shadow:0 2px 5px rgba(0,0,0,0.02)}
+.input-group input[type="text"],.input-group input[type="number"],.input-group input[type="tel"],.input-group input[type="password"],.input-group input[type="date"],.input-group input[type="datetime-local"],.input-group textarea,.input-group select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;color:var(--text);font-size:15px;outline:none;box-shadow:0 2px 5px rgba(0,0,0,0.02)}
+.input-group input[type="checkbox"], .input-group input[type="radio"]{width:20px;height:20px;min-width:20px;flex-shrink:0;padding:0;margin:0;accent-color:var(--text);cursor:pointer;}
 .btn-primary{width:100%;background:var(--grad-fk);color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 15px rgba(229,45,39,0.4);transition:transform 0.2s}
 .btn-small{flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.02)}
 .recent-grid{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;margin-bottom:15px}
@@ -162,8 +162,13 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .tier-bronze{background:#cd7f32;color:#fff}
 .tier-silver{background:#adb5bd;color:#fff}
 .tier-gold{background:var(--grad-gold);color:#000;box-shadow:0 2px 10px rgba(212,175,55,0.4)}
-.payment-option{display:flex;align-items:center;gap:12px;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow-sm)}
+
+/* FIX: Payment Option CSS */
+.payment-option{display:flex;align-items:center;gap:12px;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow-sm);width:100%;overflow:hidden;}
 .payment-option.selected{border:2px solid var(--text);background:var(--card2)}
+.payment-option input[type=radio]{width:20px;height:20px;min-width:20px;flex-shrink:0;cursor:pointer;accent-color:var(--text);margin:0;}
+.payment-option div{flex:1;font-size:14px;font-weight:700;word-break:break-word;}
+
 .lang-toggle{display:flex;gap:6px;background:var(--card2);padding:6px;border-radius:10px}
 .lang-btn{flex:1;padding:10px;border-radius:8px;border:none;background:transparent;color:var(--text);font-weight:800;font-size:14px;cursor:pointer;transition:all 0.2s}
 .lang-btn.active{background:var(--card);color:var(--text);box-shadow:var(--shadow-sm)}
@@ -176,7 +181,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <div style="width:50px;height:50px;border:4px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite"></div>
 </div>
 
-<!-- LANDING / SPLASH / LOGIN SCREENS (UNCHANGED) -->
+<!-- LANDING / SPLASH / LOGIN SCREENS -->
 <div id="screen-splash" class="screen active">
   <div class="landing-container">
     <div class="logo-circle" style="margin:0 auto 20px"><img src="logo.png" alt="FAIZ FASHION" onerror="this.style.display='none'"></div>
@@ -301,24 +306,25 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <div id="shopClosedNotice" style="display:none;background:#fff0f0;border:1px solid var(--danger);padding:15px;border-radius:12px;text-align:center;margin-bottom:15px"><h3 style="color:var(--danger);font-size:16px;margin-bottom:5px">🛑 Shop is Closed</h3><p style="color:var(--text-dim);font-size:13px">Please visit early morning!</p></div>
   
   <div class="top-bar">
-    <!-- NEW ADDRESS PANEL -->
-    <div class="address-panel" onclick="openAddressSelect()">
-      <div class="address-panel-text">
-        <span style="font-size:16px;">📍</span>
-        <div>
-          <div style="font-size:12px; font-weight:900; color:#fff;" id="currentAddressName">Deliver to Home</div>
-          <span id="currentAddressText">Tap to select address...</span>
-        </div>
-      </div>
-      <span style="color:#fff; font-size:12px;">▼</span>
-    </div>
-
+    <!-- 1. Title Row -->
     <div class="top-row">
       <h2>FAIZ FASHION</h2>
       <div style="display:flex;gap:8px"><button class="icon-btn" onclick="showScreen('cart')">🛒<span class="badge" id="shopCartBadge" style="position:absolute;top:-5px;right:-5px;background:#000;color:#fff;font-size:10px;font-weight:900;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.4)">0</span></button></div>
     </div>
 
-    <!-- NEW SEARCH AND SORT ROW -->
+    <!-- 2. NEW ADDRESS PANEL -->
+    <div class="address-panel" onclick="openAddressSelect()">
+      <div class="address-panel-text">
+        <span style="font-size:16px;">📍</span>
+        <div>
+          <div style="font-size:12px; font-weight:900; color:#fff;" id="currentAddressName">Deliver to Home</div>
+          <span id="currentAddressText" style="display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:200px;">Tap to select address...</span>
+        </div>
+      </div>
+      <span style="color:#fff; font-size:12px;">▼</span>
+    </div>
+
+    <!-- 3. NEW SEARCH ROW (No Sort) -->
     <div class="search-row">
       <div class="search-container">
         <span>🔍</span>
@@ -326,10 +332,10 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
         <button id="clearSearchBtn" onclick="clearSearchText()" style="display: none; background: none; border: none; font-size: 16px; color: var(--text-dim); cursor: pointer; padding: 5px; z-index: 10;">✕</button>
         <button class="search-mic-btn" onclick="startVoiceSearch()" id="voiceSearchBtn">🎤</button>
       </div>
-      <select class="sort-select" onchange="sortProducts(this.value)"><option value="default">Sort</option><option value="low-high">Low→High</option><option value="high-low">High→Low</option></select>
     </div>
-    <div class="autocomplete-box" id="autocompleteBox" style="position:absolute;top:100%;left:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:6px;max-height:280px;overflow-y:auto;z-index:100;display:none;box-shadow:var(--shadow-md)"></div>
     
+    <div class="autocomplete-box" id="autocompleteBox" style="position:absolute;top:100%;left:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:6px;max-height:280px;overflow-y:auto;z-index:100;display:none;box-shadow:var(--shadow-md)"></div>
+
     <div class="horizontal-scroll-row" id="mainTabs">
       <div class="cat-icon-item active" onclick="setMainCategory('All')"><div class="cat-icon-box">✨</div><span class="cat-icon-text">For You</span></div>
       <div class="cat-icon-item" onclick="setMainCategory('Men')"><div class="cat-icon-box">👔</div><span class="cat-icon-text">Men</span></div>
@@ -435,7 +441,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       <div id="settingsRecentGrid" class="recent-grid" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;"></div>
     </div>
 
-    <!-- COMPACT REWARDS PANEL MOVED HERE -->
     <div class="ref-card-compact">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <div id="tierBadgeDisplay" style="transform:scale(0.9); transform-origin: left;"></div>
@@ -480,12 +485,15 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 
 <div id="screen-contact" class="screen"><div class="header"><button class="back-btn" onclick="showScreen('customer-settings')">←</button><h2>Contact Us</h2></div><div class="form-container"><button class="btn-primary" style="background:var(--card2);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="contactCall()"><span style="font-size:24px">📞</span><div><div style="font-size:16px;font-weight:800">Call Us</div></div></button><button class="btn-primary" style="background:#25D366;color:#fff;border:none;display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="contactWhatsApp()"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg><div><div style="font-size:16px;font-weight:800">WhatsApp Us</div></div></button><button class="btn-primary" style="background:var(--card2);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="contactEmail()"><span style="font-size:24px">✉️</span><div><div style="font-size:16px;font-weight:800">Email Us</div></div></button></div></div>
 
+<!-- PRODUCT DETAILS SCREEN (FIXED SHARE & LIKE POSITIONS) -->
 <div id="screen-product-details" class="screen">
   <div class="detail-header" style="position:fixed;top:0;left:0;right:0;padding:15px 20px;display:flex;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,0.6),transparent)">
-    <button class="back-btn" style="background:rgba(255,255,255,0.9);border:none;color:#333" onclick="goBackFromDetails()">←</button>
+    <div style="display:flex;gap:10px">
+      <button class="back-btn" style="background:rgba(255,255,255,0.9);border:none;color:#333" onclick="goBackFromDetails()">←</button>
+      <button class="back-btn" style="background:#25D366;border:none;color:#fff" onclick="shareProduct()"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>
+    </div>
     <div style="display:flex;gap:10px">
       <button class="back-btn" id="detailLikeBtn" style="background:rgba(255,255,255,0.9);border:none;color:#333" onclick="toggleWatchlistDetails()">🤍</button>
-      <button class="back-btn" style="background:#25D366;border:none;color:#fff" onclick="shareProduct()"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>
     </div>
   </div>
   <div class="detail-gallery" id="detailGallery" style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;width:100%;height:55vh;background:var(--card2);scrollbar-width:none" onclick="openImageZoom(event)"></div>
@@ -716,7 +724,7 @@ function renderAddressSelectList(addresses) {
     
     let h = '';
     addresses.forEach((a, idx) => {
-        const isSelected = idx === 0; // Just UI mock
+        const isSelected = idx === 0;
         h += `
         <div class="addr-card-new" onclick="selectDeliveryAddress(${JSON.stringify(a).replace(/"/g, '&quot;')})">
             <div class="addr-icon-box">${a.building ? '🏢' : '🏠'}</div>
@@ -743,7 +751,6 @@ function filterSavedAddresses(q) {
 function selectDeliveryAddress(addr) {
     document.getElementById('currentAddressName').textContent = `Deliver to ${addr.name}`;
     document.getElementById('currentAddressText').textContent = addr.address.substring(0, 30) + '...';
-    // Autofill checkout
     document.getElementById('chkName').value = addr.name || '';
     document.getElementById('chkPhone').value = addr.phone || '';
     document.getElementById('chkBuilding').value = addr.building || '';
@@ -876,7 +883,6 @@ function clearSearchText() {
 }
 
 function promptSettingsPassword() {
-  // Obfuscated password check
   const pwd = prompt("Enter Secret Password to access Settings:");
   if (pwd === "Gulab123@#++") { openSettings(); }
   else if (pwd !== null) { alert("❌ Incorrect Password!"); }
@@ -1220,7 +1226,7 @@ onAuthStateChanged(auth,async(user)=>{
       await initUserRewards();
       await loadMyStockAlerts();
       await checkFirstOrderBonus();
-      await checkReferralClaim(); // NEW: Claim referral points
+      await checkReferralClaim(); 
     }catch(e){console.log(e)}
   }
   setTimeout(()=>checkDeepLink(), 1500);
@@ -1231,23 +1237,19 @@ async function checkReferralClaim() {
     const refCode = urlParams.get('ref');
     if(!refCode || !currentUid || isAdminUser) return;
     
-    // Check if user already claimed
     const userSnap = await getDoc(doc(db, 'users', currentUid));
-    if(userSnap.data()?.referredBy) return; // Already claimed
+    if(userSnap.data()?.referredBy) return; 
     
     try {
-        // Find referrer by code
         const usersSnap = await getDocs(query(collection(db, 'users'), where('refCode', '==', refCode.toUpperCase())));
         if(usersSnap.empty) return;
         
         const referrerId = usersSnap.docs[0].id;
-        if(referrerId === currentUid) return; // Cannot refer self
+        if(referrerId === currentUid) return; 
         
-        // Give points
         await addUserPoints(50);
         await updateDoc(doc(db, 'users', currentUid), { referredBy: referrerId });
         
-        // Add to referrer
         await setDoc(doc(db, 'users', referrerId), { points: increment(100), walletBalance: increment(50) }, { merge: true });
         
         alert('🎁 Referral Claimed! You got 50 points, your friend got 100 points + ₹50 wallet!');
@@ -1905,7 +1907,6 @@ async function submitOrder(){
       if(saveAddr)await setDoc(doc(db,'users',currentUid,'addresses',Date.now().toString()),{name,phone,building,address,landmark});
       for(let item of cartItems)await deleteDoc(doc(db,'users',currentUid,'cart',item.cartId));
       
-      // STOCK DEDUCTION UPDATE
       for(let item of items){
         try{
           const ref=doc(db,'categories',item.productId);
@@ -2026,7 +2027,6 @@ async function confirmCancelOrder(){
   showLoading();
   
   try{
-    // Calculate refund for canceled items
     let cancelledSubtotal = 0;
     let cancelledQty = 0;
     cancelIndices.forEach(idx => {
@@ -2035,7 +2035,6 @@ async function confirmCancelOrder(){
         cancelledQty += item.qty;
     });
 
-    // Proportional refund for wallet & points
     let refundPoints = 0;
     let refundWallet = 0;
     
@@ -2045,19 +2044,16 @@ async function confirmCancelOrder(){
         refundWallet = (order.walletUsed || 0) * ratio;
     }
 
-    // Reverse earned points for canceled items
     let reverseEarnedPoints = 0;
     if(order.pointsEarned > 0 && order.subtotal > 0) {
         const ratio = cancelledSubtotal / order.subtotal;
         reverseEarnedPoints = Math.round(order.pointsEarned * ratio);
     }
 
-    // Process refunds
     if(refundWallet > 0) await addUserWallet(refundWallet);
     if(refundPoints > 0) await addUserPoints(refundPoints);
     if(reverseEarnedPoints > 0) await addUserPoints(-reverseEarnedPoints);
 
-    // Restore stock
     for(const idx of cancelIndices){
         const item = order.items[idx];
         try{
@@ -2120,8 +2116,181 @@ function checkSpinWheel(){const last=localStorage.getItem('lastSpinDate');const 
 function closeSpinWheel(){document.getElementById('spinWheelModal').style.display='none'}
 function spinWheel(){const btn=document.getElementById('spinBtn');btn.disabled=true;const wheel=document.getElementById('wheelCanvas');const deg=Math.floor(Math.random()*360)+720;wheel.style.transform=`rotate(${deg}deg)`;setTimeout(()=>{if(couponsCache.length>0){const c=couponsCache[Math.floor(Math.random()*couponsCache.length)];document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML=`🎉 Won: <span style="color:var(--text)">${c.code}</span> (${c.discountPercent}% OFF)`;localStorage.setItem('lastSpinDate',new Date().toDateString())}else{document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML='No coupons active'};btn.textContent='CLOSE';btn.onclick=closeSpinWheel;btn.disabled=false},3000)}
 
-const EXPORTS=['showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail','requestStockAlert','checkFirstOrderBonus','getSizeRecommendation','updateSizeRecommendation','lookupPincodeDebounced','lookupPincode','selectPincode','trackProductView','trackCartAdd','loadProductAnalytics','loadAbandonedCarts','setLanguage','applyLanguage','renderNewArrivalsAndHot','renderDealsAndSuggested','openProfileDetails','saveProfileDetails','openFilterScreen','closeFilterScreen','switchFilterTab','updateTempFilter','clearTempFilters','applyFilters','updateApplyButtonText','clearSearchText','goToShopHome','openAddressSelect','closeAddressSelect','selectDeliveryAddress','filterSavedAddresses','checkReferralClaim'];
-EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
+// Explicitly bind all functions to window to prevent CSP issues that break onclick
+window.showScreen = showScreen;
+window.loginWithGoogle = loginWithGoogle;
+window.loginWithAnonymous = loginWithAnonymous;
+window.handleLogin = handleLogin;
+window.handleReset = handleReset;
+window.handleLogout = handleLogout;
+window.promptSettingsPassword = promptSettingsPassword;
+window.unlockAdminOtp = unlockAdminOtp;
+window.openSettings = openSettings;
+window.saveSettings = saveSettings;
+window.previewBanner = previewBanner;
+window.removePendingBanner = removePendingBanner;
+window.removeExistingBanner = removeExistingBanner;
+window.openCategoryForm = openCategoryForm;
+window.previewPhoto = previewPhoto;
+window.removeExistingPhoto = removeExistingPhoto;
+window.removeNewPhoto = removeNewPhoto;
+window.saveCategory = saveCategory;
+window.deleteCategory = deleteCategory;
+window.previewCatSizeGuide = previewCatSizeGuide;
+window.saveCoupon = saveCoupon;
+window.deleteCoupon = deleteCoupon;
+window.changeAdminPassword = changeAdminPassword;
+window.setMainCategory = setMainCategory;
+window.onSearchInput = onSearchInput;
+window.selectAutocomplete = selectAutocomplete;
+window.sortProducts = sortProducts;
+window.toggleInStockFilter = toggleInStockFilter;
+window.openPriceRange = openPriceRange;
+window.clearAllFilters = clearAllFilters;
+window.openProductDetails = openProductDetails;
+window.shareProduct = shareProduct;
+window.shareProductCard = shareProductCard;
+window.addToCartDetails = addToCartDetails;
+window.buyNowDetails = buyNowDetails;
+window.toggleWatchlist = toggleWatchlist;
+window.toggleWatchlistDetails = toggleWatchlistDetails;
+window.goBackFromDetails = goBackFromDetails;
+window.validateSizeColor = validateSizeColor;
+window.openSizeGuide = openSizeGuide;
+window.closeSizeGuide = closeSizeGuide;
+window.toggleCartFromCard = toggleCartFromCard;
+window.removeCartItem = removeCartItem;
+window.updateCartQty = updateCartQty;
+window.applyCoupon = applyCoupon;
+window.removeCoupon = removeCoupon;
+window.openCheckout = openCheckout;
+window.calculateRedemption = calculateRedemption;
+window.useMaxPoints = useMaxPoints;
+window.calculateWalletRedemption = calculateWalletRedemption;
+window.useMaxWallet = useMaxWallet;
+window.shareReferralCode = shareReferralCode;
+window.submitOrder = submitOrder;
+window.loadAdminOrders = loadAdminOrders;
+window.updateOrderStatus = updateOrderStatus;
+window.deleteOrder = deleteOrder;
+window.updateReturnTracking = updateReturnTracking;
+window.saveDeliveryBoy = saveDeliveryBoy;
+window.printInvoice = printInvoice;
+window.showAdminNotifs = showAdminNotifs;
+window.closeAdminNotifs = closeAdminNotifs;
+window.openReviewForm = openReviewForm;
+window.closeReviewForm = closeReviewForm;
+window.submitReview = submitReview;
+window.previewPrePhoto = previewPrePhoto;
+window.toggleVoiceRecord = toggleVoiceRecord;
+window.submitPreOrder = submitPreOrder;
+window.fillSavedAddress = fillSavedAddress;
+window.loadAdminPreOrders = loadAdminPreOrders;
+window.updatePreOrderStatus = updatePreOrderStatus;
+window.deletePreOrder = deletePreOrder;
+window.loadAdminReviews = loadAdminReviews;
+window.deleteReview = deleteReview;
+window.installPWA = installPWA;
+window.toggleDarkMode = toggleDarkMode;
+window.showAddAddressForm = showAddAddressForm;
+window.saveNewAddress = saveNewAddress;
+window.deleteAddress = deleteAddress;
+window.setOrderFilter = setOrderFilter;
+window.openReturnModal = openReturnModal;
+window.closeReturnModal = closeReturnModal;
+window.updateReturnItemDetails = updateReturnItemDetails;
+window.submitReturnRequest = submitReturnRequest;
+window.toggleExchangeFields = toggleExchangeFields;
+window.toggleShopStatus = toggleShopStatus;
+window.contactCall = contactCall;
+window.contactWhatsApp = contactWhatsApp;
+window.contactEmail = contactEmail;
+window.shareLocationFromOrder = shareLocationFromOrder;
+window.requestGlobalLocation = requestGlobalLocation;
+window.requestCheckoutLocation = requestCheckoutLocation;
+window.deleteCustomerOrder = deleteCustomerOrder;
+window.openImageZoom = openImageZoom;
+window.closeImageZoom = closeImageZoom;
+window.spinWheel = spinWheel;
+window.closeSpinWheel = closeSpinWheel;
+window.filterAdminOrders = filterAdminOrders;
+window.calculatePreOrderTotal = calculatePreOrderTotal;
+window.sendPreOrderPrice = sendPreOrderPrice;
+window.savePreOrderDeliveryBoy = savePreOrderDeliveryBoy;
+window.acceptPreOrderPrice = acceptPreOrderPrice;
+window.filterAdminPreOrders = filterAdminPreOrders;
+window.adminAdjustWallet = adminAdjustWallet;
+window.addUserWallet = addUserWallet;
+window.startVoiceSearch = startVoiceSearch;
+window.loadFrequentlyBought = loadFrequentlyBought;
+window.quickAddToCart = quickAddToCart;
+window.toggleBoughtWith = toggleBoughtWith;
+window.populateBoughtWithList = populateBoughtWithList;
+window.openCancelModal = openCancelModal;
+window.closeCancelModal = closeCancelModal;
+window.confirmCancelOrder = confirmCancelOrder;
+window.openOtpModal = openOtpModal;
+window.closeOtpModal = closeOtpModal;
+window.verifyDeliveryOtp = verifyDeliveryOtp;
+window.showTierInfo = showTierInfo;
+window.loadDashboard = loadDashboard;
+window.openCustomerChat = openCustomerChat;
+window.sendCustomerChatMsg = sendCustomerChatMsg;
+window.openAdminChat = openAdminChat;
+window.sendAdminChatMsg = sendAdminChatMsg;
+window.openQAForm = openQAForm;
+window.closeQAForm = closeQAForm;
+window.submitQA = submitQA;
+window.answerQuestion = answerQuestion;
+window.deleteQuestion = deleteQuestion;
+window.showRecentSearches = showRecentSearches;
+window.clearRecentSearches = clearRecentSearches;
+window.selectPaymentMethod = selectPaymentMethod;
+window.viewCustomerOrders = viewCustomerOrders;
+window.switchCustOrderTab = switchCustOrderTab;
+window.filterDashboardUsers = filterDashboardUsers;
+window.renderSettingsRecentlyViewed = renderSettingsRecentlyViewed;
+window.openOrderDetail = openOrderDetail;
+window.openReviewForProduct = openReviewForProduct;
+window.previewAdImage = previewAdImage;
+window.addAd = addAd;
+window.loadAdminAds = loadAdminAds;
+window.toggleAdActive = toggleAdActive;
+window.deleteAd = deleteAd;
+window.renderAdsCarousel = renderAdsCarousel;
+window.renderWatchlistGrid = renderWatchlistGrid;
+window.renderOrderDetail = renderOrderDetail;
+window.requestStockAlert = requestStockAlert;
+window.checkFirstOrderBonus = checkFirstOrderBonus;
+window.getSizeRecommendation = getSizeRecommendation;
+window.updateSizeRecommendation = updateSizeRecommendation;
+window.lookupPincodeDebounced = lookupPincodeDebounced;
+window.lookupPincode = lookupPincode;
+window.selectPincode = selectPincode;
+window.trackProductView = trackProductView;
+window.trackCartAdd = trackCartAdd;
+window.loadProductAnalytics = loadProductAnalytics;
+window.loadAbandonedCarts = loadAbandonedCarts;
+window.setLanguage = setLanguage;
+window.applyLanguage = applyLanguage;
+window.renderNewArrivalsAndHot = renderNewArrivalsAndHot;
+window.renderDealsAndSuggested = renderDealsAndSuggested;
+window.openProfileDetails = openProfileDetails;
+window.saveProfileDetails = saveProfileDetails;
+window.openFilterScreen = openFilterScreen;
+window.closeFilterScreen = closeFilterScreen;
+window.switchFilterTab = switchFilterTab;
+window.updateTempFilter = updateTempFilter;
+window.clearTempFilters = clearTempFilters;
+window.applyFilters = applyFilters;
+window.updateApplyButtonText = updateApplyButtonText;
+window.clearSearchText = clearSearchText;
+window.goToShopHome = goToShopHome;
+window.openAddressSelect = openAddressSelect;
+window.closeAddressSelect = closeAddressSelect;
+window.selectDeliveryAddress = selectDeliveryAddress;
+window.filterSavedAddresses = filterSavedAddresses;
+window.checkReferralClaim = checkReferralClaim;
 
 initTheme();
 applyLanguage();
