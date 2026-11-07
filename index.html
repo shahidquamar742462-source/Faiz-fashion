@@ -1774,7 +1774,43 @@ function shareReferralCode(){if(!userRefCode)return;const link=`${window.locatio
 
 function updateGlobalLocStatus(){const e=document.getElementById('globalLocStatus');if(!e)return;if(userSavedLat&&userSavedLng){e.textContent='✅ Shared';e.style.color='var(--success)'}else{e.textContent='Tap to allow GPS';e.style.color='var(--text-dim)'}}
 function updateCheckoutLocStatus(){const e=document.getElementById('checkoutLocStatus');if(!e)return;if(userSavedLat&&userSavedLng){e.textContent='✅ Shared';e.style.color='var(--success)'}else{e.textContent='Not shared';e.style.color='var(--danger)'}}
-async function requestGlobalLocation(){showLoading();try{const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:10000,enableHighAccuracy:true}));userSavedLat=pos.coords.latitude;userSavedLng=pos.coords.longitude;await setDoc(doc(db,'users',currentUid),{savedLatitude:userSavedLat,savedLongitude:userSavedLng},{merge:true});updateGlobalLocStatus();alert('✅ Location saved!')}catch(e){alert('❌ GPS failed')}hideLoading()}
+async function requestGlobalLocation(){
+  showLoading();
+  try{
+    const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:10000,enableHighAccuracy:true}));
+    userSavedLat = pos.coords.latitude;
+    userSavedLng = pos.coords.longitude;
+    
+    await setDoc(doc(db,'users',currentUid),{savedLatitude:userSavedLat,savedLongitude:userSavedLng},{merge:true});
+    
+    const ordersSnap = await getDocs(query(collection(db,'orders'), where('userId','==',currentUid)));
+    let updatedOrdersCount = 0;
+    
+    for (const orderDoc of ordersSnap.docs) {
+        const orderData = orderDoc.data();
+        if (['Pending', 'Processing'].includes(orderData.status)) {
+            await updateDoc(doc(db,'orders', orderDoc.id), { 
+                latitude: userSavedLat, 
+                longitude: userSavedLng, 
+                locationShared: true 
+            });
+            updatedOrdersCount++;
+        }
+    }
+    
+    updateGlobalLocStatus();
+    
+    if(updatedOrdersCount > 0){
+        alert(`✅ Location saved! Aapke ${updatedOrdersCount} pending order(s) me location update ho gayi.`);
+    } else {
+        alert('✅ Location saved!');
+    }
+
+  }catch(e){
+    alert('❌ GPS failed. Please check your location permissions.');
+  }
+  hideLoading();
+}
 async function requestCheckoutLocation(){const el=document.getElementById('checkoutLocStatus');el.textContent='Fetching...';try{const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:10000,enableHighAccuracy:true}));userSavedLat=pos.coords.latitude;userSavedLng=pos.coords.longitude;await setDoc(doc(db,'users',currentUid),{savedLatitude:userSavedLat,savedLongitude:userSavedLng},{merge:true});el.textContent='✅ Shared!';el.style.color='var(--success)'}catch(e){el.textContent='❌ Failed';el.style.color='var(--danger)'}}
 
 // FIXED: Voice Search functionality
