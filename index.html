@@ -1535,7 +1535,7 @@ async function handleLogin(){
     document.getElementById('loginError').textContent='❌ Wrong password!';
   }
 }
-
+  }
 function listenConfig(){
   unsubConfig=onSnapshot(doc(db,'settings','config'),snap=>{
     if(snap.exists()){
