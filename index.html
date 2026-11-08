@@ -1606,14 +1606,14 @@ function promptSettingsPassword() {
   if (pwd === atob("R3VsYWIxMjNAIysr")) { openSettings(); }
   else if (pwd !== null) { alert("❌ Incorrect Password!"); }
 }
-}
+
 
 function unlockAdminOtp(orderId) {
   const pwd = prompt("Enter Password to view OTP:");
   if (pwd === atob("R3VsYWIxMjNAIysr")) { unlockedOtps.push(orderId); renderAdminOrdersList(); if(document.getElementById('screen-admin-customer-orders').classList.contains('active')) { renderCustomerDashboardData(); } }
   else if (pwd !== null) { alert("❌ Incorrect Password!"); }
 }
-}
+
 
 function getEffectivePrice(p){if(p.flashPrice>0 && p.flashEnd && new Date(p.flashEnd.seconds?p.flashEnd.seconds*1000:p.flashEnd).getTime()>Date.now()){return p.flashPrice}return p.discountPrice}
 function isFlashActive(p){return p.flashPrice>0 && p.flashEnd && new Date(p.flashEnd.seconds?p.flashEnd.seconds*1000:p.flashEnd).getTime()>Date.now()}
@@ -2105,8 +2105,8 @@ function updateRewardsDisplay(){
   }
 }
 function showTierInfo(){const t=getLoyaltyTier(lifetimePoints);alert(`🏆 ${t.name} Member\n\nLifetime Points: ${lifetimePoints}\n\nBenefits:\n${t.benefits.map(b=>'✓ '+b).join('\n')}${t.next?'\n\nNext tier: '+(t.next-lifetimePoints)+' more points needed':''}`)}
-async function addUserPoints(delta){if(!currentUid)return;try{await setDoc(doc(db,'users',currentUid),{points:increment(delta)},{merge:true});userPoints+=delta;if(delta>0){await setDoc(doc(db,'users',currentUid),{lifetimePoints:increment(delta)},{merge:true});lifetimePoints+=delta}updateRewardsDisplay()}catch(e){console.log(e)}}
-async function addUserWallet(delta){if(!currentUid)return;try{await setDoc(doc(db,'users',currentUid),{walletBalance:increment(delta)},{merge:true});userWallet+=delta;updateRewardsDisplay()}catch(e){console.log(e)}}
+async function addUserPoints(delta){ /* Cloud Function handles this later */ }
+async function addUserWallet(delta){ /* Cloud Function handles this later */ }
 function shareReferralCode(){if(!userRefCode)return;const link=`${window.location.origin}${window.location.pathname}?ref=${userRefCode}`;window.open(`https://wa.me/?text=${encodeURIComponent(`🛍️ Join FAIZ FASHION! My code: ${userRefCode}\n${link}`)}`,'_blank')}
 
 function updateGlobalLocStatus(){const e=document.getElementById('globalLocStatus');if(!e)return;if(userSavedLat&&userSavedLng){e.textContent='✅ Shared';e.style.color='var(--success)'}else{e.textContent='Tap to allow GPS';e.style.color='var(--text-dim)'}}
