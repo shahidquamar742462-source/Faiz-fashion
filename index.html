@@ -1208,6 +1208,33 @@ const firebaseConfig={apiKey:"AIzaSyCBLRe3QajETrVTuK-ljrOVndJO9ndZiuU",authDomai
 const ADMIN_EMAIL="shahidquamar72@gmail.com";
 const CLOUDINARY_CLOUD_NAME="vsp6mp0d";
 const CLOUDINARY_UPLOAD_PRESET="FAIZ-FASHION";
+  const CLOUDINARY_SIGN_URL = "https://fragrant-violet-e6f9.shahidquamar742462.workers.dev";
+
+async function uploadToCloudinary(file, resourceType = 'image') {
+  const timestamp = Math.round(Date.now() / 1000);
+  const signRes = await fetch(CLOUDINARY_SIGN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ paramsToSign: { timestamp, folder: 'faiz-fashion' } })
+  });
+  const { signature, api_key, cloud_name } = await signRes.json();
+  if (!signature) throw new Error('Signature failed');
+
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('api_key', api_key);
+  fd.append('timestamp', timestamp);
+  fd.append('signature', signature);
+  fd.append('folder', 'faiz-fashion');
+
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloud_name}/${resourceType}/upload`,
+    { method: 'POST', body: fd }
+  );
+  const data = await res.json();
+  if (!data.secure_url) throw new Error('Upload failed: ' + (data.error?.message || 'unknown'));
+  return data.secure_url;
+}
 const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);
 
 let currentUid=null,isAdminUser=false,categoriesCache=[],cartItems=[],cartProductIds=new Set(),watchlistIds=new Set(),couponsCache=[];
