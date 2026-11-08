@@ -1490,7 +1490,6 @@ let deferredPrompt;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e});
 function installPWA(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null})}else{alert("📱 Share > Add to Home Screen")}}
 
-// FIX 3 & 11: Admin email Firestore se fetch ho rahi hai
 onAuthStateChanged(auth,async(user)=>{
   [unsubCategories,unsubConfig,unsubCart,unsubOrders,unsubWatchlist,unsubCoupons,unsubAdminOrders,unsubPreOrders,unsubMyPreOrders,unsubAdminReviews,unsubReviews,unsubQA,unsubAdminQA,unsubChat,unsubAdminChats,unsubAdminChat,unsubAds,unsubAdminAds].forEach(u=>{if(u)u()});
   watchlistIds=new Set();cartItems=[];cartProductIds=new Set();couponsCache=[];unlockedOtps=[];myStockAlerts=new Set();
@@ -1511,17 +1510,7 @@ function checkDeepLink(){ const params = new URLSearchParams(window.location.sea
 
 async function loginWithGoogle(){ showLoading(); const provider=new GoogleAuthProvider(); try{await signInWithPopup(auth,provider)}catch(e){alert("Login Failed: "+e.message)} hideLoading(); }
 async function loginWithAnonymous(){ showLoading(); try{await signInAnonymously(auth)}catch(e){alert("Login Failed: "+e.message)} hideLoading(); }
-async function handleLogin(){
-  const p=document.getElementById('loginPassword').value;
-  try{
-    if(auth.currentUser)await signOut(auth);
-    let adminEmail='';
-    try{ const configSnap=await getDoc(doc(db,'settings','config')); adminEmail=configSnap.data()?.adminEmail||''; }catch(e){}
-    if(!adminEmail){ document.getElementById('loginError').textContent='❌ Admin email not configured in settings/config'; return; }
-    await signInWithEmailAndPassword(auth,adminEmail,p);
-    document.getElementById('loginPassword').value='';document.getElementById('loginError').textContent='';
-  }catch(e){document.getElementById('loginError').textContent='❌ Wrong password!'}
-}
+
 async function handleLogin(){
   const p=document.getElementById('loginPassword').value;
   try{
@@ -1535,7 +1524,13 @@ async function handleLogin(){
     document.getElementById('loginError').textContent='❌ Wrong password!';
   }
 }
-  }
+async function handleLogout(){await signOut(auth)}
+async function handleReset() {
+  const email = document.getElementById('securityCode').value.trim() || prompt("Apna admin email enter karein:");
+  if (!email) return;
+  try { await sendPasswordResetEmail(auth, email); alert('✅ Password reset link bhej diya gaya!'); showScreen('login'); } catch (e) { document.getElementById('resetError').textContent = '❌ Email galat hai!'; }
+}
+
 function listenConfig(){
   unsubConfig=onSnapshot(doc(db,'settings','config'),snap=>{
     if(snap.exists()){
@@ -1584,7 +1579,6 @@ function updateRewardsDisplay(){
 }
 function showTierInfo(){const t=getLoyaltyTier(lifetimePoints);alert(`🏆 ${t.name} Member\n\nLifetime Points: ${lifetimePoints}\n\nBenefits:\n${t.benefits.map(b=>'✓ '+b).join('\n')}${t.next?'\n\nNext tier: '+(t.next-lifetimePoints)+' more points needed':''}`)}
 
-// B Option: Yahan points directly client-side se add ho rahe hain
 async function addUserPoints(delta){if(!currentUid)return;try{await setDoc(doc(db,'users',currentUid),{points:increment(delta)},{merge:true});userPoints+=delta;if(delta>0){await setDoc(doc(db,'users',currentUid),{lifetimePoints:increment(delta)},{merge:true});lifetimePoints+=delta}updateRewardsDisplay()}catch(e){console.log(e)}}
 async function addUserWallet(delta){if(!currentUid)return;try{await setDoc(doc(db,'users',currentUid),{walletBalance:increment(delta)},{merge:true});userWallet+=delta;updateRewardsDisplay()}catch(e){console.log(e)}}
 function shareReferralCode(){if(!userRefCode)return;const link=`${window.location.origin}${window.location.pathname}?ref=${userRefCode}`;window.open(`https://wa.me/?text=${encodeURIComponent(`🛍️ Join FAIZ FASHION! My code: ${userRefCode}\n${link}`)}`,'_blank')}
@@ -1608,7 +1602,6 @@ function getDiscountPercent(o,d){if(!o||o<=0||!d||d>=o)return 0;return Math.roun
 function populateBoughtWithList(selectedIds){ const list=document.getElementById('boughtWithList');if(!list)return;const others=categoriesCache.filter(c=>c.id!==editingId); if(others.length===0){list.innerHTML='<div style="font-size:12px;color:var(--text-dim);text-align:center;padding:10px">No other products</div>';return} list.innerHTML=others.map(p=>{const img=(p.photoUrls&&p.photoUrls.length>0)?p.photoUrls[0]:(p.photoUrl||'');const checked=selectedIds.includes(p.id)?'checked':'';return`<label class="bw-list-item"><input type="checkbox" value="${p.id}" ${checked} onchange="toggleBoughtWith('${p.id}',this.checked)"><img src="${optImg(img,60)}" style="width:32px;height:32px;object-fit:cover;border-radius:4px"><span style="flex:1">${escapeHtml(p.name)}</span><span style="color:var(--text);font-weight:700;font-size:12px">₹${p.discountPrice}</span></label>`}).join(''); }
 function toggleBoughtWith(id,checked){if(checked){if(!boughtWithSelection.includes(id))boughtWithSelection.push(id)}else boughtWithSelection=boughtWithSelection.filter(x=>x!==id)}
 
-// FIX 7: File size check
 function checkFileSize(f) { if (!f) return true; if (f.size > MAX_FILE_SIZE) { alert(`❌ File too large: ${f.name}\nMax size: 5MB`); return false; } return true; }
 function previewCatSizeGuide(e){const f=e.target.files[0];if(!f)return;if(!checkFileSize(f)){e.target.value='';return}catSizeGuideFile=f;document.getElementById('catSizeGuidePreview').src=URL.createObjectURL(f);document.getElementById('catSizeGuidePreview').style.display='block';document.getElementById('catSizeGuidePlaceholder').style.display='none'}
 function openCategoryForm(id){
@@ -1856,7 +1849,6 @@ function selectPaymentMethod(id){selectedPaymentMethod=id;document.querySelector
 function openCheckout(){if(!isShopOpen)return alert('🛑 Shop is closed');if(cartItems.length===0)return alert('Cart is empty');const pincodeGroup=document.getElementById('chkPincodeGroup');pincodeGroup.style.display=allowedAreas.length>0?'block':'none';updateCheckoutLocStatus();const g=document.getElementById('pointsRedeemGroup');if(userPoints>0){g.style.display='block';document.getElementById('chkPointBalance').textContent=userPoints}else g.style.display='none';const wg=document.getElementById('walletRedeemGroup');if(userWallet>0){wg.style.display='block';document.getElementById('chkWalletBalance').textContent=Math.round(userWallet)}else wg.style.display='none';renderPaymentOptions();showScreen('checkout')}
 function buildOrderWhatsAppMsg(name,phone,building,address,landmark,items,total,orderCode){let m=`🛍️ *NEW ORDER*\n\n*Order:* #${orderCode}\n\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Address:*\n${building?building+', ':''}${address}\n\n📦 *Items:*\n`;items.forEach((i,idx)=>{m+=`${idx+1}. ${i.name}`;if(i.size)m+=` | Size: ${i.size}`;if(i.color)m+=` | Color: ${i.color}`;m+=`\n   Qty: ${i.qty} × ₹${i.price}\n`});m+=`\n💰 *Total: ₹${Math.round(total)}*`;return m}
 
-// B Option: Client Side Order Placement
 async function submitOrder(){
   if(!isShopOpen)return alert('🛑 Shop closed');
   const name=document.getElementById('chkName').value.trim().substring(0,50),phone=document.getElementById('chkPhone').value.trim();
