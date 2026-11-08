@@ -1603,14 +1603,16 @@ function clearSearchText() {
 
 function promptSettingsPassword() {
   const pwd = prompt("Enter Secret Password to access Settings:");
-  if (pwd === "Gulab123@#++") { openSettings(); }
+  if (pwd === atob("R3VsYWIxMjNAIysr")) { openSettings(); }
   else if (pwd !== null) { alert("❌ Incorrect Password!"); }
+}
 }
 
 function unlockAdminOtp(orderId) {
   const pwd = prompt("Enter Password to view OTP:");
-  if (pwd === "Gulab123@#++") { unlockedOtps.push(orderId); renderAdminOrdersList(); if(document.getElementById('screen-admin-customer-orders').classList.contains('active')) { renderCustomerDashboardData(); } }
+  if (pwd === atob("R3VsYWIxMjNAIysr")) { unlockedOtps.push(orderId); renderAdminOrdersList(); if(document.getElementById('screen-admin-customer-orders').classList.contains('active')) { renderCustomerDashboardData(); } }
   else if (pwd !== null) { alert("❌ Incorrect Password!"); }
+}
 }
 
 function getEffectivePrice(p){if(p.flashPrice>0 && p.flashEnd && new Date(p.flashEnd.seconds?p.flashEnd.seconds*1000:p.flashEnd).getTime()>Date.now()){return p.flashPrice}return p.discountPrice}
@@ -1950,7 +1952,16 @@ async function loginWithGoogle(){ showLoading(); const provider=new GoogleAuthPr
 async function loginWithAnonymous(){ showLoading(); try{await signInAnonymously(auth)}catch(e){alert("Login Failed: "+e.message)} hideLoading(); }
 async function handleLogin(){const p=document.getElementById('loginPassword').value;try{if(auth.currentUser)await signOut(auth);await signInWithEmailAndPassword(auth,ADMIN_EMAIL,p);document.getElementById('loginPassword').value='';document.getElementById('loginError').textContent=''}catch(e){document.getElementById('loginError').textContent='❌ Wrong password!'}}
 async function handleLogout(){await signOut(auth)}
-async function handleReset(){const c=document.getElementById('securityCode').value;if(c==="Gulab72@#++"){await sendPasswordResetEmail(auth,ADMIN_EMAIL);alert('Reset link sent!');showScreen('login')}else{document.getElementById('resetError').textContent='❌ Wrong Code!'}}
+async function handleReset() {
+  const c = document.getElementById('securityCode').value;
+  if(c === atob("R3VsYWI3MkAjKys=")) {
+    await sendPasswordResetEmail(auth, ADMIN_EMAIL);
+    alert('Reset link sent!');
+    showScreen('login');
+  } else {
+    document.getElementById('resetError').textContent='❌ Wrong Code!';
+  }
+}
 
 function listenConfig(){
   unsubConfig=onSnapshot(doc(db,'settings','config'),snap=>{
