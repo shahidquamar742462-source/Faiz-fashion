@@ -1208,7 +1208,7 @@ const firebaseConfig={apiKey:"AIzaSyCBLRe3QajETrVTuK-ljrOVndJO9ndZiuU",authDomai
 const ADMIN_EMAIL="shahidquamar72@gmail.com";
 const CLOUDINARY_CLOUD_NAME="vsp6mp0d";
 const CLOUDINARY_UPLOAD_PRESET="FAIZ-FASHION";
-  const CLOUDINARY_SIGN_URL = "https://fragrant-violet-e6f9.shahidquamar742462.workers.dev";
+const CLOUDINARY_SIGN_URL = "https://fragrant-violet-e6f9.shahidquamar742462.workers.dev";
 
 async function uploadToCloudinary(file, resourceType = 'image') {
   const timestamp = Math.round(Date.now() / 1000);
@@ -2207,9 +2207,13 @@ async function saveCategory(){
     let oldStock = 0; if(editingId){ const oldP = categoriesCache.find(x => x.id === editingId); if(oldP) oldStock = oldP.times || 0; }
     const isRestock = (oldStock === 0 && times > 0);
     let finalPhotos=[...existingPhotoUrls];
-    for(let i=0;i<currentPhotoFiles.length;i++){const fd=new FormData();fd.append('file',currentPhotoFiles[i].file);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();if(!data.secure_url)throw new Error('Upload fail');finalPhotos.push(data.secure_url)}
+    for(let i=0;i<currentPhotoFiles.length;i++){
+      finalPhotos.push(await uploadToCloudinary(currentPhotoFiles[i].file, 'image'));
+    }
     let finalSizeGuide=catSizeGuideUrl;
-    if(catSizeGuideFile){const fd=new FormData();fd.append('file',catSizeGuideFile);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();if(data.secure_url)finalSizeGuide=data.secure_url}
+    if(catSizeGuideFile){
+      finalSizeGuide = await uploadToCloudinary(catSizeGuideFile, 'image');
+    }
     const payload={name,mainCategory:main,returnPolicy:rp,times,sizes,colors,description:desc,originalPrice:op,discountPrice:dp,bundleQty:bq,bundlePrice:bp,flashPrice:fp,flashEnd:fe?new Date(fe):null,wholesalePrice:wp,wholesaleMinQty:wm,sizeGuideUrl:finalSizeGuide,photoUrl:finalPhotos[0],photoUrls:finalPhotos,boughtWith:[...boughtWithSelection],updatedAt:serverTimestamp()};
     if(!editingId)payload.createdAt=serverTimestamp();
     if(isRestock) payload.lastRestockedAt = serverTimestamp();
@@ -2240,7 +2244,9 @@ async function saveSettings(){
   showLoading();
   try{
     let finalBanners=[...existingBannersCache];
-    for(const f of pendingBannerFiles){const fd=new FormData();fd.append('file',f);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();if(data.secure_url)finalBanners.push(data.secure_url)}
+    for(const f of pendingBannerFiles){
+      finalBanners.push(await uploadToCloudinary(f, 'image'));
+    }
     const payload={whatsappNumber:num,bannerUrls:finalBanners,bannerUrl:finalBanners[0]||'',deliveryCharge:delC,freeDeliveryAbove:freeAbv,platformFee:platF,handlingCharge:handC,allowedAreas:allowedAreasVal,paymentMode:payMode,upiId:uId,razorpayKey:rpKey};
     if(saleEndVal)payload.saleEnd=new Date(saleEndVal);else payload.saleEnd=null;
     await setDoc(doc(db,'settings','config'),payload,{merge:true});pendingBannerFiles=[];document.getElementById('bannerPhoto').value='';alert('✅ Settings Saved!');
@@ -2254,12 +2260,9 @@ async function addAd(){
   if(!adPendingFile){alert('Select an image');return}
   showLoading();
   try{
-    const fd=new FormData();fd.append('file',adPendingFile);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);
-    const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});
-    const data=await res.json();
-    if(!data.secure_url)throw new Error('Upload failed');
+    const imageUrl = await uploadToCloudinary(adPendingFile, 'image');
     const count=(await getDocs(collection(db,'ads'))).size;
-    await addDoc(collection(db,'ads'),{imageUrl:data.secure_url,title,active:true,order:count,createdAt:serverTimestamp()});
+    await addDoc(collection(db,'ads'),{imageUrl,title,active:true,order:count,createdAt:serverTimestamp()});
     document.getElementById('adTitle').value='';document.getElementById('adImage').value='';
     document.getElementById('adImagePreview').style.display='none';document.getElementById('adImagePlaceholder').style.display='block';
     adPendingFile=null;alert('✅ Ad added!');
@@ -2751,7 +2754,11 @@ function loadCustomerOrders(){const list=document.getElementById('ordersList');i
 function loadReviews(pid){const list=document.getElementById('reviewList');list.innerHTML='<div class="loading-row">Loading...</div>';if(unsubReviews)unsubReviews();unsubReviews=onSnapshot(query(collection(db,'reviews'),where('productId','==',pid)),snap=>{if(snap.empty){list.innerHTML='<div style="color:var(--text-dim);font-size:13px">No reviews yet</div>';return}let revs=snap.docs.map(d=>d.data());revs.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));list.innerHTML=revs.map(r=>{let stars='';for(let i=0;i<5;i++)stars+=i<r.rating?'★':'☆';const photosHtml=(r.photos&&r.photos.length>0)?`<div class="review-photos">${r.photos.map(p=>`<img src="${p}" onclick="window.open('${p}','_blank')">`).join('')}</div>`:'';return`<div class="review-card"><div class="review-stars">${stars}</div><div class="review-text">${escapeHtml(r.text)}</div>${photosHtml}<div class="review-name">- ${escapeHtml(r.name)}</div></div>`}).join('')})}
 function openReviewForm(){document.getElementById('reviewModal').style.display='flex'}
 function closeReviewForm(){document.getElementById('reviewModal').style.display='none'}
-async function submitReview(){const name=document.getElementById('revName').value.trim(),rating=parseInt(document.getElementById('revRating').value),text=document.getElementById('revText').value.trim();if(!name||!text){alert('Required');return}if(rating<1||rating>5){alert('1-5 rating');return}showLoading();try{const existing=await getDocs(query(collection(db,'reviews'),where('productId','==',currentDetailProduct.id),where('userId','==',currentUid)));if(!existing.empty){hideLoading();alert('❌ Already reviewed');return}const photos=[];const fI=document.getElementById('revPhotos');if(fI&&fI.files.length>0){for(const f of [...fI.files].slice(0,3)){const fd=new FormData();fd.append('file',f);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();if(data.secure_url)photos.push(data.secure_url)}}await addDoc(collection(db,'reviews'),{productId:currentDetailProduct.id,userId:currentUid,name,rating,text,photos,date:serverTimestamp()});alert('✅ Submitted!');closeReviewForm();['revName','revText'].forEach(id=>document.getElementById(id).value='');if(fI)fI.value=''}catch(e){alert('Error: '+e.message)}hideLoading()}
+async function submitReview(){const name=document.getElementById('revName').value.trim(),rating=parseInt(document.getElementById('revRating').value),text=document.getElementById('revText').value.trim();if(!name||!text){alert('Required');return}if(rating<1||rating>5){alert('1-5 rating');return}showLoading();try{const existing=await getDocs(query(collection(db,'reviews'),where('productId','==',currentDetailProduct.id),where('userId','==',currentUid)));if(!existing.empty){hideLoading();alert('❌ Already reviewed');return}const photos=[];const fI=document.getElementById('revPhotos');if(fI&&fI.files.length>0){
+      for(const f of [...fI.files].slice(0,3)){
+        photos.push(await uploadToCloudinary(f, 'image'));
+      }
+    }await addDoc(collection(db,'reviews'),{productId:currentDetailProduct.id,userId:currentUid,name,rating,text,photos,date:serverTimestamp()});alert('✅ Submitted!');closeReviewForm();['revName','revText'].forEach(id=>document.getElementById(id).value='');if(fI)fI.value=''}catch(e){alert('Error: '+e.message)}hideLoading()}
 function loadRelatedProducts(cat,cid){const cur=categoriesCache.find(x=>x.id===cid);if(!cur)return;const scored=categoriesCache.filter(c=>c.id!==cid).map(c=>{let s=0;if(c.mainCategory===cat)s+=3;return{c,score:s}}).filter(x=>x.score>0).slice(0,6).map(x=>x.c);const grid=document.getElementById('relatedProducts');if(scored.length===0){grid.innerHTML='<div style="color:var(--text-dim);font-size:12px">No related</div>';return}grid.innerHTML=scored.map(c=>{const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:c.photoUrl;return`<div class="related-card" onclick="openProductDetails('${c.id}')"><img src="${optImg(img,200)}"><p>${escapeHtml(c.name)}</p><p style="color:var(--text);font-weight:800;">₹${getEffectivePrice(c)}</p></div>`}).join('')}
 
 function previewPrePhoto(e){const f=e.target.files[0];if(!f)return;currentPrePhotoFile=f;document.getElementById('prePhotoPreview').src=URL.createObjectURL(f);document.getElementById('prePhotoPreview').style.display='block';document.getElementById('prePhotoPlaceholder').style.display='none'}
@@ -2764,8 +2771,14 @@ async function submitPreOrder(btn){
   try{const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:10000,enableHighAccuracy:true}));preLat=pos.coords.latitude;preLng=pos.coords.longitude}catch(e){hideLoading();btn.disabled=false;btn.textContent='Submit Pre-Order';return alert('❌ Location required')}
   btn.textContent='Submitting...';
   try{
-    let photoUrl='';if(currentPrePhotoFile){const fd=new FormData();fd.append('file',currentPrePhotoFile);fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,{method:'POST',body:fd});const data=await res.json();photoUrl=data.secure_url}
-    let audioUrl='';if(audioBlob){const fd=new FormData();fd.append('file',audioBlob,'voice.webm');fd.append('upload_preset',CLOUDINARY_UPLOAD_PRESET);const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`,{method:'POST',body:fd});const data=await res.json();audioUrl=data.secure_url}
+    let photoUrl='';
+    if(currentPrePhotoFile){
+      photoUrl = await uploadToCloudinary(currentPrePhotoFile, 'image');
+    }
+    let audioUrl='';
+    if(audioBlob){
+      audioUrl = await uploadToCloudinary(audioBlob, 'video');
+    }
     await addDoc(collection(db,'pre_orders'),{userId:currentUid,description:desc,budget,phone,address,photoUrl,audioUrl,latitude:preLat,longitude:preLng,status:'Pending',date:serverTimestamp()});
     alert('✅ Sent!');['preDesc','prePhone','preAddress','preBudget'].forEach(id=>document.getElementById(id).value='');document.getElementById('prePhotoPreview').style.display='none';document.getElementById('prePhotoPlaceholder').style.display='block';document.getElementById('voicePlayback').style.display='none';audioBlob=null;currentPrePhotoFile=null;showScreen('my-preorders');
   }catch(e){alert('Error: '+e.message)}finally{hideLoading();btn.disabled=false;btn.textContent='Submit Pre-Order'}
