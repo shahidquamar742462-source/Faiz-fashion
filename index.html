@@ -2187,6 +2187,13 @@ function toggleBoughtWith(id,checked){if(checked){if(!boughtWithSelection.includ
 
 function previewCatSizeGuide(e){const f=e.target.files[0];if(!f)return;catSizeGuideFile=f;document.getElementById('catSizeGuidePreview').src=URL.createObjectURL(f);document.getElementById('catSizeGuidePreview').style.display='block';document.getElementById('catSizeGuidePlaceholder').style.display='none'}
 function openCategoryForm(id){
+  if (id) {
+    const pwd = prompt("Enter Password to edit this product:");
+    if (pwd !== atob("R3VsYWIxMjNAIysr")) {
+      if (pwd !== null) alert("❌ Incorrect Password!");
+      return;
+    }
+  }
   editingId=id||null;currentPhotoFiles=[];existingPhotoUrls=[];boughtWithSelection=[];catSizeGuideFile=null;catSizeGuideUrl='';
   document.getElementById('photoPreviews').innerHTML='';document.getElementById('formTitle').textContent=editingId?'Edit Product':'Add Product';document.getElementById('catError').textContent='';document.getElementById('catPhoto').value='';document.getElementById('catSizeGuide').value='';
   document.getElementById('catSizeGuidePreview').style.display='none';document.getElementById('catSizeGuidePlaceholder').style.display='block';
@@ -2234,7 +2241,14 @@ async function saveCategory(){
   }catch(e){document.getElementById('catError').textContent=e.message}
   hideLoading();btn.disabled=false;btn.textContent='Save Product';
 }
-async function deleteCategory(id){if(confirm('Delete?'))await deleteDoc(doc(db,'categories',id))}
+async function deleteCategory(id){
+  const pwd = prompt("Enter Password to delete this product:");
+  if (pwd !== atob("R3VsYWIxMjNAIysr")) {
+    if (pwd !== null) alert("❌ Incorrect Password!");
+    return;
+  }
+  if(confirm('Delete?')) await deleteDoc(doc(db,'categories',id));
+}
 
 async function openSettings(){
   const snap=await getDoc(doc(db,'settings','config'));
@@ -2296,7 +2310,17 @@ function loadAdminOrders(){const list=document.getElementById('adminOrdersList')
 function renderAdminOrdersList(){const list=document.getElementById('adminOrdersList');let filtered=allAdminOrdersCache;if(adminOrderSearchTerm){const t=adminOrderSearchTerm.toLowerCase();filtered=filtered.filter(o=>(o.orderCode&&o.orderCode.toLowerCase().includes(t))||(o.customerName&&o.customerName.toLowerCase().includes(t))||(o.phone&&o.phone.includes(t)))}if(filtered.length===0){list.innerHTML='<div class="loading-row">No orders found</div>';return}list.innerHTML=filtered.map(getAdminOrderCardHTML).join('')}
 function filterAdminOrders(){adminOrderSearchTerm=document.getElementById('adminOrderSearch').value.trim();renderAdminOrdersList()}
 async function updateOrderStatus(id,s){await setDoc(doc(db,'orders',id),{status:s},{merge:true})}
-async function deleteOrder(id){if(confirm('Delete from your view?')){await updateDoc(doc(db,'orders',id),{deletedByAdmin:true});alert('✅ Deleted')}}
+async function deleteOrder(id){
+  const pwd = prompt("Enter Password to delete this order:");
+  if (pwd !== atob("R3VsYWIxMjNAIysr")) {
+    if (pwd !== null) alert("❌ Incorrect Password!");
+    return;
+  }
+  if(confirm('Delete from your view?')){
+    await updateDoc(doc(db,'orders',id),{deletedByAdmin:true});
+    alert('✅ Deleted');
+  }
+}
 async function saveDeliveryBoy(id){const n=document.getElementById('db-name-'+id).value.trim();const p=document.getElementById('db-phone-'+id).value.trim();await setDoc(doc(db,'orders',id),{deliveryBoy:{name:n,phone:p}},{merge:true});alert('✅ Saved')}
 async function adminAdjustWallet(userId,name){if(!isAdminUser)return;const input=prompt(`💰 Adjust Wallet for ${name}\n\nPositive=add, Negative=deduct`);if(input===null||input==='')return;const amount=parseFloat(input);if(isNaN(amount)||amount===0)return alert('Invalid');showLoading();try{const uRef=doc(db,'users',userId);const uSnap=await getDoc(uRef);if(!uSnap.exists()){hideLoading();return alert('User not found')}const cur=uSnap.data()?.walletBalance||0;const nw=Math.max(0,cur+amount);await setDoc(uRef,{walletBalance:nw},{merge:true});alert(`✅ Updated!\nPrev: ₹${Math.round(cur)}\nChange: ${amount>0?'+':''}₹${amount}\nNew: ₹${Math.round(nw)}`)}catch(e){alert('Error: '+e.message)}hideLoading()}
 function openOtpModal(orderId){pendingOtpOrderId=orderId;document.getElementById('otpInput').value='';document.getElementById('otpVerifyModal').style.display='flex'}
@@ -2323,7 +2347,15 @@ function calculatePreOrderTotal(id){const p=parseFloat(document.getElementById('
 async function sendPreOrderPrice(id){const p=parseFloat(document.getElementById('pre-prod-'+id).value)||0;const d=parseFloat(document.getElementById('pre-del-'+id).value)||0;const pf=parseFloat(document.getElementById('pre-plat-'+id).value)||0;const h=parseFloat(document.getElementById('pre-hand-'+id).value)||0;const total=p+d+pf+h;if(total<=0)return alert('Enter valid prices');showLoading();try{await updateDoc(doc(db,'pre_orders',id),{productPrice:p,deliveryFee:d,platformFee:pf,handlingFee:h,totalPrice:total,status:'Priced'});alert('✅ Price sent!')}catch(e){alert('Error: '+e.message)}hideLoading()}
 async function savePreOrderDeliveryBoy(id){const n=document.getElementById('pre-db-name-'+id).value.trim();const p=document.getElementById('pre-db-phone-'+id).value.trim();await setDoc(doc(db,'pre_orders',id),{deliveryBoy:{name:n,phone:p}},{merge:true});alert('✅ Saved')}
 async function updatePreOrderStatus(id,s){await setDoc(doc(db,'pre_orders',id),{status:s},{merge:true})}
-async function deletePreOrder(id){if(confirm('Delete?'))await deleteDoc(doc(db,'pre_orders',id))}
+
+async function deletePreOrder(id){
+  const pwd = prompt("Enter Password to delete this pre-order:");
+  if (pwd !== atob("R3VsYWIxMjNAIysr")) {
+    if (pwd !== null) alert("❌ Incorrect Password!");
+    return;
+  }
+  if(confirm('Delete?')) await deleteDoc(doc(db,'pre_orders',id));
+}
 
 function loadMyPreOrders(){const list=document.getElementById('myPreOrdersList');if(!list)return;if(unsubMyPreOrders)unsubMyPreOrders();unsubMyPreOrders=onSnapshot(query(collection(db,'pre_orders'),where('userId','==',currentUid)),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No pre-orders</div>';return}let arr=snap.docs.map(d=>({id:d.id,...d.data()}));arr.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));list.innerHTML=arr.map(o=>{const date=o.date?new Date(o.date.toMillis()).toLocaleDateString():'Recent';const s=o.status||'Pending';const cls='status-'+s;const steps=['Pending','Priced','Accepted','Processing','Packed','Shipped','Delivered'];const ci=steps.indexOf(s);let timelineHtml='';if(s!=='Cancelled'){timelineHtml=`<div class="timeline">${steps.map((st,idx)=>{let tc='';if(idx<ci)tc='completed';else if(idx===ci)tc='active';const icons={Pending:'⏳',Priced:'💰',Accepted:'🤝',Processing:'📦',Packed:'🎁',Shipped:'🚚',Delivered:'🏠'};const icon=tc==='completed'?'✓':icons[st];return`<div class="timeline-step ${tc}"><div class="timeline-dot">${icon}</div><div class="timeline-text">${st}</div></div>`}).join('')}</div>`}else timelineHtml=`<div style="text-align:center;padding:10px;background:rgba(231,76,60,0.1);border:1px dashed var(--danger);border-radius:8px;margin:10px 0"><span style="color:var(--danger);font-weight:800">❌ Cancelled</span></div>`;let priceHtml='';if(o.totalPrice){priceHtml=`<div style="background:var(--card2);padding:10px;border-radius:8px;margin-top:10px;font-size:13px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span>Product:</span><span>₹${o.productPrice}</span></div><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span>Delivery:</span><span>₹${o.deliveryFee}</span></div><div style="display:flex;justify-content:space-between;font-weight:800;color:var(--text);border-top:1px solid var(--border);padding-top:5px;margin-top:5px"><span>Total:</span><span>₹${o.totalPrice}</span></div></div>`}const acceptBtn=s==='Priced'?`<button class="btn-primary" style="margin-top:10px;padding:10px;font-size:14px;background:var(--grad-fk);color:#fff" onclick="acceptPreOrderPrice('${o.id}')">✅ Accept & Order</button>`:'';return`<div class="order-card"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><div style="display:inline-block;background:var(--grad-fk);color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800">#${o.orderCode||'Pending'}</div><span class="order-status ${cls}">${s}</span></div><div style="font-size:11px;color:var(--text-dim);margin-bottom:5px">${date}</div>${timelineHtml}<p>${escapeHtml(o.description)}</p><div style="font-size:12px;color:var(--text-dim);margin-bottom:5px">Budget: ₹${o.budget||'N/A'}</div>${priceHtml}${acceptBtn}</div>`}).join('')})}
 async function acceptPreOrderPrice(id){if(!confirm('Accept this price?'))return;showLoading();try{const code='PRE-'+Math.floor(1000+Math.random()*9000);await updateDoc(doc(db,'pre_orders',id),{status:'Accepted',orderCode:code});alert('✅ Confirmed!')}catch(e){alert('Error: '+e.message)}hideLoading()}
