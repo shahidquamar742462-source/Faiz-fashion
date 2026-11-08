@@ -11,12 +11,1078 @@
 <link rel="icon" type="image/png" href="logo.png">
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
-/* CSS BILKUL WAISA HI HAI, SPACE BACHANE KE LIYE YAHAN REPEAT NAHI KAR RAHA. AAPKE PURANE CODE SE CSS COPY KAR LEIN. */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+:root{
+  --bg:#f5f5f6; 
+  --card:#ffffff; 
+  --card2:#f1f3f5; 
+  --border:#e9ecef; 
+  --gold:#d4af37; 
+  --gold-light:#f4d47a; 
+  --gold-dark:#b8941f; 
+  --text:#212529; 
+  --text-dim:#6c757d; 
+  --danger:#fa5252; 
+  --success:#40c057; 
+  --star:#388e3c; 
+  --bronze:#cd7f32; 
+  --silver:#adb5bd;
+  --grad-gold: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  --grad-fk: linear-gradient(135deg, #e52d27 0%, #b31217 100%);
+  --grad-flash: linear-gradient(135deg, #ff416c, #ff4b2b);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 6px 16px rgba(0,0,0,0.1);
+}
+body.light{--bg:#f5f5f6;--card:#ffffff;--card2:#f1f3f5;--border:#e9ecef;--text:#212529;--text-dim:#6c757d}
+body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+.screen{display:none;min-height:100vh;padding:20px;animation:fadeIn .3s ease}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
+.landing-container{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center}
+.logo-circle{width:180px;height:180px;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:24px}
+.logo-circle img{width:100%;height:100%;object-fit:contain}
+.app-name{font-size:26px;font-weight:900;letter-spacing:3px;background:var(--grad-fk);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.tagline{color:var(--text-dim);font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:50px}
+.box-grid{display:grid;grid-template-columns:1fr;gap:16px;width:100%;max-width:340px}
+.box-btn{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px 20px;text-align:center;cursor:pointer;color:var(--text);box-shadow:var(--shadow-sm);transition:transform 0.2s}
+.box-btn:active{transform:scale(.97);border-color:var(--gold)}
+.box-icon{font-size:32px;margin-bottom:8px}
+.box-title{font-size:17px;font-weight:800;background:var(--grad-gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.box-sub{font-size:12px;color:var(--text-dim)}
+.header{display:flex;align-items:center;gap:14px;padding:8px 0 24px;border-bottom:1px solid var(--border);margin-bottom:24px}
+.header h2{font-size:20px;font-weight:800;background:var(--grad-fk);-webkit-background-clip:text;-webkit-text-fill-color:transparent;flex:1}
+.back-btn{background:var(--card);border:1px solid var(--border);color:var(--text);width:40px;height:40px;border-radius:10px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm)}
+.form-container{max-width:420px;margin:0 auto}
+.input-group{margin-bottom:20px}
+.input-group label{display:block;font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase}
+.input-group input,.input-group textarea,.input-group select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;color:var(--text);font-size:15px;outline:none;box-shadow:0 2px 5px rgba(0,0,0,0.02)}
+.input-group input:focus{border-color:var(--text);box-shadow:0 0 0 3px rgba(0,0,0,0.1)}
+.btn-primary{width:100%;background:var(--grad-fk);color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 15px rgba(229,45,39,0.4);transition:transform 0.2s}
+.btn-primary:active{transform:scale(0.98)}
+.btn-link{display:block;width:100%;background:transparent;border:none;color:var(--text);font-size:14px;font-weight:700;padding:16px 0;cursor:pointer;text-decoration:underline}
+.error-msg{color:var(--danger);font-size:14px;text-align:center;margin-top:12px;font-weight:700}
+.admin-header{display:block;padding:10px 0 20px;border-bottom:1px solid var(--border);margin-bottom:20px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px;text-align:center;box-shadow:var(--shadow-sm)}
+.stat-val{font-size:24px;font-weight:900;background:var(--grad-fk);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{font-size:12px;color:var(--text-dim);margin-top:4px;font-weight:600}
+.analytics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.analytics-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-sm)}
+.analytics-val{font-size:20px;font-weight:900;color:var(--text)}
+.analytics-label{font-size:10px;color:var(--text-dim);margin-top:4px;text-transform:uppercase;font-weight:700}
+.category-list{display:grid;grid-template-columns:1fr;gap:16px;padding-bottom:40px}
+.category-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-sm)}
+.cat-img{width:100%;height:180px;object-fit:cover}
+.cat-body{padding:16px}
+.cat-name{font-size:16px;font-weight:800}
+.cat-tag{font-size:10px;background:var(--grad-fk);color:#fff;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:6px;font-weight:800;box-shadow:0 2px 5px rgba(229,45,39,0.3)}
+.cat-price-row{display:flex;align-items:baseline;gap:10px;margin:10px 0;flex-wrap:wrap}
+.cat-discount{font-size:20px;font-weight:900;color:var(--text)}
+.cat-original{font-size:14px;color:var(--text-dim);text-decoration:line-through;font-weight:600}
+.cat-off{color:var(--success);font-size:12px;font-weight:800}
+.cat-actions{display:flex;gap:10px}
+.btn-small{flex:1;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.02)}
+.photo-upload{background:var(--card2);border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer}
+#photoPreviews,#bannerPreviews{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.preview-box{position:relative;width:70px;height:70px;border-radius:8px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.preview-box img{width:100%;height:100%;object-fit:cover}
+.preview-box .remove-btn{position:absolute;top:2px;right:2px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.order-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:15px;box-shadow:var(--shadow-sm)}
+.order-card h4{color:var(--text);margin-bottom:5px;font-size:15px;font-weight:800}
+.order-card p{font-size:13px;color:var(--text-dim);margin-bottom:3px;font-weight:500}
+.order-items-list{font-size:13px;margin:10px 0;padding-left:15px;color:var(--text);list-style:none;}
+.order-item-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;background:var(--card2);padding:8px;border-radius:8px;}
+.order-img-thumb{width:45px;height:45px;border-radius:8px;object-fit:cover;border:1px solid var(--border)}
+.order-status{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:800;display:inline-block;margin-top:10px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+.status-Pending{background:#f59f00;color:#fff}
+.status-Priced{background:#339af0;color:#fff}
+.status-Accepted{background:#845ef7;color:#fff}
+.status-Processing{background:#f76707;color:#fff}
+.status-Packed{background:#7048e8;color:#fff}
+.status-Shipped{background:#1c7ed6;color:#fff}
+.status-Delivered{background:var(--success);color:#fff}
+.status-Cancelled{background:var(--danger);color:#fff}
+.timeline{display:flex;align-items:center;justify-content:space-between;margin:20px 0;position:relative;padding:0 5px;overflow-x:auto}
+.timeline::before{content:'';position:absolute;top:10px;left:20px;right:20px;height:3px;background:var(--border);z-index:1;border-radius:2px}
+.timeline-step{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px;width:45px;flex-shrink:0}
+.timeline-dot{width:22px;height:22px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px}
+.timeline-step.active .timeline-dot{background:var(--grad-fk);border-color:#fff;color:#fff;box-shadow:0 0 10px rgba(229,45,39,0.5)}
+.timeline-step.completed .timeline-dot{background:var(--success);border-color:var(--success);color:#fff}
+.timeline-text{font-size:9px;color:var(--text-dim);text-align:center;font-weight:700}
+.timeline-step.active .timeline-text{color:var(--danger)}
+.timeline-step.completed .timeline-text{color:var(--success)}
+.top-bar{background: linear-gradient(180deg, #8a0b0b 0%, #d32f2f 40%, #ff7043 75%, #f5f5f6 100%);padding:16px 16px 12px;margin:-20px -20px 16px -20px;position:sticky;top:0;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+.top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.top-bar h2{font-size:20px;color:#fff;font-weight:900;letter-spacing:1px;text-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.search-row{display:flex;gap:8px;position:relative; align-items:center;}
+.search-bar{flex:1;background:#fff;border:none;border-radius:8px;padding:12px 15px;color:#333;font-size:14px;font-weight:600;box-shadow:0 2px 5px rgba(0,0,0,0.1);outline:none; width:100%; padding-right:35px;}
+.sort-select{background:#fff;border:none;border-radius:8px;color:#333;padding:0 10px;font-size:13px;font-weight:700;outline:none;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+.icon-btn{background:#fff;border:none;color:#e52d27;width:40px;height:40px;border-radius:8px;font-size:16px;position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+.badge{position:absolute;top:-5px;right:-5px;background:#000;color:#fff;font-size:10px;font-weight:900;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.4)}
+.notif-bell{position:relative}
+.notif-badge{position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;font-size:10px;padding:2px 6px;border-radius:8px;font-weight:900;display:none;box-shadow:0 2px 5px rgba(250,82,82,0.4)}
+.horizontal-scroll-row{display:flex;overflow-x:auto;gap:20px;padding:12px 0 5px;scrollbar-width:none;-ms-overflow-style:none}
+.horizontal-scroll-row::-webkit-scrollbar{display:none}
+.cat-icon-item{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:60px;cursor:pointer;transition:transform .2s ease}
+.cat-icon-item:active{transform:scale(.9)}
+.cat-icon-box{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;background:rgba(255,255,255,0.15);backdrop-filter:blur(4px);color:#fff;border:1px solid rgba(255,255,255,0.3)}
+.cat-icon-item.active .cat-icon-box{background:#fff;color:#e52d27;border:2px solid #fff;transform:scale(1.05);box-shadow:0 4px 10px rgba(0,0,0,0.2)}
+.cat-icon-text{font-size:11px;font-weight:700;color:#fff; text-shadow:0 1px 2px rgba(0,0,0,0.3)}
+.banner-container{width:100%;height:160px;margin-bottom:20px;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;scrollbar-width:none;border-radius:12px;position:relative;box-shadow:var(--shadow-sm)}
+.banner-container::-webkit-scrollbar{display:none}
+.banner-slide{min-width:100%;height:100%;scroll-snap-align:center;border-radius:12px;overflow:hidden;position:relative}
+.banner-slide img{width:100%;height:100%;object-fit:cover}
+.countdown-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.85);color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:900;border:1px solid var(--gold);z-index:10;backdrop-filter:blur(5px)}
+.low-stock-warning{background:#fff0f0;border:1px solid var(--danger);padding:12px;border-radius:12px;margin-bottom:15px;font-size:13px;color:var(--danger);font-weight:700;box-shadow:var(--shadow-sm)}
+.flash-sale-banner{background:var(--grad-flash);color:#fff;padding:16px;border-radius:12px;text-align:center;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 6px 15px rgba(255,75,43,0.3)}
+.flash-sale-banner::before{content:'⚡';position:absolute;font-size:80px;opacity:.15;left:-10px;top:-20px;transform:rotate(-15deg)}
+.flash-sale-title{font-size:18px;font-weight:900;margin-bottom:6px;text-shadow:0 2px 4px rgba(0,0,0,0.2)}
+.flash-sale-timer{font-size:15px;font-weight:800;font-family:monospace;background:rgba(0,0,0,0.2);display:inline-block;padding:4px 12px;border-radius:10px}
+.filter-tabs{display:flex;gap:10px;overflow-x:auto;padding-bottom:5px;margin-top:10px;scrollbar-width:none}
+.filter-chip{background:var(--card);border:1px solid var(--border);color:var(--text);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow-sm)}
+.filter-chip.active{background:var(--grad-gold);color:#000;border:none;box-shadow:0 4px 12px rgba(212,175,55,0.4)}
+.product-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-bottom:90px}
+.product-card{background:var(--card);border:none;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;position:relative;cursor:pointer;transition:transform .1s ease;box-shadow:var(--shadow-sm)}
+.product-card:active{transform:scale(.97)}
+.img-wrap{width:100%;aspect-ratio:1/1;background:var(--card2);position:relative}
+.img-wrap img{width:100%;height:100%;object-fit:cover}
+.heart-btn{position:absolute;top:8px;right:8px;background:#fff;border:none;color:#ccc;width:28px;height:28px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;box-shadow:0 1px 4px rgba(0,0,0,0.2)}
+.heart-btn.liked{color:#ff4d6d}
+.share-card-btn{position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.9);border:none;color:#25D366;width:28px;height:28px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;box-shadow:0 1px 4px rgba(0,0,0,0.2)}
+.flash-badge{position:absolute;top:40px;left:8px;background:var(--grad-flash);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:800;z-index:5;animation:pulse 2s infinite}
+.rating-badge{position:absolute;bottom:8px;left:8px;background:#fff;color:#388e3c;border:1px solid #e0e0e0;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800;z-index:5;display:flex;align-items:center;gap:2px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.product-info{padding:10px;display:flex;flex-direction:column;flex:1}
+.pname{font-size:13px;font-weight:600;margin-bottom:4px;line-height:1.3;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.price-line{display:flex;align-items:baseline;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.price-line .disc{font-size:16px;font-weight:800;color:var(--text)}
+.bundle-badge{background:var(--card2);color:var(--text-dim);padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;display:inline-block;margin-top:5px}
+.product-actions{display:flex;gap:6px;margin-top:auto}
+.product-actions button{flex:1;padding:8px 0;border-radius:4px;font-size:11px;font-weight:800;border:none;cursor:pointer}
+.btn-cart{background:var(--card2);color:var(--text);border:1px solid var(--border)!important}
+.btn-notify{background:linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);color:#fff;border:none!important;font-weight:800;box-shadow:0 4px 10px rgba(79,172,254,0.3)}
+.fk-section-container{background:var(--card);border-radius:12px;padding:16px;margin-bottom:20px;box-shadow:var(--shadow-sm);border:1px solid var(--border)}
+.fk-section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.fk-section-title{font-size:18px;font-weight:800;color:var(--text)}
+.fk-section-arrow{background:var(--text);color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
+.fk-horizontal-grid{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:5px}
+.fk-horizontal-grid::-webkit-scrollbar{display:none}
+.fk-horizontal-card{min-width:140px;background:var(--card);border-radius:8px;overflow:hidden;cursor:pointer;flex-shrink:0}
+.fk-horizontal-card img{width:100%;height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--border)}
+.fk-horizontal-card p{font-size:12px;font-weight:600;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-dim)}
+.fk-horizontal-card .price{font-size:14px;font-weight:800;color:var(--text)}
+#screen-product-details{padding:0;padding-bottom:80px}
+.detail-header{position:fixed;top:0;left:0;right:0;padding:15px 20px;display:flex;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,0.6),transparent)}
+.detail-gallery{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;width:100%;height:55vh;background:var(--card2);scrollbar-width:none}
+.detail-gallery::-webkit-scrollbar{display:none}
+.detail-gallery img{width:100%;height:100%;object-fit:cover;flex-shrink:0;scroll-snap-align:center;cursor:pointer}
+.detail-body{padding:24px 20px;background:var(--card);border-radius:24px 24px 0 0;margin-top:-20px;position:relative;z-index:2;box-shadow:0 -10px 20px rgba(0,0,0,0.05)}
+.detail-title{font-size:20px;font-weight:600;margin-bottom:8px;color:var(--text)}
+.detail-price{display:flex;align-items:baseline;gap:10px;margin-bottom:15px;flex-wrap:wrap}
+.detail-price .disc{font-size:26px;color:var(--text);font-weight:800}
+.detail-price .orig{font-size:16px;color:var(--text-dim);text-decoration:line-through;font-weight:500}
+.detail-price .off{font-size:16px;color:var(--success);font-weight:800}
+.detail-desc{font-size:15px;color:var(--text-dim);line-height:1.6;margin-bottom:24px}
+.detail-policy{font-size:13px;color:var(--text);background:var(--card2);padding:12px;border-radius:8px;margin-bottom:15px;font-weight:600}
+.bundle-info{font-size:13px;color:var(--gold-dark);background:rgba(212,175,55,0.15);padding:12px;border-radius:12px;margin-bottom:15px;border:1px dashed var(--gold);font-weight:700}
+.size-color-row{display:flex;gap:10px;margin-bottom:20px}
+.size-color-row select{flex:1;padding:14px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:15px;font-weight:600;outline:none}
+.size-color-row select.required-empty{border-color:var(--danger);background:#fff0f0}
+.detail-bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);padding:15px 20px;display:flex;gap:12px;border-top:1px solid var(--border);z-index:20;box-shadow:0 -4px 20px rgba(0,0,0,0.1)}
+.detail-bottom-bar button{padding:16px;border-radius:8px;font-size:16px;font-weight:800;border:none;flex:1;cursor:pointer}
+.review-section{margin-top:30px;border-top:1px solid var(--border);padding-top:20px}
+.review-card{background:var(--card);padding:14px;border-radius:12px;margin-bottom:12px;border:1px solid var(--border)}
+.review-stars{color:var(--star);font-size:16px;margin-bottom:6px}
+.review-text{font-size:14px;color:var(--text);font-weight:500}
+.review-name{font-size:12px;color:var(--text-dim);margin-top:6px;font-weight:700}
+.review-photos{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.review-photos img{width:60px;height:60px;object-fit:cover;border-radius:8px;cursor:pointer;box-shadow:var(--shadow-sm)}
+.related-title{font-size:16px;font-weight:800;margin:24px 0 12px;color:var(--text)}
+.related-grid{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px}
+.related-card{min-width:130px;background:var(--card);border-radius:12px;overflow:hidden;cursor:pointer;box-shadow:var(--shadow-sm);border:1px solid var(--border)}
+.related-card img{width:100%;height:130px;object-fit:cover}
+.related-card p{font-size:12px;padding:8px;font-weight:600;line-height:1.3}
+.recent-grid{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;margin-bottom:15px}
+.recent-card{min-width:110px;background:var(--card);border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.recent-card img{width:100%;height:110px;object-fit:cover}
+.recent-card p{font-size:12px;padding:8px;font-weight:700}
+.bottom-nav{position:fixed;bottom:12px;left:12px;right:12px;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border:1px solid var(--border);display:none;justify-content:space-around;padding:12px 0 15px;z-index:20;box-shadow:0 5px 25px rgba(0,0,0,0.15);border-radius:24px}
+.nav-item{background:none;border:none;color:var(--text-dim);font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;cursor:pointer;transition:all .2s ease}
+.nav-item:active{transform:scale(.9)}
+.nav-item.active{color:#e52d27;font-weight:900}
+.nav-icon{font-size:22px}
+.cart-item{display:flex;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px;align-items:center;box-shadow:var(--shadow-sm)}
+.cart-item img{width:75px;height:75px;object-fit:cover;border-radius:8px}
+.ci-info{flex:1}
+.ci-name{font-size:15px;font-weight:600;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.ci-variant{font-size:12px;color:var(--text-dim);margin:4px 0;font-weight:500}
+.ci-price{font-size:15px;color:var(--text);font-weight:800}
+.ci-remove{color:var(--danger);background:rgba(250,82,82,0.1);border:none;font-size:16px;padding:8px;border-radius:8px;cursor:pointer}
+.qty-row{display:flex;align-items:center;gap:10px;margin-top:8px}
+.qty-btn{background:var(--card2);border:1px solid var(--border);color:var(--text);width:28px;height:28px;border-radius:8px;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.qty-val{font-size:15px;font-weight:800;min-width:24px;text-align:center}
+.cart-summary{background:var(--card);border-radius:12px;padding:16px;margin:16px 0;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.summary-row{display:flex;justify-content:space-between;font-size:14px;color:var(--text-dim);margin-bottom:10px;font-weight:600}
+.summary-row.total{font-weight:900;color:var(--text);font-size:20px;border-top:1px solid var(--border);padding-top:12px;margin-top:12px}
+.summary-row.total span:last-child{color:var(--text)}
+.summary-row.coupon-row{color:var(--success)}
+.coupon-box{display:flex;gap:10px;margin-bottom:20px}
+.coupon-box input{flex:1;padding:14px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);outline:none;box-shadow:var(--shadow-sm);font-weight:700}
+.btn-wa{width:100%;background:var(--grad-fk);color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(229,45,39,0.3);transition:transform 0.2s}
+.btn-wa:active{transform:scale(0.98)}
+.settings-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:18px;box-shadow:var(--shadow-sm)}
+.coupon-item{display:flex;justify-content:space-between;align-items:center;background:var(--card2);padding:12px;border-radius:12px;margin-bottom:10px;border:1px dashed var(--border)}
+.coupon-code{font-weight:900;color:var(--text);font-size:16px}
+.coupon-disc{font-size:13px;color:var(--success);font-weight:800}
+.address-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;position:relative;box-shadow:var(--shadow-sm)}
+.address-item .addr-name{font-weight:800;color:var(--text);margin-bottom:6px;font-size:15px}
+.address-item .addr-text{font-size:13px;color:var(--text-dim);line-height:1.5;font-weight:500}
+.address-item .addr-del{position:absolute;top:12px;right:12px;background:rgba(250,82,82,0.1);color:var(--danger);border:none;padding:6px;border-radius:6px;font-size:14px;cursor:pointer}
+.ref-card{background:linear-gradient(135deg,rgba(212,175,55,0.1),rgba(212,175,55,0.02));border:1px dashed var(--gold);border-radius:12px;padding:12px;margin-bottom:15px;box-shadow:var(--shadow-sm)}
+.ref-code{font-size:20px;font-weight:900;color:var(--gold-dark);letter-spacing:2px;font-family:monospace}
+.autocomplete-box{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:6px;max-height:280px;overflow-y:auto;z-index:100;display:none;box-shadow:var(--shadow-md)}
+.autocomplete-item{padding:12px 16px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--border);color:var(--text);display:flex;justify-content:space-between;align-items:center;font-weight:600}
+.autocomplete-item:hover{background:var(--card2);color:var(--text)}
+.autocomplete-header{font-size:12px;color:var(--text-dim);padding:10px 16px 6px;font-weight:800;text-transform:uppercase;background:var(--card2)}
+.voice-btn{background:var(--grad-fk);color:#fff;border:none;padding:14px;border-radius:12px;width:100%;font-weight:800;margin-top:10px;cursor:pointer;box-shadow:0 4px 15px rgba(255,75,43,0.3)}
+.voice-btn.recording{background:var(--success);animation:pulse 1.5s infinite}
+.voice-search-btn{background:#fff;color:var(--text);border:none;padding:12px;border-radius:8px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;min-width:46px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+.voice-search-btn.recording{background:var(--danger);color:#fff;animation:pulse 1.5s infinite}
+.fbt-section{margin-top:24px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:14px}
+.fbt-grid{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
+.fbt-grid::-webkit-scrollbar{display:none}
+.fbt-card{min-width:140px;background:var(--card);border-radius:8px;overflow:hidden;border:1px solid var(--border);flex-shrink:0;box-shadow:var(--shadow-sm)}
+.fbt-card img{width:100%;height:120px;object-fit:cover;cursor:pointer}
+.fbt-card-info{padding:8px}
+.fbt-card-name{font-size:12px;font-weight:600;height:32px;overflow:hidden;line-height:1.3}
+.fbt-card-price{font-size:14px;color:var(--text);font-weight:800;margin-top:4px}
+.fbt-add-btn{width:100%;padding:8px;margin-top:8px;background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:4px;font-size:12px;font-weight:800;cursor:pointer}
+.bw-list-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;cursor:pointer;font-weight:600}
+.bw-list-item:last-child{border-bottom:none}
+.bw-list-item input[type="checkbox"]{width:20px;height:20px;cursor:pointer;accent-color:var(--text)}
+.loading-row{text-align:center;padding:30px;color:var(--text-dim);font-size:14px;font-weight:600}
+.qa-item{background:var(--card2);padding:12px;border-radius:10px;margin-bottom:10px}
+.qa-question{font-size:14px;font-weight:800;color:var(--text);margin-bottom:6px}
+.qa-answer{font-size:14px;color:var(--text);padding-left:12px;border-left:3px solid var(--success);margin-top:8px;font-weight:500}
+.qa-pending{font-size:12px;color:#f59f00;font-style:italic;margin-top:6px;font-weight:700}
+.chat-container{display:flex;flex-direction:column;height:calc(100vh - 120px)}
+.chat-messages{flex:1;overflow-y:auto;padding:12px;background:var(--card2);border-radius:14px;margin-bottom:12px}
+.chat-msg{padding:10px 14px;border-radius:14px;margin-bottom:10px;max-width:80%;font-size:14px;word-wrap:break-word;font-weight:500}
+.chat-msg.customer{background:var(--grad-fk);color:#fff;margin-left:auto;border-bottom-right-radius:4px}
+.chat-msg.admin{background:var(--card);color:var(--text);margin-right:auto;border-bottom-left-radius:4px;box-shadow:var(--shadow-sm)}
+.chat-msg-time{font-size:10px;opacity:.8;margin-top:4px;text-align:right;font-weight:600}
+.chat-input-row{display:flex;gap:8px}
+.chat-input-row input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:12px 18px;color:var(--text);font-size:15px;outline:none;box-shadow:var(--shadow-sm)}
+.chat-input-row button{background:var(--grad-fk);color:#fff;border:none;border-radius:50%;width:48px;height:48px;font-size:20px;cursor:pointer;box-shadow:0 4px 10px rgba(229,45,39,0.3)}
+.tier-badge{display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:900;color:#000;text-transform:uppercase;letter-spacing:1px}
+.tier-bronze{background:#cd7f32;color:#fff}
+.tier-silver{background:#adb5bd;color:#fff}
+.tier-gold{background:var(--grad-gold);color:#000;box-shadow:0 2px 10px rgba(212,175,55,0.4)}
+.dash-chart{display:flex;align-items:flex-end;gap:6px;height:120px;background:var(--card2);border-radius:12px;padding:12px;margin-bottom:15px;overflow-x:auto}
+.dash-bar{flex:1;min-width:26px;background:var(--grad-fk);border-radius:6px 6px 0 0;position:relative;transition:height .3s}
+.dash-bar-label{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--text-dim);white-space:nowrap;font-weight:700}
+.dash-bar-val{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--text);font-weight:900;white-space:nowrap}
+.dash-top-item{display:flex;align-items:center;gap:12px;padding:10px;background:var(--card2);border-radius:10px;margin-bottom:8px;font-size:14px;font-weight:600}
+.dash-top-rank{font-weight:900;color:var(--text);min-width:28px;font-size:16px}
+.payment-option{display:flex;align-items:center;gap:12px;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow-sm)}
+.payment-option.selected{border:2px solid var(--text);background:var(--card2)}
+.payment-option input[type=radio]{width:20px;height:20px;cursor:pointer;accent-color:var(--text)}
+.new-arrival-section{margin-bottom:20px}
+.new-arrival-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.new-arrival-title{font-size:16px;font-weight:900;color:var(--text);}
+.delivery-boy-card{background:rgba(79,172,254,0.1);border:1px dashed #4facfe;padding:14px;border-radius:12px;margin:12px 0}
+.first-order-banner{background:var(--grad-gold);color:#000;padding:14px;border-radius:12px;margin-bottom:20px;text-align:center;font-size:14px;font-weight:800;display:none;box-shadow:0 4px 15px rgba(212,175,55,0.3)}
+.size-hint{font-size:13px;color:var(--success);font-weight:800;margin-bottom:15px;margin-top:-10px;background:rgba(64,192,87,0.1);padding:8px;border-radius:8px;text-align:center}
+.lang-toggle{display:flex;gap:6px;background:var(--card2);padding:6px;border-radius:10px}
+.lang-btn{flex:1;padding:10px;border-radius:8px;border:none;background:transparent;color:var(--text);font-weight:800;font-size:14px;cursor:pointer;transition:all 0.2s}
+.lang-btn.active{background:var(--card);color:var(--text);box-shadow:var(--shadow-sm)}
+.stock-alert-card{background:rgba(79,172,254,0.1);border:1px solid #4facfe;border-radius:10px;padding:12px;margin-bottom:10px;font-size:13px;font-weight:600}
+#screen-filters {padding: 0 !important;background: var(--bg);}
+.filter-header {display: flex;justify-content: space-between;align-items: center;padding: 15px 20px;background: var(--card);border-bottom: 1px solid var(--border);position: sticky;top: 0;z-index: 100;}
+.filter-header h3 { font-size: 18px; font-weight: 800; }
+.filter-body {display: flex;height: calc(100vh - 120px);overflow: hidden;}
+.filter-sidebar {width: 35%;background: var(--card2);overflow-y: auto;border-right: 1px solid var(--border);}
+.filter-tab {padding: 16px 12px;font-size: 14px;font-weight: 700;color: var(--text-dim);cursor: pointer;border-left: 3px solid transparent;}
+.filter-tab.active {background: var(--card);color: #e52d27;border-left: 3px solid #e52d27;border-right: 1px solid transparent;}
+.filter-content-area {width: 65%;background: var(--card);overflow-y: auto;padding: 15px;}
+.filter-option-item {display: flex;align-items: center;gap: 12px;padding: 12px 0;font-size: 14px;font-weight: 600;border-bottom: 1px solid var(--border);cursor: pointer;}
+.filter-option-item input {width: 20px;height: 20px;accent-color: #e52d27;cursor: pointer;}
+.filter-footer {position: fixed;bottom: 0;left: 0;right: 0;background: var(--card);padding: 15px 20px;border-top: 1px solid var(--border);box-shadow: 0 -4px 10px rgba(0,0,0,0.05);z-index: 100;}
+@media print{body *{visibility:hidden}#printArea,#printArea *{visibility:visible}#printArea{position:absolute;left:0;top:0;width:100%;background:#fff;color:#000;padding:20px}}
 </style>
 </head>
 <body class="light">
-<!-- SAARE HTML DIVS BILKUL WAISE HI RAHENGE. PURANE CODE SE SAB DIVS COPY KAR LEIN. -->
-<!-- Main sirf SCRIPT tag ka updated version de raha hoon. -->
+
+<div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center">
+  <div style="width:50px;height:50px;border:4px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite"></div>
+</div>
+
+<div id="screen-splash" class="screen active">
+  <div class="landing-container">
+    <div class="logo-circle" style="margin:0 auto 20px"><img src="logo.png" alt="FAIZ FASHION" onerror="this.style.display='none'"></div>
+    <h1 class="app-name">FAIZ FASHION</h1>
+    <p class="tagline" style="margin-bottom:30px">Wear Your Style</p>
+    <div style="width:44px;height:44px;border:4px solid #e52d27;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto"></div>
+  </div>
+</div>
+
+<div id="screen-landing" class="screen" style="position:relative;">
+  <button onclick="showScreen('login')" style="position:absolute;top:20px;right:20px;width:45px;height:45px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text-dim);font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:100">⚙️</button>
+  <div class="landing-container">
+    <div class="logo-circle"><img src="logo.png" alt="FAIZ FASHION" onerror="this.style.display='none'"></div>
+    <h1 class="app-name">FAIZ FASHION</h1>
+    <p class="tagline">Wear Your Style</p>
+    <div class="box-grid" style="margin-top:10px">
+      <button class="box-btn" onclick="showScreen('customer-login')"><div class="box-icon">🛍️</div><div class="box-title">Customer Login</div><div class="box-sub">Browse & Shop</div></button>
+      <button class="box-btn" style="background:var(--grad-fk);color:#fff" onclick="installPWA()"><div class="box-icon">📥</div><div class="box-title" style="color:#fff;-webkit-text-fill-color:#fff;">Install App</div><div class="box-sub" style="color:#ffebee">Add to Home Screen</div></button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-customer-login" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('landing')">←</button><h2>Customer Login</h2></div>
+  <div class="form-container">
+    <p style="text-align:center;color:var(--text-dim);font-size:14px;margin-bottom:20px">Order tracking, wallet aur exclusive rewards ke liye login karein.</p>
+    <button onclick="loginWithGoogle()" style="width:100%;background:#fff;color:#000;border:1px solid #ddd;border-radius:12px;padding:14px;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;cursor:pointer">
+      <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+    <div style="text-align:center;color:var(--text-dim);margin-bottom:20px;font-size:12px;font-weight:700">OR</div>
+    <button onclick="loginWithAnonymous()" style="width:100%;background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;cursor:pointer">
+      👤 Sign in without login
+    </button>
+    <div id="custLoginError" class="error-msg"></div>
+  </div>
+</div>
+
+<div id="screen-login" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('landing')">←</button><h2>Admin Login</h2></div>
+  <div class="form-container">
+    <div class="input-group"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter password" maxlength="100"></div>
+    <button class="btn-primary" onclick="handleLogin()">Login</button>
+    <button class="btn-link" onclick="showScreen('forgot')">Forgot Password?</button>
+    <div id="loginError" class="error-msg"></div>
+  </div>
+</div>
+
+<div id="screen-forgot" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('login')">←</button><h2>Reset Password</h2></div>
+  <div class="form-container">
+    <div class="input-group"><label>Admin Email</label><input type="email" id="securityCode" placeholder="Apna admin email daalein" maxlength="100"></div>
+    <button class="btn-primary" onclick="handleReset()">Send Reset Link</button>
+    <div id="resetError" class="error-msg"></div>
+  </div>
+</div>
+
+<div id="screen-admin" class="screen">
+  <div class="admin-header">
+    <div style="margin-bottom:15px"><h2>FAIZ FASHION</h2><p style="font-size:12px;color:var(--text-dim)">Admin Panel</p></div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;width:100%">
+      <button class="btn-small" style="padding:10px 3px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9px;font-weight:700;margin:0" onclick="showScreen('admin-orders')"><span style="font-size:16px">📦</span>Orders</button>
+      <button class="btn-small" style="padding:10px 3px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9px;font-weight:700;margin:0" onclick="showScreen('admin-preorders')"><span style="font-size:16px">📝</span>Pre</button>
+      <button class="btn-small" style="padding:10px 3px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9px;font-weight:700;margin:0" onclick="showScreen('admin-reviews')"><span style="font-size:16px">⭐</span>Reviews</button>
+      <button class="btn-small" style="padding:10px 3px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9px;font-weight:700;margin:0;position:relative" onclick="showScreen('admin-dashboard')"><span style="font-size:16px">📊</span>Dash</button>
+      <button class="btn-small notif-bell" style="padding:10px 3px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9px;font-weight:700;margin:0;position:relative" onclick="showAdminNotifs()"><span style="font-size:16px">🔔</span>Alerts<span class="notif-badge" id="adminNotifBadge">0</span></button>
+      <button class="btn-small" style="padding:10px 3px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9px;font-weight:700;margin:0" onclick="promptSettingsPassword()"><span style="font-size:16px">⚙️</span>Set</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px">
+      <button class="btn-small" style="padding:10px 3px;font-size:10px;font-weight:700" onclick="showScreen('admin-qa')">❓ Q&A</button>
+      <button class="btn-small" style="padding:10px 3px;font-size:10px;font-weight:700" onclick="showScreen('admin-chats')">💬 Chats</button>
+      <button class="btn-small" style="padding:10px 3px;font-size:10px;font-weight:700" onclick="showScreen('admin-ads')">📢 Ads</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
+      <button class="btn-small" style="padding:10px 3px;font-size:10px;font-weight:700" onclick="showScreen('admin-abandoned')">🛒 Abandoned Carts</button>
+      <button class="btn-small" style="padding:10px 3px;font-size:10px;font-weight:700" onclick="showScreen('admin-analytics')">📈 Analytics</button>
+    </div>
+  </div>
+  <div class="analytics-grid">
+    <div class="analytics-card"><div class="analytics-val" id="statRevenue">₹0</div><div class="analytics-label">Revenue</div></div>
+    <div class="analytics-card"><div class="analytics-val" id="statOrders">0</div><div class="analytics-label">Orders</div></div>
+    <div class="analytics-card"><div class="analytics-val" id="statUsers">0</div><div class="analytics-label">Users</div></div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val" id="statTotal">0</div><div class="stat-label">Total Items</div></div>
+    <div class="stat-card"><div class="stat-val" id="statOut" style="color:var(--danger)">0</div><div class="stat-label">Out of Stock</div></div>
+    <div class="stat-card"><div class="stat-val" id="statLow" style="color:#f39c12">0</div><div class="stat-label">Low Stock</div></div>
+    <div class="stat-card"><div class="stat-val" id="statReturns">0</div><div class="stat-label">Returns</div></div>
+  </div>
+  <div id="lowStockWarning"></div>
+  <div id="categoryList" class="category-list"></div>
+</div>
+
+<div id="screen-admin-dashboard" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>📊 Sales Dashboard</h2></div>
+  <div id="dashboardContent"><div class="loading-row">Loading...</div></div>
+</div>
+
+<div id="screen-admin-analytics" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>📈 Product Analytics</h2></div>
+  <div id="analyticsContent"><div class="loading-row">Loading...</div></div>
+</div>
+
+<div id="screen-admin-abandoned" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>🛒 Abandoned Carts</h2></div>
+  <p style="font-size:12px;color:var(--text-dim);margin-bottom:15px">30+ minutes se inactive carts — WhatsApp par recover karo</p>
+  <div id="abandonedContent"><div class="loading-row">Loading...</div></div>
+</div>
+
+<div id="screen-admin-customer-orders" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="showScreen('admin-dashboard')">←</button>
+    <h2 id="custOrdersTitle">Customer Data</h2>
+  </div>
+  <div style="display:flex; gap:10px; margin-bottom:15px;">
+    <button id="btn-cust-orders" class="btn-primary" style="flex:1; padding:10px; margin:0;" onclick="switchCustOrderTab('orders')">📦 Orders</button>
+    <button id="btn-cust-preorders" class="btn-primary" style="flex:1; padding:10px; margin:0; background:var(--card2); color:var(--text); border:1px solid var(--border);" onclick="switchCustOrderTab('preorders')">📝 Pre-Orders</button>
+  </div>
+  <div id="custOrdersList" class="category-list"><div class="loading-row">Loading...</div></div>
+  <div id="custPreOrdersList" class="category-list" style="display:none;"><div class="loading-row">Loading...</div></div>
+</div>
+
+<div id="screen-admin-orders" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>All Orders</h2></div>
+  <div style="margin-bottom:15px">
+    <input type="text" id="adminOrderSearch" placeholder="Search Order ID, Name, Phone..." oninput="filterAdminOrders()" maxlength="50" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 15px;color:var(--text);font-size:14px;outline:none">
+  </div>
+  <div id="adminOrdersList"><div class="loading-row">Loading...</div></div>
+</div>
+
+<div id="screen-admin-preorders" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>Pre-Orders</h2></div>
+  <input type="text" id="adminPreOrderSearch" placeholder="Search ID or Phone..." oninput="filterAdminPreOrders()" maxlength="50" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 15px;color:var(--text);font-size:14px;outline:none;margin-bottom:15px">
+  <div id="adminPreOrdersList"><div class="loading-row">Loading...</div></div>
+</div>
+
+<div id="screen-admin-reviews" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>All Reviews</h2></div>
+  <div id="adminReviewsList"><div class="loading-row">Loading...</div></div>
+</div>
+
+<div id="screen-admin-qa" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>❓ Product Q&A</h2></div>
+  <div id="adminQAList"><div class="loading-row">Loading...</div></div>
+</div>
+
+<div id="screen-admin-chats" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>💬 Support Chats</h2></div>
+  <div id="adminChatsList"><div class="loading-row">Loading...</div></div>
+</div>
+
+<div id="screen-admin-chat-view" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('admin-chats')">←</button><h2 id="adminChatUserName">Chat</h2></div>
+  <div class="chat-container">
+    <div class="chat-messages" id="adminChatMessages"></div>
+    <div class="chat-input-row">
+      <input type="text" id="adminChatInput" placeholder="Reply..." maxlength="500" onkeypress="if(event.key==='Enter')sendAdminChatMsg()">
+      <button onclick="sendAdminChatMsg()">➤</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-admin-ads" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>📢 Advertising</h2></div>
+  <div class="form-container">
+    <div class="settings-section" style="border:1px solid var(--gold)">
+      <h3 style="color:var(--gold-dark);margin-bottom:15px">➕ Add New Ad</h3>
+      <div class="input-group"><label>Title (optional)</label><input type="text" id="adTitle" placeholder="e.g. 50% OFF Sale" maxlength="100"></div>
+      <div class="input-group">
+        <label>Ad Image</label>
+        <div class="photo-upload" onclick="document.getElementById('adImage').click()">
+          <input type="file" id="adImage" accept="image/*" hidden onchange="previewAdImage(event)">
+          <img id="adImagePreview" style="max-width:100%;max-height:120px;border-radius:8px;display:none;margin:0 auto">
+          <div id="adImagePlaceholder" style="color:var(--text-dim);font-size:14px">📷 Tap to select ad image (max 5MB)</div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="addAd()">Save Ad</button>
+    </div>
+    <div class="settings-section">
+      <h3 style="margin-bottom:15px">📋 All Ads</h3>
+      <div id="adminAdsList"><div class="loading-row">Loading...</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-category-form" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('settings')">←</button><h2 id="formTitle">Add Product</h2></div>
+  <div class="form-container">
+    <div class="input-group"><label>Product Name</label><input type="text" id="catName" maxlength="100"></div>
+    <div class="input-group"><label>Main Category</label><select id="catMainCat"><option value="Men">Men</option><option value="Women">Women</option><option value="Kids">Kids</option><option value="Accessories">Accessories</option><option value="Grocery">Grocery</option><option value="Beauty">Beauty</option><option value="Stationery">Stationery</option></select></div>
+    <div class="input-group"><label>Return Policy</label><select id="catReturnPolicy"><option value="No Return Policy">No Return Policy</option><option value="Only Exchange Policy">Only Exchange</option><option value="Return & Exchange Available">Return & Exchange</option><option value="Only Exchange No Return">Only Exchange No Return</option></select></div>
+    <div class="input-group"><label>Photos (max 5MB each)</label><div class="photo-upload" onclick="document.getElementById('catPhoto').click()"><input type="file" id="catPhoto" accept="image/*" multiple hidden onchange="previewPhoto(event)"><div style="color:var(--text-dim);font-size:14px">📷 Tap to add photos</div></div><div id="photoPreviews"></div></div>
+    <div class="input-group"><label>Size Guide Image (Optional)</label><div class="photo-upload" onclick="document.getElementById('catSizeGuide').click()"><input type="file" id="catSizeGuide" accept="image/*" hidden onchange="previewCatSizeGuide(event)"><img id="catSizeGuidePreview" style="max-width:100%;max-height:100px;border-radius:8px;display:none;margin:0 auto"><div id="catSizeGuidePlaceholder">📏 Tap to upload size guide (max 5MB)</div></div></div>
+    <div style="display:flex;gap:10px">
+      <div class="input-group" style="flex:1"><label>Stock</label><input type="number" id="catTimes" placeholder="0" min="0"></div>
+      <div class="input-group" style="flex:1"><label>Sizes</label><input type="text" id="catSizes" placeholder="S, M, L"></div>
+    </div>
+    <div class="input-group"><label>Colors</label><input type="text" id="catColors" placeholder="Black, White"></div>
+    <div class="input-group"><label>Description</label><textarea id="catDescription" rows="2" maxlength="1000"></textarea></div>
+    <div class="input-group"><label>🛒 Frequently Bought With</label><div id="boughtWithList" style="max-height:180px;overflow-y:auto;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px"></div></div>
+    <div class="input-group"><label>Bundle Offer</label>
+      <div style="display:flex;gap:10px">
+        <input type="number" id="catBundleQty" placeholder="Qty (e.g. 3)" min="0" style="flex:1;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--text)">
+        <input type="number" id="catBundlePrice" placeholder="Price (₹)" min="0" style="flex:1;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--text)">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <div class="input-group" style="flex:1"><label>Original Price</label><input type="number" id="catOriginalPrice"></div>
+      <div class="input-group" style="flex:1"><label>Discount Price</label><input type="number" id="catDiscountPrice"></div>
+    </div>
+    <div class="input-group" style="background:rgba(255,107,107,0.08);border:1px dashed #ff6b6b;padding:12px;border-radius:12px">
+      <label style="color:#ff6b6b">⚡ Flash Sale (Optional)</label>
+      <div style="display:flex;gap:10px;margin-bottom:8px">
+        <input type="number" id="catFlashPrice" placeholder="Flash Sale Price ₹" min="0" style="flex:1;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text)">
+        <input type="datetime-local" id="catFlashEnd" style="flex:1;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:12px">
+      </div>
+    </div>
+    <div class="input-group" style="background:rgba(46,204,113,0.08);border:1px dashed var(--success);padding:12px;border-radius:12px">
+      <label style="color:var(--success)">📦 Wholesale Price (Optional)</label>
+      <div style="display:flex;gap:10px">
+        <input type="number" id="catWholesalePrice" placeholder="Wholesale ₹/unit" min="0" style="flex:1;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text)">
+        <input type="number" id="catWholesaleMinQty" placeholder="Min Qty" min="0" style="flex:1;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text)">
+      </div>
+    </div>
+    <button class="btn-primary" id="saveCatBtn" onclick="saveCategory()">Save Product</button>
+    <div id="catError" class="error-msg"></div>
+  </div>
+</div>
+
+<div id="screen-settings" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>Settings</h2></div>
+  <div class="form-container">
+    <button class="btn-primary" onclick="openCategoryForm()" style="margin-bottom:20px;background:var(--success);color:#fff">+ Add New Product</button>
+    <div class="settings-section" style="border:1px solid var(--border)">
+      <h3 style="color:var(--text);margin-bottom:15px">🏪 Shop Status</h3>
+      <button class="btn-primary" id="shopStatusBtn" onclick="toggleShopStatus()" style="background:var(--success);color:#fff">Loading...</button>
+    </div>
+    <div class="settings-section">
+      <h3>Appearance</h3>
+      <button class="btn-primary" style="background:var(--card2);color:var(--text);border:1px solid var(--border);display:flex;justify-content:space-between;margin-top:10px" onclick="toggleDarkMode()"><span>Switch Theme</span><span id="adminThemeIcon">🌙</span></button>
+    </div>
+    <div class="settings-section">
+      <h3>💳 Payment Settings</h3>
+      <div class="input-group"><label>Payment Mode</label>
+        <select id="settingsPaymentMode">
+          <option value="cod">COD Only</option>
+          <option value="cod_upi">COD + UPI Direct</option>
+          <option value="cod_razorpay">COD + Razorpay</option>
+          <option value="all">COD + UPI + Razorpay</option>
+        </select>
+      </div>
+      <div class="input-group"><label>Your UPI ID</label><input type="text" id="settingsUpiId" placeholder="yourname@paytm" maxlength="100"></div>
+      <div class="input-group"><label>Razorpay Key ID</label><input type="text" id="settingsRazorpayKey" placeholder="rzp_live_xxxxxxxx" maxlength="100"></div>
+    </div>
+    <div class="settings-section">
+      <h3>Shop Settings</h3>
+      <div class="input-group"><label>WhatsApp Number</label><input type="tel" id="settingsWhatsapp" placeholder="917838647693" maxlength="15"></div>
+      <div class="input-group"><label>Delivery Pincodes</label><input type="text" id="settingsAllowedAreas" placeholder="783101, Guwahati" maxlength="500"></div>
+      <div style="display:flex;gap:10px">
+        <div class="input-group" style="flex:1"><label>Delivery ₹</label><input type="number" id="settingsDelCharge"></div>
+        <div class="input-group" style="flex:1"><label>Free Above ₹</label><input type="number" id="settingsFreeAbove"></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <div class="input-group" style="flex:1"><label>Platform ₹</label><input type="number" id="settingsPlatformFee"></div>
+        <div class="input-group" style="flex:1"><label>Handling ₹</label><input type="number" id="settingsHandlingCharge"></div>
+      </div>
+      <div class="input-group"><label>Sale End Date</label><input type="datetime-local" id="settingsSaleEnd"></div>
+      <div class="input-group"><label>Banners (max 5MB each)</label><div class="photo-upload" onclick="document.getElementById('bannerPhoto').click()"><input type="file" id="bannerPhoto" accept="image/*" multiple hidden onchange="previewBanner(event)"><div id="bannerPlaceholder">📷 Upload banners</div></div><div id="bannerPreviews"></div></div>
+      <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+    </div>
+    <div class="settings-section">
+      <h3>Manage Coupons</h3>
+      <div style="display:flex;gap:10px;margin-bottom:15px">
+        <input type="text" id="newCouponCode" placeholder="Code" maxlength="20" style="flex:2;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);text-transform:uppercase">
+        <input type="number" id="newCouponDisc" placeholder="% Off" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text)">
+        <button id="addCouponBtn" class="btn-small" style="flex:0.5;background:var(--text);color:#fff;font-weight:800" onclick="saveCoupon()">Add</button>
+      </div>
+      <div id="couponList"></div>
+    </div>
+    <div class="settings-section" style="border:1px solid var(--border)">
+      <h3 style="color:var(--text)">🔐 Change Password</h3>
+      <div class="input-group"><input type="password" id="currentPwd" placeholder="Current Password" maxlength="100"></div>
+      <div class="input-group"><input type="password" id="newPwd" placeholder="New Password" maxlength="100"></div>
+      <div class="input-group"><input type="password" id="confirmPwd" placeholder="Confirm New Password" maxlength="100"></div>
+      <button class="btn-primary" onclick="changeAdminPassword()">Update Password</button>
+    </div>
+    <div class="settings-section" style="border:1px solid var(--border)">
+      <button class="btn-primary" style="background:var(--danger);color:#fff" onclick="handleLogout()">🚪 Logout</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-shop" class="screen">
+  <div id="firstOrderBanner" class="first-order-banner">🎁 <b>Welcome!</b> First order par 10% OFF auto-apply ho gaya — code: WELCOME10</div>
+  <div id="shopClosedNotice" style="display:none;background:#fff0f0;border:1px solid var(--danger);padding:15px;border-radius:12px;text-align:center;margin-bottom:15px">
+    <h3 style="color:var(--danger);font-size:16px;margin-bottom:5px">🛑 Shop is Closed</h3>
+    <p style="color:var(--text-dim);font-size:13px">Please visit early morning!</p>
+  </div>
+  
+  <div class="top-bar">
+    <div class="top-row">
+      <h2>FAIZ FASHION</h2>
+      <div style="display:flex;gap:8px">
+        <button class="icon-btn" onclick="showScreen('cart')">🛒<span class="badge" id="shopCartBadge">0</span></button>
+      </div>
+    </div>
+    <div class="search-row" style="align-items: center;">
+      <div style="position: relative; flex: 1;">
+        <input type="text" class="search-bar" id="shopSearch" placeholder="Search for Products..." autocomplete="off" oninput="onSearchInput(this.value)" onfocus="showRecentSearches()" maxlength="100" style="width: 100%; padding-right: 35px;">
+        <button id="clearSearchBtn" onclick="clearSearchText()" style="display: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 16px; color: var(--text-dim); cursor: pointer; padding: 5px; z-index: 10;">✕</button>
+      </div>
+      <div class="autocomplete-box" id="autocompleteBox" style="top: 100%;"></div>
+      <button class="voice-search-btn" onclick="startVoiceSearch()" id="voiceSearchBtn">🎤</button>
+      <select class="sort-select" onchange="sortProducts(this.value)"><option value="default">Sort</option><option value="low-high">Low→High</option><option value="high-low">High→Low</option></select>
+    </div>
+    <div class="horizontal-scroll-row" id="mainTabs">
+      <div class="cat-icon-item active" onclick="setMainCategory('All')"><div class="cat-icon-box">✨</div><span class="cat-icon-text">For You</span></div>
+      <div class="cat-icon-item" onclick="setMainCategory('Men')"><div class="cat-icon-box">👔</div><span class="cat-icon-text">Men</span></div>
+      <div class="cat-icon-item" onclick="setMainCategory('Women')"><div class="cat-icon-box">👗</div><span class="cat-icon-text">Women</span></div>
+      <div class="cat-icon-item" onclick="setMainCategory('Kids')"><div class="cat-icon-box">🧸</div><span class="cat-icon-text">Kids</span></div>
+      <div class="cat-icon-item" onclick="setMainCategory('Grocery')"><div class="cat-icon-box">🥦</div><span class="cat-icon-text">Grocery</span></div>
+      <div class="cat-icon-item" onclick="setMainCategory('Beauty')"><div class="cat-icon-box">💄</div><span class="cat-icon-text">Beauty</span></div>
+      <div class="cat-icon-item" onclick="setMainCategory('Stationery')"><div class="cat-icon-box">✏️</div><span class="cat-icon-text">Stationery</span></div>
+    </div>
+  </div>
+  
+  <div class="filter-tabs">
+    <div class="filter-chip" id="inStockFilterBtn" onclick="toggleInStockFilter()">✅ In Stock</div>
+    <div class="filter-chip" onclick="openPriceRange()" id="priceFilterBtn">💰 Price</div>
+    <div class="filter-chip" onclick="clearAllFilters()" id="clearFilterBtn" style="display:none;color:var(--danger);border-color:var(--danger)">❌ Clear</div>
+  </div>
+
+  <div id="searchFilterBar" style="display:none; margin-bottom:15px;">
+      <button onclick="openFilterScreen()" style="width:100%; padding:12px; background:var(--grad-fk); color:#fff; font-weight:800; font-size:14px; border-radius:8px; border:none; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:var(--shadow-md);">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+        Filter Products
+      </button>
+  </div>
+
+  <div class="banner-container" id="shopBanner" style="display:none"></div>
+  
+  <div id="flashSaleBanner" class="flash-sale-banner" style="display:none">
+    <div class="flash-sale-title">⚡ FLASH SALE LIVE!</div>
+    <div class="flash-sale-timer" id="flashSaleTimer">--:--:--</div>
+  </div>
+
+  <div id="dealsForYouSection" class="fk-section-container" style="display:none;background:linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+    <div class="fk-section-header">
+      <div class="fk-section-title" style="color:#333;">Deals for You</div>
+      <div class="fk-section-arrow">→</div>
+    </div>
+    <div class="fk-horizontal-grid" id="dealsForYouGrid"></div>
+  </div>
+
+  <div id="suggestedForYouSection" class="fk-section-container" style="display:none">
+    <div class="fk-section-header">
+      <div class="fk-section-title">Suggested For You</div>
+      <div class="fk-section-arrow">→</div>
+    </div>
+    <div class="fk-horizontal-grid" id="suggestedForYouGrid"></div>
+  </div>
+
+  <div id="recentlyViewedSection" style="display:none;margin-bottom:15px">
+    <div class="new-arrival-header"><span class="new-arrival-title">👀 Recently Viewed</span></div>
+    <div class="recent-grid" id="recentlyViewedGrid"></div>
+  </div>
+  
+  <div id="allProductsHeader" class="new-arrival-header" style="margin-top:10px">
+    <span class="new-arrival-title">All Products</span>
+  </div>
+  <div id="shopGrid" class="product-grid"></div>
+</div>
+
+<div id="screen-filters" class="screen">
+    <div class="filter-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <button class="back-btn" style="width:30px; height:30px; font-size:16px; border:none; box-shadow:none; background:transparent;" onclick="closeFilterScreen()">←</button>
+            <h3>Filters</h3>
+        </div>
+        <button onclick="clearTempFilters()" style="background:none; border:none; color:#e52d27; font-weight:700; font-size:14px; cursor:pointer;">Clear All</button>
+    </div>
+    <div class="filter-body">
+        <div class="filter-sidebar" id="filterSidebar"></div>
+        <div class="filter-content-area" id="filterContentArea"></div>
+    </div>
+    <div class="filter-footer">
+        <button class="btn-primary" onclick="applyFilters()" id="applyFilterBtn">See Products</button>
+    </div>
+</div>
+
+<div id="screen-watchlist" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('customer-settings')">←</button><h2>❤️ My Watchlist</h2></div>
+  <div id="watchlistGrid" class="product-grid"></div>
+</div>
+
+<div id="screen-customer-settings" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Account</h2></div>
+  <div class="form-container" style="max-width: 500px;">
+    <div onclick="openProfileDetails()" style="background: var(--card); padding: 15px; border-radius: 16px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid var(--border); cursor: pointer;">
+       <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--grad-fk); display: flex; align-items: center; justify-content: center; font-size: 30px; color: #fff;">👤</div>
+       <div style="flex: 1; overflow: hidden;">
+         <div style="font-size: 18px; font-weight: 800; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="profileGreeting">Hey, User</div>
+         <div style="font-size: 12px; color: var(--text-dim); word-break: break-all;" id="custLoginId">Loading...</div>
+         <div style="font-size: 11px; color: var(--gold); font-weight: 700; margin-top:2px;" id="custLoginType">Loading...</div>
+       </div>
+       <div style="font-size:20px; color:var(--text-dim);">›</div>
+    </div>
+    <div class="ref-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div id="tierBadgeDisplay"></div>
+        <button class="btn-small" style="flex:0;padding:4px 8px;background:var(--text);color:#fff;font-weight:800;font-size:10px" onclick="showTierInfo()">ℹ️ Benefits</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+        <div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase">Points</div><div style="font-size:18px;font-weight:800;color:var(--gold-dark)"><span id="userPointsDisplay">0</span> ⭐</div></div>
+        <div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase">Wallet</div><div style="font-size:18px;font-weight:800;color:var(--success)">₹<span id="userWalletDisplay">0</span></div></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end">
+        <div style="text-align:right"><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase">Referral Code</div><div class="ref-code" id="userRefCodeDisplay">------</div><button class="btn-small" style="padding:4px 10px;margin-top:4px;background:var(--text);color:#fff;font-weight:800;font-size:11px" onclick="shareReferralCode()">📤 Share</button></div>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+      <button onclick="showScreen('orders')" style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+        <span style="font-size: 24px;">📦</span>
+        <span style="font-size: 12px; font-weight: 800; color: var(--text);">Orders</span>
+      </button>
+      <button onclick="showScreen('watchlist')" style="background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+        <span style="font-size: 24px; color: #ff4d6d;">❤️</span>
+        <span style="font-size: 12px; font-weight: 800; color: var(--text);">Watchlist</span>
+      </button>
+    </div>
+    <div style="margin-bottom: 20px;">
+      <h3 style="font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 10px;">Recently Viewed</h3>
+      <div id="settingsRecentGrid" class="recent-grid" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;"></div>
+    </div>
+    <div class="settings-section" style="padding:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:14px;font-weight:800;">🌐 Language / भाषा</div>
+      </div>
+      <div class="lang-toggle">
+        <button class="lang-btn" id="langBtnEn" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" id="langBtnHi" onclick="setLanguage('hi')">हिंदी</button>
+      </div>
+    </div>
+    <button class="btn-primary" style="background:var(--card); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);" onclick="openCustomerChat()">
+      <span style="font-size:24px">💬</span>
+      <div><div style="font-size:16px; font-weight:800;">Support Chat</div><div style="font-size:13px;color:var(--text-dim)">Chat with admin directly</div></div>
+    </button>
+    <button class="btn-primary" style="background:var(--card); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);" onclick="showScreen('contact')">
+      <span style="font-size:24px">🎧</span>
+      <div><div style="font-size:16px; font-weight:800;">Contact Us</div><div style="font-size:13px;color:var(--text-dim)">Call, WhatsApp, Email</div></div>
+    </button>
+    <button class="btn-primary" style="background:var(--card); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);" onclick="toggleDarkMode()">
+      <span style="font-size:24px" id="custThemeIcon">🌙</span>
+      <div><div style="font-size:16px; font-weight:800;">Theme</div><div style="font-size:13px;color:var(--text-dim)">Switch Light/Dark Mode</div></div>
+    </button>
+    <button class="btn-primary" style="background:var(--card); border:1px solid var(--gold); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px;" onclick="requestGlobalLocation()">
+      <span style="font-size:24px">📍</span>
+      <div><div style="font-size:16px; font-weight:800;">Share Location</div><div style="font-size:13px;color:var(--text-dim)" id="globalLocStatus">Tap to allow GPS</div></div>
+    </button>
+    <button class="btn-primary" style="background:var(--card); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; gap:15px; margin-bottom:15px; padding:15px; text-align:left; border-radius:16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);" onclick="installPWA()">
+      <span style="font-size:24px">📥</span>
+      <div><div style="font-size:16px; font-weight:800;">Install App</div><div style="font-size:13px;color:var(--text-dim)">Add to Home Screen</div></div>
+    </button>
+  </div>
+</div>
+
+<div id="screen-profile-details" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('customer-settings')">←</button><h2>Profile Details</h2></div>
+  <div class="form-container">
+    <div class="input-group"><label>First Name</label><input type="text" id="profFirstName" placeholder="Enter first name" maxlength="50"></div>
+    <div class="input-group"><label>Last Name</label><input type="text" id="profLastName" placeholder="Enter last name" maxlength="50"></div>
+    <div class="input-group"><label>Phone Number</label><input type="tel" id="profPhone" maxlength="10" placeholder="10-digit mobile number"></div>
+    <div class="input-group">
+      <label>Gender</label>
+      <select id="profGender">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="input-group"><label>Date of Birth</label><input type="date" id="profDob"></div>
+    <div class="input-group"><label>Address</label><textarea id="profAddress" rows="3" placeholder="Full address" maxlength="300"></textarea></div>
+    <button class="btn-primary" onclick="saveProfileDetails()">Save Details</button>
+    <div style="margin-top:30px; padding-top:20px; border-top:1px solid var(--border);">
+      <button class="btn-primary" style="background:var(--danger); color:#fff; box-shadow:none;" onclick="handleLogout()">🚪 Logout</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-customer-chat" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('customer-settings')">←</button><h2>💬 Support Chat</h2></div>
+  <div class="chat-container">
+    <div class="chat-messages" id="customerChatMessages"></div>
+    <div class="chat-input-row">
+      <input type="text" id="customerChatInput" placeholder="Type message..." maxlength="500" onkeypress="if(event.key==='Enter')sendCustomerChatMsg()">
+      <button onclick="sendCustomerChatMsg()">➤</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-contact" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('customer-settings')">←</button><h2>Contact Us</h2></div>
+  <div class="form-container">
+    <button class="btn-primary" style="background:var(--card2);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="contactCall()"><span style="font-size:24px">📞</span><div><div style="font-size:16px;font-weight:800">Call Us</div></div></button>
+    <button class="btn-primary" style="background:#25D366;color:#fff;border:none;display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="contactWhatsApp()">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      <div><div style="font-size:16px;font-weight:800">WhatsApp Us</div></div>
+    </button>
+    <button class="btn-primary" style="background:var(--card2);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;gap:15px;margin-bottom:15px;padding:15px;text-align:left" onclick="contactEmail()"><span style="font-size:24px">✉️</span><div><div style="font-size:16px;font-weight:800">Email Us</div></div></button>
+  </div>
+</div>
+
+<div id="screen-product-details" class="screen">
+  <div class="detail-header">
+    <button class="back-btn" style="background:rgba(255,255,255,0.9);border:none;color:#333" onclick="goBackFromDetails()">←</button>
+    <div style="display:flex;gap:10px">
+      <button class="back-btn" id="detailLikeBtn" style="background:rgba(255,255,255,0.9);border:none;color:#333" onclick="toggleWatchlistDetails()">🤍</button>
+      <button class="back-btn" style="background:#25D366;border:none;color:#fff" onclick="shareProduct()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="detail-gallery" id="detailGallery" onclick="openImageZoom(event)"></div>
+  <div class="detail-body">
+    <div class="detail-title" id="detailName"></div>
+    <div class="detail-price"><span class="disc" id="detailDisc"></span><span class="orig" id="detailOrig"></span><span class="off" id="detailOff"></span></div>
+    <div class="detail-policy" id="detailPolicy"></div>
+    <div id="detailFlashInfo" class="bundle-info" style="display:none;background:rgba(255,107,107,0.15);border-color:#ff6b6b"></div>
+    <div id="detailBundleInfo" class="bundle-info" style="display:none"></div>
+    <div id="detailWholesaleInfo" class="bundle-info" style="display:none;background:rgba(46,204,113,0.1);border-color:var(--success);color:var(--success)"></div>
+    <button id="sizeGuideBtn" onclick="openSizeGuide()" style="display:none;margin-bottom:15px;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:13px">📏 Size Guide</button>
+    <div class="detail-desc" id="detailDesc"></div>
+    <div class="size-color-row">
+      <select id="detailSize" onchange="validateSizeColor()"><option value="">Size</option></select>
+      <select id="detailColor" onchange="validateSizeColor()"><option value="">Color</option></select>
+    </div>
+    <div id="sizeRecommendationHint" class="size-hint" style="display:none"></div>
+    <div id="detailStockMsg" style="font-size:12px;color:var(--danger);font-weight:700"></div>
+    <div id="fbtSection" class="fbt-section" style="display:none">
+      <div class="related-title">🛒 Frequently Bought Together</div>
+      <div class="fbt-grid" id="fbtGrid"></div>
+    </div>
+    <div class="review-section">
+      <h3 style="font-size:16px;margin-bottom:10px">Customer Reviews</h3>
+      <button class="btn-small" style="width:100%;margin-bottom:15px;background:var(--card);border:1px solid var(--border)" onclick="openReviewForm()">+ Write a Review</button>
+      <div id="reviewList"></div>
+    </div>
+    <div style="margin-top:20px">
+      <h3 style="font-size:16px;margin-bottom:10px">❓ Product Q&A</h3>
+      <button class="btn-small" style="width:100%;margin-bottom:15px;background:var(--card);border:1px solid var(--border)" onclick="openQAForm()">+ Ask a Question</button>
+      <div id="qaList"></div>
+    </div>
+    <div class="related-title">You May Also Like</div>
+    <div class="related-grid" id="relatedProducts"></div>
+  </div>
+  <div class="detail-bottom-bar" id="detailBottomBar">
+    <button style="background:var(--card2);color:var(--text);border:1px solid var(--border)" onclick="addToCartDetails()">Add to Cart</button>
+    <button style="background:var(--grad-fk);color:#fff" onclick="buyNowDetails()">Buy Now</button>
+  </div>
+</div>
+
+<div id="screen-order-detail" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('orders')">←</button><h2>Order Details</h2></div>
+  <div id="orderDetailContent"><div class="loading-row">Loading...</div></div>
+</div>
+
+<div id="imageZoomModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);z-index:9999;align-items:center;justify-content:center" onclick="closeImageZoom()">
+  <img id="zoomedImage" style="max-width:100%;max-height:100vh;object-fit:contain" onclick="event.stopPropagation()">
+</div>
+
+<div id="reviewModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);padding:20px;border-radius:16px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto">
+    <h3 style="margin-bottom:15px;color:var(--text)">Write a Review</h3>
+    <div class="input-group"><label>Name</label><input type="text" id="revName" maxlength="50"></div>
+    <div class="input-group"><label>Rating (1-5)</label><input type="number" id="revRating" min="1" max="5" value="5"></div>
+    <div class="input-group"><label>Comment</label><textarea id="revText" rows="3" maxlength="500"></textarea></div>
+    <div class="input-group"><label>Photos (max 3, 5MB each)</label><input type="file" id="revPhotos" accept="image/*" multiple></div>
+    <div style="display:flex;gap:10px"><button class="btn-small" onclick="closeReviewForm()">Cancel</button><button class="btn-primary" style="flex:1;padding:10px;background:var(--grad-fk);color:#fff" onclick="submitReview()">Submit</button></div>
+  </div>
+</div>
+
+<div id="qaModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);padding:20px;border-radius:16px;width:100%;max-width:400px">
+    <h3 style="margin-bottom:15px;color:var(--text)">❓ Ask a Question</h3>
+    <div class="input-group"><label>Your Name</label><input type="text" id="qaName" maxlength="50"></div>
+    <div class="input-group"><label>Your Question</label><textarea id="qaText" rows="3" maxlength="500" placeholder="e.g. Is this pure cotton?"></textarea></div>
+    <div style="display:flex;gap:10px"><button class="btn-small" onclick="closeQAForm()">Cancel</button><button class="btn-primary" style="flex:1;padding:10px;background:var(--grad-fk);color:#fff" onclick="submitQA()">Submit</button></div>
+  </div>
+</div>
+
+<div id="sizeGuideModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);z-index:100;align-items:center;justify-content:center;padding:20px" onclick="closeSizeGuide()">
+  <img id="sizeGuideImg" style="max-width:100%;max-height:90vh;border-radius:12px" onclick="event.stopPropagation()">
+</div>
+
+<div id="adminNotifModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeAdminNotifs()">
+  <div style="background:var(--card);padding:20px;border-radius:16px;width:100%;max-width:400px;max-height:80vh;overflow-y:auto">
+    <h3 style="margin-bottom:15px;color:var(--text)">🔔 Notifications</h3>
+    <div id="adminNotifList"></div>
+    <button class="btn-primary" style="margin-top:15px;background:var(--grad-fk);color:#fff" onclick="closeAdminNotifs()">Close</button>
+  </div>
+</div>
+
+<div id="returnRequestModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);padding:20px;border-radius:16px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto">
+    <h3 style="margin-bottom:15px;color:var(--text)">🔄 Return / Exchange</h3>
+    <div class="input-group"><label>Select Product</label><select id="retItemSelect" onchange="updateReturnItemDetails()"></select></div>
+    <div class="input-group"><label>Request Type</label><select id="retType" onchange="toggleExchangeFields()"><option value="Return">Return</option><option value="Exchange">Exchange</option></select></div>
+    <div class="input-group" id="exchangeSizeGroup" style="display:none"><label>New Size</label><select id="retNewSize"></select></div>
+    <div class="input-group" id="exchangeColorGroup" style="display:none"><label>New Color</label><select id="retNewColor"></select></div>
+    <div class="input-group"><label>Issue</label><select id="retCondition"><option value="Size Issue">Size Issue</option><option value="Color Issue">Color Issue</option><option value="Product Defect">Defect</option><option value="Wrong Item">Wrong Item</option><option value="Other">Other</option></select></div>
+    <div class="input-group"><label>Reason (Compulsory)</label><textarea id="retReason" rows="4" maxlength="500" placeholder="Thoda detail me likhein..."></textarea></div>
+    <div style="display:flex;gap:10px"><button class="btn-small" onclick="closeReturnModal()">Cancel</button><button class="btn-primary" style="flex:1;padding:10px;background:var(--grad-fk);color:#fff" onclick="submitReturnRequest()">Submit</button></div>
+  </div>
+</div>
+
+<div id="cancelOrderModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);padding:20px;border-radius:16px;width:100%;max-width:400px">
+    <h3 style="margin-bottom:15px;color:var(--danger)">❌ Cancel Order</h3>
+    <div class="input-group"><label>Select Products to Cancel</label><div id="cancelItemsList" style="max-height:150px; overflow-y:auto; margin-bottom:10px;"></div></div>
+    <div class="input-group"><label>Reason (Compulsory)</label><select id="cancelReason">
+      <option value="Changed my mind">Changed my mind</option>
+      <option value="Found better price elsewhere">Found better price</option>
+      <option value="Ordered by mistake">Ordered by mistake</option>
+      <option value="Delivery taking too long">Delivery taking too long</option>
+      <option value="Other">Other</option>
+    </select></div>
+    <div style="display:flex;gap:10px"><button class="btn-small" onclick="closeCancelModal()">Keep Order</button><button class="btn-primary" style="flex:1;padding:10px;background:var(--danger);color:#fff" onclick="confirmCancelOrder()">Cancel Selected</button></div>
+  </div>
+</div>
+
+<div id="otpVerifyModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);padding:20px;border-radius:16px;width:100%;max-width:400px">
+    <h3 style="margin-bottom:15px;color:var(--text)">🔐 Verify Delivery OTP</h3>
+    <p style="font-size:13px;color:var(--text-dim);margin-bottom:15px">Customer se OTP lein aur enter karein</p>
+    <div class="input-group"><input type="text" id="otpInput" placeholder="4-digit OTP" maxlength="4" style="text-align:center;font-size:24px;letter-spacing:10px"></div>
+    <div style="display:flex;gap:10px"><button class="btn-small" onclick="closeOtpModal()">Cancel</button><button class="btn-primary" style="flex:1;padding:10px;background:var(--grad-fk);color:#fff" onclick="verifyDeliveryOtp()">Verify & Mark Delivered</button></div>
+  </div>
+</div>
+
+<div id="spinWheelModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);padding:25px;border-radius:20px;width:100%;max-width:350px;text-align:center;border:2px solid var(--border);position:relative">
+    <button onclick="closeSpinWheel()" style="position:absolute;top:10px;right:15px;background:none;border:none;color:var(--text-dim);font-size:24px;cursor:pointer">✕</button>
+    <h2 style="color:var(--text);margin-bottom:10px">🎉 Spin & Win!</h2>
+    <div style="position:relative;width:200px;height:200px;margin:0 auto 25px">
+      <div id="wheelCanvas" style="width:100%;height:100%;border-radius:50%;border:8px solid var(--text);background:conic-gradient(var(--card2) 0deg 45deg,var(--card) 45deg 90deg,var(--card2) 90deg 135deg,var(--card) 135deg 180deg,var(--card2) 180deg 225deg,var(--card) 225deg 270deg,var(--card2) 270deg 315deg,var(--card) 315deg 360deg);transition:transform 3s cubic-bezier(0.17,0.67,0.12,0.99);display:flex;align-items:center;justify-content:center">
+        <div style="width:40px;height:40px;background:var(--bg);border-radius:50%;border:4px solid var(--text);z-index:2"></div>
+      </div>
+      <div style="position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:30px;color:var(--danger);z-index:3">▼</div>
+    </div>
+    <button id="spinBtn" class="btn-primary" onclick="spinWheel()" style="border-radius:30px;font-size:18px;background:var(--grad-fk);color:#fff">SPIN NOW</button>
+    <div id="spinResult" style="margin-top:15px;font-size:18px;font-weight:800;color:var(--success);display:none"></div>
+  </div>
+</div>
+
+<div id="screen-preorder" class="screen" style="padding-bottom:100px">
+  <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Custom Pre-Order</h2></div>
+  <div class="form-container">
+    <button onclick="showScreen('my-preorders')" style="width:100%;margin-bottom:18px;background:var(--card);border:1px solid var(--border);color:var(--text);padding:14px;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer">📋 View My Pre-Orders</button>
+    <div class="input-group"><label>Product Description</label><textarea id="preDesc" rows="3" maxlength="1000"></textarea></div>
+    <div class="input-group"><label>Approx Budget (₹)</label><input type="number" id="preBudget"></div>
+    <div class="input-group"><label>Photo (Optional, max 5MB)</label><div class="photo-upload" onclick="document.getElementById('prePhoto').click()"><input type="file" id="prePhoto" accept="image/*" hidden onchange="previewPrePhoto(event)"><img id="prePhotoPreview" style="max-width:100%;max-height:100px;border-radius:8px;display:none;margin:0 auto"><div id="prePhotoPlaceholder">📷 Upload photo</div></div></div>
+    <div class="input-group"><label>Voice Note</label><button class="voice-btn" id="voiceRecordBtn" onclick="toggleVoiceRecord()">🎤 Start Recording</button><audio id="voicePlayback" controls style="display:none;width:100%;margin-top:10px"></audio></div>
+    <div class="input-group"><label>Phone</label><input type="tel" id="prePhone" maxlength="10"></div>
+    <div class="input-group"><label>Address</label><textarea id="preAddress" rows="2" maxlength="300"></textarea></div>
+    <button class="btn-primary" id="btnSubmitPreOrder" onclick="submitPreOrder(this)">Submit Pre-Order</button>
+  </div>
+</div>
+
+<div id="screen-my-preorders" class="screen" style="padding-bottom:100px">
+  <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>My Pre-Orders</h2></div>
+  <div id="myPreOrdersList" class="category-list"><div class="loading-row">Loading...</div></div>
+</div>
+
+<div id="screen-cart" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>Cart</h2></div>
+  <div id="cartList"></div>
+  <div class="coupon-box"><input type="text" id="couponInput" placeholder="Coupon Code" maxlength="20"><button class="btn-small" style="flex:0;padding:0 20px;background:var(--card);border:1px solid var(--border);color:var(--text);font-weight:800" onclick="applyCoupon()">Apply</button></div>
+  <div class="cart-summary">
+    <div class="summary-row"><span>Subtotal</span><span id="cartSubtotal">₹0</span></div>
+    <div class="summary-row coupon-row" id="couponRow" style="display:none"><span>Coupon <button onclick="removeCoupon()" style="background:none;border:none;color:var(--danger);cursor:pointer">✕</button></span><span id="couponDiscountAmt">-₹0</span></div>
+    <div class="summary-row"><span>Delivery</span><span id="cartDelivery">₹0</span></div>
+    <div class="summary-row"><span>Platform Fee</span><span id="cartPlatformFee">₹0</span></div>
+    <div class="summary-row"><span>Handling</span><span id="cartHandlingFee">₹0</span></div>
+    <div class="summary-row total"><span>Total</span><span id="cartTotal">₹0</span></div>
+  </div>
+  <button class="btn-wa" onclick="openCheckout()">Proceed to Checkout</button>
+</div>
+
+<div id="screen-addresses" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('checkout')">←</button><h2>My Addresses</h2></div>
+  <div id="addressesList"></div>
+  <button class="btn-primary" style="margin-top:15px;background:var(--card);border:1px solid var(--border);color:var(--text)" onclick="showAddAddressForm()">+ Add New Address</button>
+  <div id="addAddressForm" style="display:none;margin-top:20px">
+    <div class="settings-section">
+      <div class="input-group"><label>Full Name</label><input type="text" id="addrName" maxlength="50"></div>
+      <div class="input-group"><label>Phone</label><input type="tel" id="addrPhone" maxlength="10"></div>
+      <div class="input-group"><label>Building</label><input type="text" id="addrBuilding" maxlength="100"></div>
+      <div class="input-group"><label>Address</label><textarea id="addrText" rows="2" maxlength="300"></textarea></div>
+      <div class="input-group"><label>Landmark</label><input type="text" id="addrLandmark" maxlength="100"></div>
+      <button class="btn-primary" style="background:var(--grad-fk);color:#fff" onclick="saveNewAddress()">Save Address</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-checkout" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('cart')">←</button><h2>Checkout</h2></div>
+  <div class="form-container">
+    <button onclick="showScreen('addresses')" style="width:100%;margin-bottom:15px;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:12px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">📋 Manage Addresses</button>
+    <div class="input-group" id="savedAddressGroup" style="display:none"><label>Saved Address</label><select id="chkSavedAddress" onchange="fillSavedAddress(this.value)"><option value="">-- Select --</option></select></div>
+    <div class="input-group"><label>Full Name</label><input type="text" id="chkName" maxlength="50"></div>
+    <div class="input-group"><label>Phone</label><input type="tel" id="chkPhone" maxlength="10"></div>
+    <div class="input-group"><label>Building</label><input type="text" id="chkBuilding" maxlength="100"></div>
+    <div class="input-group"><label>Address</label><textarea id="chkAddress" rows="2" maxlength="300"></textarea></div>
+    <div class="input-group" id="chkPincodeGroup" style="display:none;position:relative">
+      <label>Pincode (auto-suggest area)</label>
+      <input type="text" id="chkPincode" maxlength="6" placeholder="6-digit pincode" oninput="lookupPincodeDebounced(this.value)" autocomplete="off">
+      <div class="autocomplete-box" id="pincodeSuggestions"></div>
+    </div>
+    <div class="input-group"><label>Landmark / Area</label><input type="text" id="chkLandmark" maxlength="100" placeholder="Auto-filled from pincode"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px"><input type="checkbox" id="chkSaveAddress" style="width:20px;height:20px;accent-color:var(--text)"><label for="chkSaveAddress" style="font-size:14px;color:var(--text-dim)">Save this address</label></div>
+    <div class="input-group" style="background:rgba(212,175,55,0.1);border:1px dashed var(--gold);padding:12px;border-radius:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:13px;font-weight:700;color:var(--gold-dark)">📍 Share Location</div><div style="font-size:11px;color:var(--text-dim)" id="checkoutLocStatus">Not shared</div></div>
+        <button class="btn-small" style="flex:0;background:var(--gold);color:#000;padding:6px 12px" onclick="requestCheckoutLocation()">Share</button>
+      </div>
+    </div>
+    <div class="input-group" id="pointsRedeemGroup" style="display:none">
+      <label>⭐ Redeem Points (Balance: <span id="chkPointBalance">0</span>)</label>
+      <div style="display:flex;gap:8px"><input type="number" id="chkRedeemPoints" placeholder="0" min="0" oninput="calculateRedemption()" style="flex:1"><button class="btn-small" style="flex:0;padding:10px 15px" onclick="useMaxPoints()">Max</button></div>
+    </div>
+    <div class="input-group" id="walletRedeemGroup" style="display:none">
+      <label>💰 Use Wallet (₹<span id="chkWalletBalance">0</span>)</label>
+      <div style="display:flex;gap:8px"><input type="number" id="chkWalletAmount" placeholder="0" min="0" oninput="calculateWalletRedemption()" style="flex:1"><button class="btn-small" style="flex:0;padding:10px 15px;background:var(--success);color:#000;font-weight:800" onclick="useMaxWallet()">Max</button></div>
+    </div>
+    <div class="input-group" id="paymentGroup">
+      <label>💳 Payment Method</label>
+      <div id="paymentOptions"></div>
+    </div>
+    <div class="cart-summary"><div class="summary-row total"><span>Final Amount</span><span id="chkTotal">₹0</span></div></div>
+    <button class="btn-wa" id="btnPlaceOrder" onclick="submitOrder()">Place Order</button>
+    <div id="chkError" class="error-msg"></div>
+  </div>
+</div>
+
+<div id="screen-orders" class="screen" style="padding-bottom:100px">
+  <div class="header"><button class="back-btn" onclick="showScreen('shop')">←</button><h2>My Orders</h2></div>
+  <div id="ordersAdsCarousel" style="display:none;position:relative;border-radius:12px;overflow:hidden;margin-bottom:15px;height:140px;background:var(--card2)"></div>
+  <button onclick="showScreen('my-preorders')" style="width:100%;margin-bottom:15px;background:var(--card);border:1px solid var(--border);color:var(--text);padding:12px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">📋 My Pre-Orders</button>
+  <div style="display:flex;gap:8px;margin-bottom:15px;overflow-x:auto">
+    <div class="filter-chip active" id="filterAll" onclick="setOrderFilter('all')">All</div>
+    <div class="filter-chip" id="filterActive" onclick="setOrderFilter('active')">Active</div>
+    <div class="filter-chip" id="filterDelivered" onclick="setOrderFilter('delivered')">Delivered</div>
+    <div class="filter-chip" id="filterCancelled" onclick="setOrderFilter('cancelled')">Cancelled</div>
+  </div>
+  <div id="ordersList" class="category-list"><div class="loading-row">Loading...</div></div>
+</div>
+
+<div id="printArea" style="display:none"></div>
+
+<div id="bottomNav" class="bottom-nav">
+  <button class="nav-item active" data-screen="shop" onclick="goToShopHome()"><span class="nav-icon">🏠</span><span id="navShopLabel">Shop</span></button>
+  <button class="nav-item" data-screen="preorder" onclick="showScreen('preorder')"><span class="nav-icon">📝</span><span id="navPreLabel">Pre-Order</span></button>
+  <button class="nav-item" data-screen="cart" onclick="showScreen('cart')"><span class="nav-icon">🛒</span><span id="navCartLabel">Cart</span><span class="badge" id="navCartBadge" style="top:-2px">0</span></button>
+  <button class="nav-item" data-screen="customer-settings" onclick="showScreen('customer-settings')"><span class="nav-icon">👤</span><span id="navAccLabel">Account</span></button>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -27,7 +1093,9 @@ const firebaseConfig={apiKey:"AIzaSyCBLRe3QajETrVTuK-ljrOVndJO9ndZiuU",authDomai
 const CLOUDINARY_CLOUD_NAME="vsp6mp0d";
 const CLOUDINARY_UPLOAD_PRESET="FAIZ-FASHION";
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
-const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
 
 let currentUid=null,isAdminUser=false,categoriesCache=[],cartItems=[],cartProductIds=new Set(),watchlistIds=new Set(),couponsCache=[];
 let whatsappNumber="917838647693",mainCategory='All',searchQuery='',sortOrder='default';
@@ -121,6 +1189,7 @@ function openFilterScreen() {
     renderFilterScreen();
 }
 function closeFilterScreen() { showScreen('shop'); }
+
 function renderFilterScreen() {
     const currentSearchProducts = categoriesCache.filter(c => c.name.toLowerCase().includes(searchQuery) || (c.description || '').toLowerCase().includes(searchQuery));
     let maxPrice = 1000;
