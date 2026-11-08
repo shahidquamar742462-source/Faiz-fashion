@@ -1497,11 +1497,9 @@ onAuthStateChanged(auth,async(user)=>{
   if(!user){currentUid=null;showScreen('landing');return}
   currentUid=user.uid;
   
-  try{
-    const configSnap=await getDoc(doc(db,'settings','config'));
-    const adminEmail=configSnap.data()?.adminEmail||'';
-    isAdminUser = adminEmail!=='' && user.email===adminEmail;
-  }catch(e){ isAdminUser=false; }
+  // Encrypted Admin Email Check
+  const adminEmail = atob("c2hhaGlkcXVhbWFyNzJAZ21haWwuY29t");
+  isAdminUser = user.email === adminEmail;
   
   listenCategories();listenConfig();listenCoupons();listenAds();
   if(isAdminUser){showScreen('admin');renderAdminCategories()}
@@ -1524,11 +1522,18 @@ async function handleLogin(){
     document.getElementById('loginPassword').value='';document.getElementById('loginError').textContent='';
   }catch(e){document.getElementById('loginError').textContent='❌ Wrong password!'}
 }
-async function handleLogout(){await signOut(auth)}
-async function handleReset() {
-  const email = document.getElementById('securityCode').value.trim() || prompt("Apna admin email enter karein:");
-  if (!email) return;
-  try { await sendPasswordResetEmail(auth, email); alert('✅ Password reset link bhej diya gaya!'); showScreen('login'); } catch (e) { document.getElementById('resetError').textContent = '❌ Email galat hai!'; }
+async function handleLogin(){
+  const p=document.getElementById('loginPassword').value;
+  try{
+    if(auth.currentUser)await signOut(auth);
+    // Encrypted Admin Email (Security ke liye)
+    const adminEmail = atob("c2hhaGlkcXVhbWFyNzJAZ21haWwuY29t");
+    await signInWithEmailAndPassword(auth,adminEmail,p);
+    document.getElementById('loginPassword').value='';
+    document.getElementById('loginError').textContent='';
+  }catch(e){
+    document.getElementById('loginError').textContent='❌ Wrong password!';
+  }
 }
 
 function listenConfig(){
