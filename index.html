@@ -2365,6 +2365,7 @@ async function adminAdjustWallet(userId,name){
   }catch(e){ alert('Error: '+e.message); }
   hideLoading();
 }
+  let pendingOtpType = 'normal';
   function openOtpModal(orderId, type='normal'){
   pendingOtpOrderId=orderId; 
   pendingOtpType=type;
