@@ -1915,7 +1915,7 @@ function getAdminPreOrderCardHTML(o) {
       }
   }
 
-  return`<div class="order-card"><div style="display:flex;justify-content:space-between"><div><div style="display:inline-block;background:var(--grad-fk);color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;margin-bottom:5px">#${o.orderCode||'Pending'}</div><h4>Pre-Order — ${date}</h4></div><button onclick="deletePreOrder('${o.id}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">🗑️</button></div><p>📞 ${escapeHtml(o.phone)} | 📍 ${escapeHtml(o.address)}</p><p>📝 ${escapeHtml(o.description)}</p>${o.photoUrl?`<p>📷 <a href="${o.photoUrl}" target="_blank" style="color:var(--text)">View</a></p>`:''}${o.audioUrl?`<audio controls src="${o.audioUrl}" style="width:100%;margin-top:5px"></audio>`:''}${pricingHtml}${dbHtml}${mapBtn}${otpDisplay}${verifyOtpBtn}<div style="margin-top:15px"><span class="order-status ${cls}">${s}</span><select style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;float:right;margin-top:10px" onchange="updatePreOrderStatus('${o.id}',this.value)">${['Pending','Priced','Accepted','Processing','Packed','Shipped','Out for Delivery','Delivered','Cancelled'].map(opt=>`<option value="${opt}" ${s===opt?'selected':''}>${opt}</option>`).join('')}</select></div></div>`;
+  return`<div class="order-card"><div style="display:flex;justify-content:space-between"><div><div style="display:inline-block;background:var(--grad-fk);color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:800;margin-bottom:5px">#${o.orderCode||'Pending'}</div><h4>Pre-Order — ${date}</h4></div><button onclick="deletePreOrder('${o.id}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">🗑️</button></div><p>📞 ${escapeHtml(o.phone)} | 📍 ${escapeHtml(o.address)}</p><p>📝 ${escapeHtml(o.description)}</p>${o.photoUrl?`<p>📷 <a href="${o.photoUrl}" target="_blank" style="color:var(--text)">View</a></p>`:''}${o.audioUrl?`<audio controls src="${o.audioUrl}" style="width:100%;margin-top:5px"></audio>`:''}${pricingHtml}${dbHtml}${mapBtn}${otpDisplay}${verifyOtpBtn}<div style="margin-top:15px"><span class="order-status ${cls}">${s}</span><select style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:5px;border-radius:5px;float:right;margin-top:10px" onchange="updatePreOrderStatus('${o.id}',this.value)">${['Pending','Priced','Accepted','Processing','Packed','Shipped','Out for Delivery','Cancelled'].map(opt=>`<option value="${opt}" ${s===opt?'selected':''}>${opt}</option>`).join('')}</select></div></div>`;
 }
 
 
@@ -2342,6 +2342,11 @@ function openOtpModal(orderId, type='normal'){
   document.getElementById('otpInput').value='';
   document.getElementById('otpVerifyModal').style.display='flex';
 }
+function closeOtpModal(){
+  document.getElementById('otpVerifyModal').style.display='none';
+  pendingOtpOrderId=null; 
+  pendingOtpType='normal';
+}  
 async function verifyDeliveryOtp(){
   const entered=document.getElementById('otpInput').value.trim();
   if(!entered||entered.length!==4)return alert('Enter 4-digit OTP');
