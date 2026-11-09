@@ -2342,7 +2342,6 @@ function openOtpModal(orderId, type='normal'){
   document.getElementById('otpInput').value='';
   document.getElementById('otpVerifyModal').style.display='flex';
 }
-function closeOtpModal(){document.getElementById('otpVerifyModal').style.display='none';pendingOtpOrderId=null;pendingOtpType='normal';}
 async function verifyDeliveryOtp(){
   const entered=document.getElementById('otpInput').value.trim();
   if(!entered||entered.length!==4)return alert('Enter 4-digit OTP');
