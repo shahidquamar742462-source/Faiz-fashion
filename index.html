@@ -2360,8 +2360,7 @@ async function verifyDeliveryOtp(){
   }catch(e){alert('Error: '+e.message)}
   hideLoading();
 }
-function closeOtpModal(){document.getElementById('otpVerifyModal').style.display='none';pendingOtpOrderId=null}
-async function verifyDeliveryOtp(){const entered=document.getElementById('otpInput').value.trim();if(!entered||entered.length!==4)return alert('Enter 4-digit OTP');const order=allAdminOrdersCache.find(o=>o.id===pendingOtpOrderId);if(!order)return;if(entered!==String(order.deliveryOtp)){return alert('❌ Wrong OTP!')}showLoading();try{await updateDoc(doc(db,'orders',pendingOtpOrderId),{status:'Delivered',deliveredAt:serverTimestamp()});alert('✅ Order Delivered!');closeOtpModal()}catch(e){alert('Error: '+e.message)}hideLoading()}
+
 async function updateReturnTracking(orderId,newStatus){if(!newStatus)return;const order=allAdminOrdersCache.find(o=>o.id===orderId);if(!order)return;const timeline=order.returnTimeline||[];timeline.push({status:newStatus});await updateDoc(doc(db,'orders',orderId),{returnStatus:newStatus,returnTimeline:timeline});alert('✅ Updated')}
 
 function printInvoice(id){
