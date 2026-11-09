@@ -396,7 +396,45 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
     z-index: 100;
 }
+/* --- FULL SCREEN SEARCH PAGE (PINK HEADER & WHITE BODY) --- */
+#fullSearchPage {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+  background: #ffffff; /* Body White Hai */
+  z-index: 9999; display: none; flex-direction: column;
+}
+#fullSearchPage.active { display: flex; }
 
+.search-header { 
+  display: flex; align-items: center; gap: 10px; padding: 15px; 
+  background: #f8bbd0; /* Header Pink Hai */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.search-header .back-btn { 
+  background: none; border: none; font-size: 24px; color: #d81b60; cursor: pointer; 
+}
+.search-input-wrap { 
+  flex: 1; display: flex; align-items: center; background: #ffffff; 
+  border-radius: 10px; padding: 10px 15px;
+}
+.search-input-wrap input { 
+  flex: 1; border: none; background: transparent; font-size: 16px; outline: none; color: #333;
+}
+.search-body { flex: 1; overflow-y: auto; padding: 15px; background: #ffffff; }
+
+/* Horizontal Recent Searches */
+.recent-title { font-size: 14px; font-weight: 800; color: #d81b60; margin-bottom: 15px; display: flex; justify-content: space-between; }
+.recent-horiz-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
+.recent-horiz-scroll::-webkit-scrollbar { display: none; }
+.recent-card { min-width: 80px; max-width: 80px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+.recent-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #eee; background: #fff; }
+.recent-card p { font-size: 11px; font-weight: 700; text-align: center; margin-top: 6px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+
+/* Vertical Search Suggestions */
+.suggest-item { display: flex; align-items: center; gap: 15px; padding: 12px 0; border-bottom: 1px solid #eee; cursor: pointer; }
+.suggest-item img { width: 45px; height: 45px; object-fit: cover; border-radius: 8px; border: 1px solid #eee; }
+.suggest-item div { flex: 1; }
+.suggest-item .s-name { font-size: 14px; font-weight: 700; color: #333; }
+.suggest-item .s-price { font-size: 12px; font-weight: 800; color: #d81b60; margin-top: 2px; }
 @media print{body *{visibility:hidden}#printArea,#printArea *{visibility:visible}#printArea{position:absolute;left:0;top:0;width:100%;background:#fff;color:#000;padding:20px}}
   /* --- SEARCH MODE BLUE THEME & PHOTO GRID --- */
 .top-bar.search-active { 
@@ -427,7 +465,17 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 </style>
 </head>
 <body class="light">
-
+<div id="fullSearchPage">
+  <div class="search-header">
+    <button class="back-btn" onclick="closeSearchPage()">←</button>
+    <div class="search-input-wrap">
+      <input type="search" id="fullSearchInput" placeholder="Search for Products..." autocomplete="off" oninput="handleFullSearch(this.value)">
+    </div>
+  </div>
+  <div class="search-body" id="fullSearchBody">
+    <!-- Dynamic content yahan aayega -->
+  </div>
+</div>
 <div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center">
   <div style="width:50px;height:50px;border:4px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite"></div>
 </div>
@@ -738,19 +786,12 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
         <button class="icon-btn" onclick="showScreen('cart')">🛒<span class="badge" id="shopCartBadge">0</span></button>
       </div>
     </div>
-   <div class="search-row" style="align-items: center;">
-  <button id="searchBackBtn" onclick="closeSearchMode()" style="display:none; background:none; border:none; color:#fff; font-size:22px; cursor:pointer; margin-right:5px;">←</button>
-  
+ <div class="search-row" style="align-items: center;">
   <div style="position: relative; flex: 1;">
-    <input type="search" class="search-bar" id="shopSearch" placeholder="Search for Products..." autocomplete="off" enterkeyhint="search" oninput="onSearchInput(this.value)" onfocus="activateSearchMode()" onkeydown="if(event.key === 'Enter') this.blur()" style="width: 100%; padding-right: 75px;"> 
-    
-    <button id="clearSearchBtn" onclick="clearSearchText()" style="display: none; position: absolute; right: 40px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 16px; color: var(--text-dim); cursor: pointer; padding: 5px; z-index: 10;">✕</button>
-    
-    <button class="voice-search-btn" onclick="startVoiceSearch()" id="voiceSearchBtn" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: none; box-shadow: none; border: none; font-size: 20px; cursor: pointer; padding: 5px;">🎤</button>
+    <!-- readonly ka matlab: click karne par keyboard nahi khulega, direct naya page khulega -->
+    <input type="search" class="search-bar" id="shopSearch" placeholder="Search for Products..." onclick="openSearchPage()" readonly style="cursor: pointer;">
   </div>
-  
-  <div class="autocomplete-box" id="autocompleteBox"></div>
-  
+  <button class="voice-search-btn" onclick="startVoiceSearch()" id="voiceSearchBtn">🎤</button>
   <select class="sort-select" onchange="sortProducts(this.value)"><option value="default">Sort</option><option value="low-high">Low→High</option><option value="high-low">High→Low</option></select>
 </div>
     <div class="horizontal-scroll-row" id="mainTabs">
@@ -2563,59 +2604,83 @@ async function sendAdminChatMsg(){const inp=document.getElementById('adminChatIn
 function setMainCategory(cat){mainCategory=cat;document.querySelectorAll('.cat-icon-item').forEach(item=>{item.classList.toggle('active',item.getAttribute('onclick').includes(`'${cat}'`))});renderShop()}
 
 // UPDATED onSearchInput
-  function activateSearchMode() {
-  document.querySelector('.top-bar').classList.add('search-active');
-  document.getElementById('searchBackBtn').style.display = 'block';
-  document.querySelector('.top-row').style.display = 'none'; // Logo hide karega
-  document.getElementById('mainTabs').style.display = 'none';
-  document.getElementById('autocompleteBox').classList.add('full-screen-search');
-  document.getElementById('autocompleteBox').style.display = 'block';
-  showRecentSearches();
+ function openSearchPage() {
+  document.getElementById('fullSearchPage').classList.add('active');
+  document.getElementById('fullSearchInput').value = '';
+  document.getElementById('bottomNav').style.display = 'none'; // Nav bar hide
+  renderRecentSearchesHorizontal();
 }
 
-function closeSearchMode() {
-  document.querySelector('.top-bar').classList.remove('search-active');
-  document.getElementById('searchBackBtn').style.display = 'none';
-  document.querySelector('.top-row').style.display = 'flex';
-  document.getElementById('mainTabs').style.display = 'flex';
-  document.getElementById('autocompleteBox').classList.remove('full-screen-search');
-  document.getElementById('autocompleteBox').style.display = 'none';
-  document.getElementById('shopSearch').blur();
+function closeSearchPage() {
+  document.getElementById('fullSearchPage').classList.remove('active');
+  document.getElementById('bottomNav').style.display = 'flex'; // Nav bar wapas
 }
-function onSearchInput(q){
-  const clearBtn = document.getElementById('clearSearchBtn');
-  if(clearBtn) clearBtn.style.display = (q.length > 0) ? 'block' : 'none';
 
-  searchQuery = q.toLowerCase().trim();
-  
-  if(q.trim() === '') {
-      searchFilterBrand = ''; searchFilterSize = ''; searchFilterColor = ''; searchFilterPrice = ''; searchFilterDeal = false;
-  }
-  
-  const box = document.getElementById('autocompleteBox');
-  if(!q || q.length < 2){
-    showRecentSearches();
-    renderShop();
+function renderRecentSearchesHorizontal() {
+  const body = document.getElementById('fullSearchBody');
+  if(recentSearches.length === 0) {
+    body.innerHTML = '<div style="text-align:center; padding:30px; color:#d81b60; font-weight:bold;">No recent searches</div>';
     return;
   }
   
-  const matches = categoriesCache.filter(c => c.name.toLowerCase().includes(q.toLowerCase())).slice(0, 6);
-  if(matches.length === 0) {
-    box.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-dim);font-weight:bold;">No products found</div>';
-  } else {
-    box.innerHTML = `<div class="autocomplete-header" style="background:transparent;padding-left:10px;">Suggestions</div>` + matches.map(m => `<div class="autocomplete-item" onmousedown="selectAutocomplete('${escapeHtml(m.name)}')">${escapeHtml(m.name)} — <span style="color:var(--text);font-weight:800;">₹${getEffectivePrice(m)}</span></div>`).join('');
+  let html = `<div class="recent-title">Recent Searches <span style="color:#d81b60; cursor:pointer;" onclick="clearRecentSearches()">Clear</span></div>`;
+  html += `<div class="recent-horiz-scroll">`;
+  
+  recentSearches.forEach(r => {
+    const p = categoriesCache.find(c => c.name.toLowerCase().includes(r.toLowerCase()));
+    const img = p ? ((p.photoUrls && p.photoUrls.length > 0) ? p.photoUrls[0] : p.photoUrl) : 'logo.png';
+    html += `<div class="recent-card" onclick="selectFullSearch('${escapeHtml(r)}')">
+              <img src="${optImg(img, 200)}">
+              <p>${escapeHtml(r)}</p>
+            </div>`;
+  });
+  html += `</div>`;
+  body.innerHTML = html;
+}
+
+function handleFullSearch(q) {
+  const body = document.getElementById('fullSearchBody');
+  if(!q || q.trim() === '') {
+    renderRecentSearchesHorizontal();
+    return;
   }
-  box.style.display = 'block';
-  if(q.length >= 2) saveRecentSearch(q);
+  
+  saveRecentSearch(q);
+  const matches = categoriesCache.filter(c => c.name.toLowerCase().includes(q.toLowerCase()));
+  
+  if(matches.length === 0) {
+    body.innerHTML = '<div style="text-align:center; padding:30px; color:#d81b60; font-weight:bold;">No products found</div>';
+    return;
+  }
+  
+  let html = '';
+  matches.forEach(m => {
+    const img = (m.photoUrls && m.photoUrls.length > 0) ? m.photoUrls[0] : (m.photoUrl || 'logo.png');
+    html += `<div class="suggest-item" onclick="selectFullSearch('${escapeHtml(m.name)}')">
+              <img src="${optImg(img, 150)}">
+              <div>
+                <div class="s-name">${escapeHtml(m.name)}</div>
+              <div class="s-price">₹${getEffectivePrice(m)}</div>
+              </div>
+              <div style="color:#d81b60;">↗️</div>
+            </div>`;
+  });
+  body.innerHTML = html;
+}
+
+function selectFullSearch(name) {
+  closeSearchPage();
+  searchQuery = name.toLowerCase();
+  saveRecentSearch(name);
   renderShop();
 }
 
-function selectAutocomplete(name){
-  document.getElementById('shopSearch').value=name;
-  searchQuery=name.toLowerCase();
-  closeSearchMode(); 
-  saveRecentSearch(name);
-  renderShop();
+// Bottom Nav ka Shop button fix karne ke liye
+function goToShopHome() {
+  closeSearchPage();
+  clearSearchText();
+  showScreen('shop');
+  window.scrollTo(0,0);
 }
 function sortProducts(order){sortOrder=order;renderShop()}
 function toggleInStockFilter(){filterInStock=!filterInStock;document.getElementById('inStockFilterBtn').classList.toggle('active',filterInStock);updateClearFilterBtn();renderShop()}
@@ -3052,7 +3117,7 @@ function checkSpinWheel(){const last=localStorage.getItem('lastSpinDate');const 
 function closeSpinWheel(){document.getElementById('spinWheelModal').style.display='none'}
 function spinWheel(){const btn=document.getElementById('spinBtn');btn.disabled=true;const wheel=document.getElementById('wheelCanvas');const deg=Math.floor(Math.random()*360)+720;wheel.style.transform=`rotate(${deg}deg)`;setTimeout(()=>{if(couponsCache.length>0){const c=couponsCache[Math.floor(Math.random()*couponsCache.length)];document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML=`🎉 Won: <span style="color:var(--text)">${c.code}</span> (${c.discountPercent}% OFF)`;localStorage.setItem('lastSpinDate',new Date().toDateString())}else{document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML='No coupons active'};btn.textContent='CLOSE';btn.onclick=closeSpinWheel;btn.disabled=false},3000)}
 
-const EXPORTS=['activateSearchMode','closeSearchMode','sharePreOrderLocation','openOtpmodal','closeOtpmodal','showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail','requestStockAlert','checkFirstOrderBonus','getSizeRecommendation','updateSizeRecommendation','lookupPincodeDebounced','lookupPincode','selectPincode','trackProductView','trackCartAdd','loadProductAnalytics','loadAbandonedCarts','setLanguage','applyLanguage','renderNewArrivalsAndHot','renderDealsAndSuggested','openProfileDetails','saveProfileDetails','openFilterScreen','closeFilterScreen','switchFilterTab','updateTempFilter','clearTempFilters','applyFilters','updateApplyButtonText','clearSearchText','goToShopHome'];
+const EXPORTS=['openSearchPage','closeSearchPage','handleFullSearch','selectFullSearch','sharePreOrderLocation','openOtpmodal','closeOtpmodal','showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail','requestStockAlert','checkFirstOrderBonus','getSizeRecommendation','updateSizeRecommendation','lookupPincodeDebounced','lookupPincode','selectPincode','trackProductView','trackCartAdd','loadProductAnalytics','loadAbandonedCarts','setLanguage','applyLanguage','renderNewArrivalsAndHot','renderDealsAndSuggested','openProfileDetails','saveProfileDetails','openFilterScreen','closeFilterScreen','switchFilterTab','updateTempFilter','clearTempFilters','applyFilters','updateApplyButtonText','clearSearchText','goToShopHome'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
