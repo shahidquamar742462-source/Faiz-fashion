@@ -2334,13 +2334,36 @@ async function deleteOrder(id){
     alert('✅ Deleted');
   }
 }
-async function saveDeliveryBoy(id){const n=document.getElementById('db-name-'+id).value.trim();const p=document.getElementById('db-phone-'+id).value.trim();await setDoc(doc(db,'orders',id),{deliveryBoy:{name:n,phone:p}},{merge:true});alert('✅ Saved')}
-async function adminAdjustWallet(userId,name){if(!isAdminUser)return;const input=prompt(`💰 Adjust Wallet for ${name}\n\nPositive=add, Negative=deduct`);if(input===null||input==='')return;const amount=parseFloat(input);if(isNaN(amount)||amount===0)return alert('Invalid');showLoading();try{const uRef=doc(db,'users',userId);const uSnap=await getDoc(uRef);if(!uSnap.exists()){hideLoading();return alert('User not found')}const cur=uSnap.data()?.walletBalance||0;const nw=Math.max(0,cur+amount);await setDoc(uRef,{walletBalance:nw},{merge:true});alert(`✅ Updated!\nPrev: ₹${Math.round(cur)}\nChange: ${amount>0?'+':''}₹${amount}\nNew: ₹${Math.round(nw)}`)}catch(e){alert('Error: '+e.message)}hideLoading()}
-let pendingOtpType = 'normal';
-function openOtpModal(orderId, type='normal'){
-  pendingOtpOrderId=orderId; pendingOtpType=type;
-  document.getElementById('otpInput').value='';
-  document.getElementById('otpVerifyModal').style.display='flex';
+async function saveDeliveryBoy(id){
+  const pwd = prompt("Enter Password to assign Delivery Boy:");
+  if (pwd !== atob("R3VsYWIxMjNAIysr")) { if (pwd !== null) alert("❌ Incorrect Password!"); return; }
+  
+  const n = document.getElementById('db-name-'+id).value.trim();
+  const p = document.getElementById('db-phone-'+id).value.trim();
+  await setDoc(doc(db,'orders',id),{deliveryBoy:{name:n,phone:p}},{merge:true});
+  alert('✅ Delivery Boy Saved!');
+}
+async function adminAdjustWallet(userId,name){
+  if(!isAdminUser) return;
+  const pwd = prompt("Enter Password to adjust wallet:");
+  if (pwd !== atob("R3VsYWIxMjNAIysr")) { if (pwd !== null) alert("❌ Incorrect Password!"); return; }
+  
+  const input = prompt(`💰 Adjust Wallet for ${name}\n\nPositive=add, Negative=deduct`);
+  if(input===null||input==='') return;
+  const amount = parseFloat(input);
+  if(isNaN(amount)||amount===0) return alert('Invalid amount');
+  
+  showLoading();
+  try{
+    const uRef = doc(db,'users',userId);
+    const uSnap = await getDoc(uRef);
+    if(!uSnap.exists()){ hideLoading(); return alert('User not found'); }
+    const cur = uSnap.data()?.walletBalance||0;
+    const nw = Math.max(0,cur+amount);
+    await setDoc(uRef,{walletBalance:nw},{merge:true});
+    alert(`✅ Updated!\nPrev: ₹${Math.round(cur)}\nChange: ${amount>0?'+':''}₹${amount}\nNew: ₹${Math.round(nw)}`);
+  }catch(e){ alert('Error: '+e.message); }
+  hideLoading();
 }
 function closeOtpModal(){
   document.getElementById('otpVerifyModal').style.display='none';
@@ -2385,7 +2408,15 @@ function renderAdminPreOrdersList(){const list=document.getElementById('adminPre
 function filterAdminPreOrders(){adminPreOrderSearchTerm=document.getElementById('adminPreOrderSearch').value.trim();renderAdminPreOrdersList()}
 function calculatePreOrderTotal(id){const p=parseFloat(document.getElementById('pre-prod-'+id).value)||0;const d=parseFloat(document.getElementById('pre-del-'+id).value)||0;const pf=parseFloat(document.getElementById('pre-plat-'+id).value)||0;const h=parseFloat(document.getElementById('pre-hand-'+id).value)||0;document.getElementById('pre-total-'+id).textContent=p+d+pf+h}
 async function sendPreOrderPrice(id){const p=parseFloat(document.getElementById('pre-prod-'+id).value)||0;const d=parseFloat(document.getElementById('pre-del-'+id).value)||0;const pf=parseFloat(document.getElementById('pre-plat-'+id).value)||0;const h=parseFloat(document.getElementById('pre-hand-'+id).value)||0;const total=p+d+pf+h;if(total<=0)return alert('Enter valid prices');showLoading();try{await updateDoc(doc(db,'pre_orders',id),{productPrice:p,deliveryFee:d,platformFee:pf,handlingFee:h,totalPrice:total,status:'Priced'});alert('✅ Price sent!')}catch(e){alert('Error: '+e.message)}hideLoading()}
-async function savePreOrderDeliveryBoy(id){const n=document.getElementById('pre-db-name-'+id).value.trim();const p=document.getElementById('pre-db-phone-'+id).value.trim();await setDoc(doc(db,'pre_orders',id),{deliveryBoy:{name:n,phone:p}},{merge:true});alert('✅ Saved')}
+async function savePreOrderDeliveryBoy(id){
+  const pwd = prompt("Enter Password to assign Delivery Boy:");
+  if (pwd !== atob("R3VsYWIxMjNAIysr")) { if (pwd !== null) alert("❌ Incorrect Password!"); return; }
+  
+  const n = document.getElementById('pre-db-name-'+id).value.trim();
+  const p = document.getElementById('pre-db-phone-'+id).value.trim();
+  await setDoc(doc(db,'pre_orders',id),{deliveryBoy:{name:n,phone:p}},{merge:true});
+  alert('✅ Delivery Boy Saved!');
+}
 async function updatePreOrderStatus(id,s){
   const updateData = {status: s};
   if ((s === 'Shipped' || s === 'Out for Delivery') && !allAdminPreOrdersCache.find(o=>o.id===id)?.deliveryOtp) {
@@ -2916,7 +2947,7 @@ async function submitPreOrder(btn){
       audioUrl = await uploadToCloudinary(audioBlob, 'video');
     }
     await addDoc(collection(db,'pre_orders'),{userId:currentUid,description:desc,budget,phone,address,photoUrl,audioUrl,latitude:preLat,longitude:preLng,status:'Pending',date:serverTimestamp()});
-    alert('✅ Sent!');['preDesc','prePhone','preAddress','preBudget'].forEach(id=>document.getElementById(id).value='');document.getElementById('prePhotoPreview').style.display='none';document.getElementById('prePhotoPlaceholder').style.display='block';document.getElementById('voicePlayback').style.display='none';audioBlob=null;currentPrePhotoFile=null;showScreen('my-preorders');
+    alert('✅ aapka order mil gya hai! jald hi hum aapse contact karenge.');['preDesc','prePhone','preAddress','preBudget'].forEach(id=>document.getElementById(id).value='');document.getElementById('prePhotoPreview').style.display='none';document.getElementById('prePhotoPlaceholder').style.display='block';document.getElementById('voicePlayback').style.display='none';audioBlob=null;currentPrePhotoFile=null;showScreen('my-preorders');
   }catch(e){alert('Error: '+e.message)}finally{hideLoading();btn.disabled=false;btn.textContent='Submit Pre-Order'}
 }
 
