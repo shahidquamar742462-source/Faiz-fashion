@@ -2680,19 +2680,22 @@ function selectFullSearch(name) {
 }
 // Bottom Nav ka Shop button fix karne ke liye
 function goToShopHome() {
-  // Search page ko band karega
   const searchPage = document.getElementById('fullSearchPage');
   if(searchPage) searchPage.classList.remove('active');
   
-  // Neeche ka Nav bar wapas laayega
   document.getElementById('bottomNav').style.display = 'flex';
   
-  // Search bar ko khali karega
   const s = document.getElementById('shopSearch');
   if(s) s.value = '';
   searchQuery = '';
+  searchFilterBrand = ''; searchFilterSize = ''; searchFilterColor = ''; searchFilterPrice = ''; searchFilterDeal = false;
   
-  // Direct Shop (Main Page) kholega
+  // Category ko wapas 'All' par laao
+  mainCategory = 'All';
+  document.querySelectorAll('.cat-icon-item').forEach(item=>{
+      item.classList.toggle('active', item.getAttribute('onclick').includes("'All'"));
+  });
+  
   showScreen('shop');
   window.scrollTo(0,0);
 }
@@ -2721,10 +2724,12 @@ function renderShop(){
   const grid=document.getElementById('shopGrid');if(!grid)return;
   
   const isSearching = searchQuery.length > 0;
-  
-  // Hide extra sections if searching
+  const isCategoryFiltered = mainCategory !== 'All';
+  const hideExtras = isSearching || isCategoryFiltered;
+
+  // Extra sections ko chhipana
   const sections = ['recentlyViewedSection', 'dealsForYouSection', 'suggestedForYouSection', 'newArrivalsSection', 'hotItemsSection'];
-  if(isSearching) {
+  if(hideExtras) {
       sections.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
   } else {
       renderRecentlyViewed();
@@ -2732,7 +2737,6 @@ function renderShop(){
       renderNewArrivalsAndHot();
   }
   
-  // Hide main category tabs and filter chips if searching
   const topBarTabs = document.getElementById('mainTabs');
   const filterTabs = document.querySelector('.filter-tabs');
   const bannerContainer = document.getElementById('shopBanner');
@@ -2746,11 +2750,17 @@ function renderShop(){
   } else {
       if(topBarTabs) topBarTabs.style.display = 'flex';
       if(filterTabs) filterTabs.style.display = 'flex';
-      if(bannerUrls.length > 0 && bannerContainer) bannerContainer.style.display = 'flex';
-      // Flash sale handled by its own function
+      
+      // Category change par banner chhipao
+      if(isCategoryFiltered) {
+          if(bannerContainer) bannerContainer.style.display = 'none';
+          if(flashSaleBanner) flashSaleBanner.style.display = 'none';
+      } else {
+          if(bannerUrls.length > 0 && bannerContainer) bannerContainer.style.display = 'flex';
+          if(typeof renderFlashSaleBanner === 'function') renderFlashSaleBanner();
+      }
   }
 
-  // Show/Hide search filter button bar
   const filterBar = document.getElementById('searchFilterBar');
   if(filterBar) {
       filterBar.style.display = isSearching ? 'block' : 'none';
@@ -2761,18 +2771,13 @@ function renderShop(){
   
   if(searchQuery) {
       items = items.filter(c => c.name.toLowerCase().includes(searchQuery) || (c.description || '').toLowerCase().includes(searchQuery));
-      
       if(searchFilterBrand) items = items.filter(c => c.name.toLowerCase().startsWith(searchFilterBrand.toLowerCase()));
       if(searchFilterSize) items = items.filter(c => (c.sizes || []).includes(searchFilterSize));
       if(searchFilterColor) items = items.filter(c => (c.colors || []).includes(searchFilterColor));
       if(searchFilterDeal) items = items.filter(c => getDiscountPercent(c.originalPrice, c.discountPrice) >= 20);
-      
       if(searchFilterPrice) {
           const [min, max] = searchFilterPrice.split('-').map(Number);
-          items = items.filter(c => {
-              const p = getEffectivePrice(c);
-              return p >= min && p <= max;
-          });
+          items = items.filter(c => { const p = getEffectivePrice(c); return p >= min && p <= max; });
       }
   }
   
@@ -2781,7 +2786,7 @@ function renderShop(){
   
   if(sortOrder==='low-high')items.sort((a,b)=>getEffectivePrice(a)-getEffectivePrice(b));else if(sortOrder==='high-low')items.sort((a,b)=>getEffectivePrice(b)-getEffectivePrice(a));else items.sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));
   
-  if(items.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim)">No products found for your search/filters</div>';return}
+  if(items.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim)">No products found</div>';return}
   
   grid.innerHTML=items.map(c=>{const out=(c.times||0)<=0;const price=getEffectivePrice(c);const isFlash=isFlashActive(c);const off=getDiscountPercent(c.originalPrice,price);const liked=watchlistIds.has(c.id);const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const inCart=cartProductIds.has(c.id);const flashBadge=isFlash?`<div class="flash-badge">⚡ FLASH</div>`:'';const alerted=myStockAlerts.has(c.id);const actionBtn=out?`<button class="btn-notify" onclick="event.stopPropagation();${alerted?'':'requestStockAlert(\''+c.id+'\')'}">${alerted?'✅ Notified':'🔔 Notify Me'}</button>`:`<button class="btn-cart" onclick="event.stopPropagation();toggleCartFromCard('${c.id}')">${inCart?'✓ In Cart':'+ Cart'}</button>`;
   
