@@ -738,22 +738,21 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
         <button class="icon-btn" onclick="showScreen('cart')">🛒<span class="badge" id="shopCartBadge">0</span></button>
       </div>
     </div>
-    <div class="search-row" style="align-items: center;">
+   <div class="search-row" style="align-items: center;">
   <button id="searchBackBtn" onclick="closeSearchMode()" style="display:none; background:none; border:none; color:#fff; font-size:22px; cursor:pointer; margin-right:5px;">←</button>
   
   <div style="position: relative; flex: 1;">
-    <!-- Yahan type="text" ki jagah type="search" kar diya hai (keyboard patti hatane ke liye) -->
-    <input type="search" class="search-bar" id="shopSearch" placeholder="Search for Products..." autocomplete="off" enterkeyhint="search" oninput="onSearchInput(this.value)" onfocus="activateSearchMode()" onkeydown="if(event.key === 'Enter') this.blur()" style="width: 100%; padding-right: 35px;">
-    <button id="clearSearchBtn" onclick="clearSearchText()" style="display: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 16px; color: var(--text-dim); cursor: pointer; padding: 5px; z-index: 10;">✕</button>
+    <input type="search" class="search-bar" id="shopSearch" placeholder="Search for Products..." autocomplete="off" enterkeyhint="search" oninput="onSearchInput(this.value)" onfocus="activateSearchMode()" onkeydown="if(event.key === 'Enter') this.blur()" style="width: 100%; padding-right: 75px;"> 
+    
+    <button id="clearSearchBtn" onclick="clearSearchText()" style="display: none; position: absolute; right: 40px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 16px; color: var(--text-dim); cursor: pointer; padding: 5px; z-index: 10;">✕</button>
+    
+    <button class="voice-search-btn" onclick="startVoiceSearch()" id="voiceSearchBtn" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: none; box-shadow: none; border: none; font-size: 20px; cursor: pointer; padding: 5px;">🎤</button>
   </div>
   
   <div class="autocomplete-box" id="autocompleteBox"></div>
-  <button class="voice-search-btn" onclick="startVoiceSearch()" id="voiceSearchBtn">🎤</button>
+  
+  <select class="sort-select" onchange="sortProducts(this.value)"><option value="default">Sort</option><option value="low-high">Low→High</option><option value="high-low">High→Low</option></select>
 </div>
-      <div class="autocomplete-box" id="autocompleteBox" style="top: 100%;"></div>
-      <button class="voice-search-btn" onclick="startVoiceSearch()" id="voiceSearchBtn">🎤</button>
-      <select class="sort-select" onchange="sortProducts(this.value)"><option value="default">Sort</option><option value="low-high">Low→High</option><option value="high-low">High→Low</option></select>
-    </div>
     <div class="horizontal-scroll-row" id="mainTabs">
       <div class="cat-icon-item active" onclick="setMainCategory('All')"><div class="cat-icon-box">✨</div><span class="cat-icon-text">For You</span></div>
       <div class="cat-icon-item" onclick="setMainCategory('Men')"><div class="cat-icon-box">👔</div><span class="cat-icon-text">Men</span></div>
@@ -1566,11 +1565,23 @@ function renderNewArrivalsAndHot(){
     else { hotSec.style.display = 'block'; hotGrid.innerHTML = hotItems.map(c => { const img = (c.photoUrls && c.photoUrls.length > 0) ? c.photoUrls[0] : c.photoUrl; return `<div class="recent-card" onclick="openProductDetails('${c.id}')"><img src="${optImg(img,200)}"><p>${escapeHtml(c.name)}</p><p style="color:var(--text);font-weight:800;">₹${getEffectivePrice(c)} 🔥${c.views||0}</p></div>`; }).join(''); }
   }
 }
-
 function showScreen(name){
   if(ADMIN_SCREENS.includes(name)&&!isAdminUser){alert('Admin required');return}
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  const el=document.getElementById('screen-'+name);if(!el)return;el.classList.add('active');
+  
+  if(typeof closeSearchMode === 'function') closeSearchMode();
+
+  // 1. Saari purani screens ko force se chhupayega (White screen bhi hat jayega)
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.setProperty('display', 'none', 'important'); 
+  });
+  
+  // 2. Naye page ko force se dikhayega
+  const el=document.getElementById('screen-'+name);
+  if(!el)return;
+  el.classList.add('active');
+  el.style.setProperty('display', 'block', 'important'); 
+  
   const nav=document.getElementById('bottomNav');
   nav.style.display=['shop','cart','orders','preorder','my-preorders','customer-settings','watchlist'].includes(name)?'flex':'none';
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.screen===name));
@@ -1605,14 +1616,8 @@ function showScreen(name){
   
   if(name==='checkout')updateCheckoutLocStatus();
   if(name==='admin')loadAnalytics();
-  window.scrollTo(0,0)
-}
-
-// NEW: Go To Home Reset Function
-function goToShopHome() {
-    clearSearchText();
-    showScreen('shop');
-    window.scrollTo(0,0);
+  
+  setTimeout(() => { window.scrollTo(0, 0); }, 50);
 }
 
 // NEW: Clear Search Text Function
