@@ -2593,6 +2593,7 @@ function onSearchInput(q){
     renderShop();
     return;
   }
+  
   const matches = categoriesCache.filter(c => c.name.toLowerCase().includes(q.toLowerCase())).slice(0, 6);
   if(matches.length === 0) {
     box.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-dim);font-weight:bold;">No products found</div>';
@@ -2600,23 +2601,6 @@ function onSearchInput(q){
     box.innerHTML = `<div class="autocomplete-header" style="background:transparent;padding-left:10px;">Suggestions</div>` + matches.map(m => `<div class="autocomplete-item" onmousedown="selectAutocomplete('${escapeHtml(m.name)}')">${escapeHtml(m.name)} — <span style="color:var(--text);font-weight:800;">₹${getEffectivePrice(m)}</span></div>`).join('');
   }
   box.style.display = 'block';
-  if(q.length >= 2) saveRecentSearch(q);
-  renderShop();
-}
-  
-  const box = document.getElementById('autocompleteBox');
-  if(!q || q.length < 2){
-    box.style.display = 'none';
-    renderShop();
-    return;
-  }
-  const matches = categoriesCache.filter(c => c.name.toLowerCase().includes(q.toLowerCase())).slice(0, 6);
-  if(matches.length === 0) {
-    box.style.display = 'none';
-  } else {
-    box.innerHTML = matches.map(m => `<div class="autocomplete-item" onmousedown="selectAutocomplete('${escapeHtml(m.name)}')">${escapeHtml(m.name)} — <span style="color:var(--text);font-weight:800;">₹${getEffectivePrice(m)}</span></div>`).join('');
-    box.style.display = 'block';
-  }
   if(q.length >= 2) saveRecentSearch(q);
   renderShop();
 }
