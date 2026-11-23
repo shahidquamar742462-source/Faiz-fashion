@@ -2904,8 +2904,6 @@ function clearAllFilters(){
 }
 function updateClearFilterBtn(){document.getElementById('clearFilterBtn').style.display=(filterInStock||filterMaxPrice!==null)?'inline-block':'none'}
 
-// UPDATED renderShop
-  // Ye naya function hai (Ise renderShop ke theek upar paste karo)
 function getProductCardHTML(c) {
   const out=(c.times||0)<=0;const price=getEffectivePrice(c);const isFlash=isFlashActive(c);const off=getDiscountPercent(c.originalPrice,price);const liked=watchlistIds.has(c.id);const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const inCart=cartProductIds.has(c.id);const flashBadge=isFlash?`<div class="flash-badge">⚡ FLASH</div>`:'';const alerted=myStockAlerts.has(c.id);const actionBtn=out?`<button class="btn-notify" onclick="event.stopPropagation();${alerted?'':'requestStockAlert(\''+c.id+'\')'}">${alerted?'✅ Notified':'🔔 Notify Me'}</button>`:`<button class="btn-cart" onclick="event.stopPropagation();toggleCartFromCard('${c.id}')">${inCart?'✓ In Cart':'+ Cart'}</button>`;
   
@@ -2988,6 +2986,7 @@ function renderShop(){
   if(items.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim)">No products found</div>';return}
   
   grid.innerHTML = items.map(c => getProductCardHTML(c)).join('');
+}
 function shareProductCard(id){
   const c=categoriesCache.find(x=>x.id===id);if(!c)return;
   const url = `${window.location.origin}${window.location.pathname}?product=${c.id}`;
