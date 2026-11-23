@@ -604,9 +604,31 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 
 <div id="screen-admin-orders" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>All Orders</h2></div>
+  
   <div style="margin-bottom:15px">
     <input type="text" id="adminOrderSearch" placeholder="Search Order ID, Name, Phone..." oninput="filterAdminOrders()" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 15px;color:var(--text);font-size:14px;outline:none">
   </div>
+  
+  <!-- CATEGORY FILTERS -->
+  <div style="display:flex; gap:8px; margin-bottom:10px; overflow-x:auto; padding-bottom:5px; scrollbar-width:none;" id="adminOrderCatFilters">
+      <button class="filter-chip active" id="adminCat-All" onclick="setAdminCatFilter('All')">All Categories</button>
+      <button class="filter-chip" id="adminCat-Men" onclick="setAdminCatFilter('Men')">Men</button>
+      <button class="filter-chip" id="adminCat-Women" onclick="setAdminCatFilter('Women')">Women</button>
+      <button class="filter-chip" id="adminCat-Kids" onclick="setAdminCatFilter('Kids')">Kids</button>
+      <button class="filter-chip" id="adminCat-Accessories" onclick="setAdminCatFilter('Accessories')">Accessories</button>
+      <button class="filter-chip" id="adminCat-Grocery" onclick="setAdminCatFilter('Grocery')">Grocery</button>
+      <button class="filter-chip" id="adminCat-Beauty" onclick="setAdminCatFilter('Beauty')">Beauty</button>
+      <button class="filter-chip" id="adminCat-Stationery" onclick="setAdminCatFilter('Stationery')">Stationery</button>
+  </div>
+
+  <!-- STATUS FILTERS -->
+  <div style="display:flex; gap:8px; margin-bottom:15px; overflow-x:auto; padding-bottom:5px; scrollbar-width:none;" id="adminOrderStatusFilters">
+      <button class="filter-chip active" id="adminStatus-All" onclick="setAdminStatusFilter('All')">All Orders</button>
+      <button class="filter-chip" id="adminStatus-Active" onclick="setAdminStatusFilter('Active')">Active</button>
+      <button class="filter-chip" id="adminStatus-Delivered" onclick="setAdminStatusFilter('Delivered')">Delivered</button>
+      <button class="filter-chip" id="adminStatus-Return" onclick="setAdminStatusFilter('Return')">Return</button>
+  </div>
+  
   <div id="adminOrdersList"><div class="loading-row">Loading...</div></div>
 </div>
 
@@ -708,7 +730,15 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <div id="catError" class="error-msg"></div>
   </div>
 </div>
-
+<!-- Ye naya box add karo -->
+    <div class="settings-section" style="border:1px solid var(--border)">
+      <h3 style="color:var(--text)">👑 Add New Admin</h3>
+      <div style="display:flex;gap:10px;margin-bottom:15px">
+        <input type="email" id="newAdminEmail" placeholder="Gmail ID (e.g. name@gmail.com)" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text)">
+        <button class="btn-small" style="flex:0.5;background:var(--text);color:#fff;font-weight:800" onclick="addAdminEmail()">Add</button>
+      </div>
+      <div id="adminEmailList"></div>
+    </div>
 <div id="screen-settings" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>Settings</h2></div>
   <div class="form-container">
@@ -1325,6 +1355,8 @@ let userPoints=0,userRefCode='',userWallet=0,lifetimePoints=0;
 let pendingBannerFiles=[],existingBannersCache=[];
 let isShopOpen=true,allowedAreas=[],userSavedLat=null,userSavedLng=null;
 let adminOrderSearchTerm='',adminPreOrderSearchTerm='';
+let adminCatFilter = 'All';
+let adminStatusFilter = 'All';
 let boughtWithSelection=[],voiceRecognition=null;
 let catSizeGuideFile=null,catSizeGuideUrl='';
 let paymentMode='cod',upiId='',razorpayKey='',selectedPaymentMethod='cod';
@@ -1339,7 +1371,7 @@ let dashboardUsersCache=[];
 let adsCache=[], adRotationInterval=null, adPendingFile=null;
 let currentOrderDetailId=null;
 let myStockAlerts=new Set(); 
-
+let allowedAdmins = [];
 // NEW: Search Filter Variables
 let searchFilterBrand = '';
 let searchFilterSize = '';
@@ -2024,7 +2056,8 @@ onAuthStateChanged(auth,async(user)=>{
   [unsubCategories,unsubConfig,unsubCart,unsubOrders,unsubWatchlist,unsubCoupons,unsubAdminOrders,unsubPreOrders,unsubMyPreOrders,unsubAdminReviews,unsubReviews,unsubQA,unsubAdminQA,unsubChat,unsubAdminChats,unsubAdminChat,unsubAds,unsubAdminAds].forEach(u=>{if(u)u()});
   watchlistIds=new Set();cartItems=[];cartProductIds=new Set();couponsCache=[];unlockedOtps=[];myStockAlerts=new Set();
   if(!user){currentUid=null;showScreen('landing');return}
-  currentUid=user.uid; isAdminUser=user.email===ADMIN_EMAIL;
+  currentUid=user.uid; 
+  isAdminUser = (user.email === ADMIN_EMAIL) || allowedAdmins.includes(user.email);
   listenCategories();listenConfig();listenCoupons();listenAds();
   if(isAdminUser){showScreen('admin');renderAdminCategories()}
   else{listenCart();listenWatchlist();showScreen('shop');try{await initUserRewards();await loadMyStockAlerts();await checkFirstOrderBonus()}catch(e){console.log(e)}}
@@ -2060,12 +2093,16 @@ function listenConfig(){
       isShopOpen=d.shopOpen!==undefined?d.shopOpen:true;
       allowedAreas=d.allowedAreas?d.allowedAreas.split(',').map(a=>a.trim().toLowerCase()).filter(a=>a):[];
       paymentMode=d.paymentMode||'cod';upiId=d.upiId||'';razorpayKey=d.razorpayKey||'';
+      
+      allowedAdmins = d.allowedAdmins || [];
+      if(typeof renderAdminEmails === 'function') renderAdminEmails();
+      if(typeof updateAdminStatus === 'function') updateAdminStatus();
+
       updateShopStatusUI();renderBannerCarousel();renderFlashSaleBanner();
       if(document.getElementById('screen-cart').classList.contains('active'))calculateTotal();
     }
   });
 }
-
 function listenAds(){
   if(unsubAds)unsubAds();
   unsubAds=onSnapshot(collection(db,'ads'),snap=>{
@@ -2499,8 +2536,69 @@ async function toggleAdActive(id,current){try{await updateDoc(doc(db,'ads',id),{
 async function deleteAd(id){if(!confirm('Delete this ad?'))return;try{await deleteDoc(doc(db,'ads',id));alert('✅ Deleted')}catch(e){alert('Error: '+e.message)}}
 
 function loadAdminOrders(){const list=document.getElementById('adminOrdersList');if(!list)return;if(unsubAdminOrders)unsubAdminOrders();unsubAdminOrders=onSnapshot(collection(db,'orders'),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders</div>';return}let arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.deletedByAdmin!==true);arr.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));allAdminOrdersCache=arr;updateAdminNotifBadge();document.getElementById('statReturns').textContent=arr.filter(o=>o.returnStatus==='Requested').length;renderAdminOrdersList();})}
-function renderAdminOrdersList(){const list=document.getElementById('adminOrdersList');let filtered=allAdminOrdersCache;if(adminOrderSearchTerm){const t=adminOrderSearchTerm.toLowerCase();filtered=filtered.filter(o=>(o.orderCode&&o.orderCode.toLowerCase().includes(t))||(o.customerName&&o.customerName.toLowerCase().includes(t))||(o.phone&&o.phone.includes(t)))}if(filtered.length===0){list.innerHTML='<div class="loading-row">No orders found</div>';return}list.innerHTML=filtered.map(getAdminOrderCardHTML).join('')}
-function filterAdminOrders(){adminOrderSearchTerm=document.getElementById('adminOrderSearch').value.trim();renderAdminOrdersList()}
+function setAdminCatFilter(cat) {
+    adminCatFilter = cat;
+    document.querySelectorAll('#adminOrderCatFilters .filter-chip').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('adminCat-' + cat).classList.add('active');
+    renderAdminOrdersList();
+}
+
+function setAdminStatusFilter(status) {
+    adminStatusFilter = status;
+    document.querySelectorAll('#adminOrderStatusFilters .filter-chip').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('adminStatus-' + status).classList.add('active');
+    renderAdminOrdersList();
+}
+
+function filterAdminOrders(){
+    adminOrderSearchTerm = document.getElementById('adminOrderSearch').value.trim();
+    renderAdminOrdersList();
+}
+
+function renderAdminOrdersList(){
+    const list = document.getElementById('adminOrdersList');
+    let filtered = allAdminOrdersCache;
+
+    // 1. Search Filter
+    if(adminOrderSearchTerm){
+        const t = adminOrderSearchTerm.toLowerCase();
+        filtered = filtered.filter(o => 
+            (o.orderCode && o.orderCode.toLowerCase().includes(t)) || 
+            (o.customerName && o.customerName.toLowerCase().includes(t)) || 
+            (o.phone && o.phone.includes(t))
+        );
+    }
+
+    // 2. Category Filter (Jo category select ki hai, uske products wale orders)
+    if (adminCatFilter !== 'All') {
+        filtered = filtered.filter(o => {
+            return o.items.some(item => {
+                const prod = categoriesCache.find(c => c.id === item.productId);
+                return prod && prod.mainCategory === adminCatFilter;
+            });
+        });
+    }
+
+    // 3. Status Filter (Active, Delivered, Return)
+    if (adminStatusFilter === 'Active') {
+        filtered = filtered.filter(o => ['Pending', 'Processing', 'Shipped', 'Out for Delivery'].includes(o.status) && !o.returnStatus);
+    } 
+    else if (adminStatusFilter === 'Delivered') {
+        // Delivered: Jo deliver ho chuke hain aur return complete/reject ho chuka hai
+        filtered = filtered.filter(o => o.status === 'Delivered' && (!o.returnStatus || o.returnStatus === 'Completed' || o.returnStatus === 'Rejected'));
+    } 
+    else if (adminStatusFilter === 'Return') {
+        // Return: Jinka return process chal raha hai
+        filtered = filtered.filter(o => o.returnStatus && o.returnStatus !== 'Completed' && o.returnStatus !== 'Rejected');
+    }
+
+    if(filtered.length === 0){
+        list.innerHTML = '<div class="loading-row">Is filter me koi order nahi mila</div>';
+        return;
+    }
+    
+    list.innerHTML = filtered.map(getAdminOrderCardHTML).join('');
+}
 async function updateOrderStatus(id,s){await setDoc(doc(db,'orders',id),{status:s},{merge:true})}
 async function deleteOrder(id){
   const pwd = prompt("Enter Password to delete this order:");
@@ -3223,7 +3321,62 @@ function contactEmail(){window.open('mailto:shahidquamar72@gmail.com','_blank')}
 function checkSpinWheel(){const last=localStorage.getItem('lastSpinDate');const today=new Date().toDateString();if(last!==today&&!isAdminUser){setTimeout(()=>{document.getElementById('spinWheelModal').style.display='flex'},2000)}}
 function closeSpinWheel(){document.getElementById('spinWheelModal').style.display='none'}
 function spinWheel(){const btn=document.getElementById('spinBtn');btn.disabled=true;const wheel=document.getElementById('wheelCanvas');const deg=Math.floor(Math.random()*360)+720;wheel.style.transform=`rotate(${deg}deg)`;setTimeout(()=>{if(couponsCache.length>0){const c=couponsCache[Math.floor(Math.random()*couponsCache.length)];document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML=`🎉 Won: <span style="color:var(--text)">${c.code}</span> (${c.discountPercent}% OFF)`;localStorage.setItem('lastSpinDate',new Date().toDateString())}else{document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML='No coupons active'};btn.textContent='CLOSE';btn.onclick=closeSpinWheel;btn.disabled=false},3000)}
+function renderAdminEmails(){
+  const list = document.getElementById('adminEmailList');
+  if(!list) return;
+  if(allowedAdmins.length === 0){
+    list.innerHTML = '<div style="font-size:12px;color:var(--text-dim)">No extra admins added.</div>';
+    return;
+  }
+  list.innerHTML = allowedAdmins.map(e => `
+    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--card2);padding:10px;border-radius:8px;margin-bottom:5px">
+      <span style="font-size:14px;font-weight:600;color:var(--text)">${escapeHtml(e)}</span>
+      <button onclick="removeAdminEmail('${escapeHtml(e)}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">✕</button>
+    </div>
+  `).join('');
+}
 
+async function addAdminEmail(){
+  if(!isAdminUser) return;
+  const email = document.getElementById('newAdminEmail').value.trim().toLowerCase();
+  if(!email || !email.includes('@')) return alert('Valid Gmail ID required');
+  if(email === ADMIN_EMAIL) return alert('This is already the main Admin');
+  if(allowedAdmins.includes(email)) return alert('Already an admin');
+  
+  showLoading();
+  try {
+    allowedAdmins.push(email);
+    await setDoc(doc(db,'settings','config'), { allowedAdmins }, { merge: true });
+    document.getElementById('newAdminEmail').value = '';
+    alert('✅ Admin added!');
+  } catch(e) { alert('Error: '+e.message); }
+  hideLoading();
+}
+
+async function removeAdminEmail(email){
+  if(!isAdminUser) return;
+  if(!confirm(`Remove ${email} from admin?`)) return;
+  showLoading();
+  try {
+    allowedAdmins = allowedAdmins.filter(e => e !== email);
+    await setDoc(doc(db,'settings','config'), { allowedAdmins }, { merge: true });
+    alert('✅ Removed!');
+  } catch(e) { alert('Error: '+e.message); }
+  hideLoading();
+}
+
+function updateAdminStatus(){
+  const user = auth.currentUser;
+  if(!user) return;
+  // Check karo ki user main admin hai ya list me add kiya hua admin hai
+  isAdminUser = (user.email === ADMIN_EMAIL) || allowedAdmins.includes(user.email);
+  
+  // Agar naya admin login hua hai aur abhi admin panel me nahi hai, toh use wahan bhejo
+  if(isAdminUser && !document.getElementById('screen-admin').classList.contains('active') && !document.getElementById('screen-settings').classList.contains('active')) {
+      showScreen('admin');
+      renderAdminCategories();
+  }
+}
 const EXPORTS=['openSearchPage','closeSearchPage','handleFullSearch','selectFullSearch','sharePreOrderLocation','openOtpmodal','showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail','requestStockAlert','checkFirstOrderBonus','getSizeRecommendation','updateSizeRecommendation','lookupPincodeDebounced','lookupPincode','selectPincode','trackProductView','trackCartAdd','loadProductAnalytics','loadAbandonedCarts','setLanguage','applyLanguage','renderNewArrivalsAndHot','renderDealsAndSuggested','openProfileDetails','saveProfileDetails','openFilterScreen','closeFilterScreen','switchFilterTab','updateTempFilter','clearTempFilters','applyFilters','updateApplyButtonText','clearSearchText','goToShopHome'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
