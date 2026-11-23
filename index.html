@@ -2190,8 +2190,26 @@ function updateRewardsDisplay(){
   }
 }
 function showTierInfo(){const t=getLoyaltyTier(lifetimePoints);alert(`🏆 ${t.name} Member\n\nLifetime Points: ${lifetimePoints}\n\nBenefits:\n${t.benefits.map(b=>'✓ '+b).join('\n')}${t.next?'\n\nNext tier: '+(t.next-lifetimePoints)+' more points needed':''}`)}
-async function addUserPoints(delta){ /* Cloud Function handles this later */ }
-async function addUserWallet(delta){ /* Cloud Function handles this later */ }
+async function addUserPoints(delta){
+    if(!currentUid || isAdminUser) return;
+    try {
+        const userRef = doc(db, 'users', currentUid);
+        await updateDoc(userRef, { points: increment(delta), lifetimePoints: increment(delta > 0 ? delta : 0) });
+        userPoints += delta;
+        if(delta > 0) lifetimePoints += delta;
+        updateRewardsDisplay();
+    } catch(e) { console.error("Points error:", e); }
+}
+
+async function addUserWallet(delta){
+    if(!currentUid || isAdminUser) return;
+    try {
+        const userRef = doc(db, 'users', currentUid);
+        await updateDoc(userRef, { walletBalance: increment(delta) });
+        userWallet += delta;
+        updateRewardsDisplay();
+    } catch(e) { console.error("Wallet error:", e); }
+}
 function shareReferralCode(){if(!userRefCode)return;const link=`${window.location.origin}${window.location.pathname}?ref=${userRefCode}`;window.open(`https://wa.me/?text=${encodeURIComponent(`🛍️ Join FAIZ FASHION! My code: ${userRefCode}\n${link}`)}`,'_blank')}
 
 function updateGlobalLocStatus(){const e=document.getElementById('globalLocStatus');if(!e)return;if(userSavedLat&&userSavedLng){e.textContent='✅ Shared';e.style.color='var(--success)'}else{e.textContent='Tap to allow GPS';e.style.color='var(--text-dim)'}}
@@ -2244,7 +2262,13 @@ function startVoiceSearch(){
   voiceRecognition=new SR();voiceRecognition.lang='hi-IN';voiceRecognition.interimResults=false;voiceRecognition.maxAlternatives=1;
   const btn=document.getElementById('voiceSearchBtn');btn.textContent='🔴';btn.classList.add('recording');
   const reset=()=>{btn.textContent='🎤';btn.classList.remove('recording');voiceRecognition=null};
-  voiceRecognition.onresult=(e)=>{const t=e.results[0][0].transcript;document.getElementById('shopSearch').value=t;onSearchInput(t)};
+ voiceRecognition.onresult=(e)=>{
+    const t=e.results[0][0].transcript;
+    document.getElementById('shopSearch').value=t;
+    openSearchPage(); 
+    document.getElementById('fullSearchInput').value = t;
+    handleFullSearch(t); 
+};
   voiceRecognition.onerror=(e)=>{if(e.error!=='aborted')alert('Voice error: '+e.error);reset()};
   voiceRecognition.onend=reset;
   try{voiceRecognition.start()}catch(e){reset();alert('Error: '+e.message)}
@@ -2959,8 +2983,7 @@ async function submitOrder(){
       const orderRef=await addDoc(collection(db,'orders'),{...orderData,...paymentExtra});
       if(saveAddr)await setDoc(doc(db,'users',currentUid,'addresses',Date.now().toString()),{name,phone,building,address,landmark});
       for(let item of cartItems)await deleteDoc(doc(db,'users',currentUid,'cart',item.cartId));
-      for(let item of items){try{const ref=doc(db,'categories',item.productId);const snap=await getDoc(ref);if(snap.exists()){const cur=snap.data().times||0;await updateDoc(ref,{times:Math.max(0,cur-item.qty)})}}catch(e){}}
-      if(rp>0)await addUserPoints(-rp);if(earned>0)await addUserPoints(earned);if(wp>0)await addUserWallet(-wp);
+for(let item of items){try{ await updateDoc(doc(db,'categories',item.productId), { times: increment(-item.qty) }); }catch(e){}}
       const rEl2=document.getElementById('chkRedeemPoints');if(rEl2)rEl2.value='';const wEl2=document.getElementById('chkWalletAmount');if(wEl2)wEl2.value='';
       discountPercent=0;appliedCoupon='';hideLoading();btn.disabled=false;btn.textContent='Place Order';showScreen('shop');
       const waMsg=buildOrderWhatsAppMsg(name,phone,building,address,landmark,items,total,orderCode);
@@ -3136,7 +3159,7 @@ function checkSpinWheel(){const last=localStorage.getItem('lastSpinDate');const 
 function closeSpinWheel(){document.getElementById('spinWheelModal').style.display='none'}
 function spinWheel(){const btn=document.getElementById('spinBtn');btn.disabled=true;const wheel=document.getElementById('wheelCanvas');const deg=Math.floor(Math.random()*360)+720;wheel.style.transform=`rotate(${deg}deg)`;setTimeout(()=>{if(couponsCache.length>0){const c=couponsCache[Math.floor(Math.random()*couponsCache.length)];document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML=`🎉 Won: <span style="color:var(--text)">${c.code}</span> (${c.discountPercent}% OFF)`;localStorage.setItem('lastSpinDate',new Date().toDateString())}else{document.getElementById('spinResult').style.display='block';document.getElementById('spinResult').innerHTML='No coupons active'};btn.textContent='CLOSE';btn.onclick=closeSpinWheel;btn.disabled=false},3000)}
 
-const EXPORTS=['openSearchPage','closeSearchPage','handleFullSearch','selectFullSearch','sharePreOrderLocation','openOtpmodal','closeOtpmodal','showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail','requestStockAlert','checkFirstOrderBonus','getSizeRecommendation','updateSizeRecommendation','lookupPincodeDebounced','lookupPincode','selectPincode','trackProductView','trackCartAdd','loadProductAnalytics','loadAbandonedCarts','setLanguage','applyLanguage','renderNewArrivalsAndHot','renderDealsAndSuggested','openProfileDetails','saveProfileDetails','openFilterScreen','closeFilterScreen','switchFilterTab','updateTempFilter','clearTempFilters','applyFilters','updateApplyButtonText','clearSearchText','goToShopHome'];
+const EXPORTS=['openSearchPage','closeSearchPage','handleFullSearch','selectFullSearch','sharePreOrderLocation','openOtpmodal','showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail','requestStockAlert','checkFirstOrderBonus','getSizeRecommendation','updateSizeRecommendation','lookupPincodeDebounced','lookupPincode','selectPincode','trackProductView','trackCartAdd','loadProductAnalytics','loadAbandonedCarts','setLanguage','applyLanguage','renderNewArrivalsAndHot','renderDealsAndSuggested','openProfileDetails','saveProfileDetails','openFilterScreen','closeFilterScreen','switchFilterTab','updateTempFilter','clearTempFilters','applyFilters','updateApplyButtonText','clearSearchText','goToShopHome'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
