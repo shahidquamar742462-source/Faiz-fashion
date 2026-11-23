@@ -730,7 +730,12 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
     <div id="catError" class="error-msg"></div>
   </div>
 </div>
-<!-- Ye naya box add karo -->
+
+<div id="screen-settings" class="screen">
+  <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>Settings</h2></div>
+  <div class="form-container">
+    <button class="btn-primary" onclick="openCategoryForm()" style="margin-bottom:20px;background:var(--success);color:#fff">+ Add New Product</button>
+    <!-- Ye naya box add karo -->
     <div class="settings-section" style="border:1px solid var(--border)">
       <h3 style="color:var(--text)">👑 Add New Admin</h3>
       <div style="display:flex;gap:10px;margin-bottom:15px">
@@ -739,10 +744,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
       </div>
       <div id="adminEmailList"></div>
     </div>
-<div id="screen-settings" class="screen">
-  <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>Settings</h2></div>
-  <div class="form-container">
-    <button class="btn-primary" onclick="openCategoryForm()" style="margin-bottom:20px;background:var(--success);color:#fff">+ Add New Product</button>
     <div class="settings-section" style="border:1px solid var(--border)">
       <h3 style="color:var(--text);margin-bottom:15px">🏪 Shop Status</h3>
       <button class="btn-primary" id="shopStatusBtn" onclick="toggleShopStatus()" style="background:var(--success);color:#fff">Loading...</button>
