@@ -3235,7 +3235,7 @@ for(let item of items){try{ await updateDoc(doc(db,'categories',item.productId),
     }
   }
   }
-}
+
 
 async function loadSavedAddresses(){const sel=document.getElementById('chkSavedAddress');if(!sel)return;sel.innerHTML='<option value="">-- Select --</option>';savedAddressesCache=[];const snap=await getDocs(collection(db,'users',currentUid,'addresses'));if(!snap.empty){document.getElementById('savedAddressGroup').style.display='block';snap.forEach(d=>{const a=d.data();savedAddressesCache.push({id:d.id,...a});const idx=savedAddressesCache.length-1;sel.innerHTML+=`<option value="${idx}">${escapeHtml(a.name)} - ${escapeHtml(a.address.substring(0,40))}</option>`})}else document.getElementById('savedAddressGroup').style.display='none'}
 function fillSavedAddress(v){if(v==='')return;const a=savedAddressesCache[parseInt(v)];if(!a)return;document.getElementById('chkName').value=a.name||'';document.getElementById('chkPhone').value=a.phone||'';document.getElementById('chkBuilding').value=a.building||'';document.getElementById('chkAddress').value=a.address||'';document.getElementById('chkLandmark').value=a.landmark||''}
