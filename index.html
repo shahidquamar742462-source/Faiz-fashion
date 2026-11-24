@@ -2530,6 +2530,8 @@ function loadAdminOrders(){
     renderAdminOrdersList(); 
   });
 }
+  
+  function setAdminCatFilter(cat) {
     adminCatFilter = cat;
     document.querySelectorAll('#adminOrderCatFilters .filter-chip').forEach(btn => btn.classList.remove('active'));
     document.getElementById('adminCat-' + cat).classList.add('active');
