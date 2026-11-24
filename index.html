@@ -885,7 +885,10 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   </div>
   <div id="shopGrid" class="product-grid"></div>
 </div>
-
+<div id="shopGrid" class="product-grid"></div>
+  
+  <!-- YE NAYA DIV ADD KARO (Auto Scroll Trigger) -->
+  <div id="infiniteScrollSentinel" style="height: 20px; width: 100%; margin-bottom: 20px;"></div>
 <!-- NEW: FULL SCREEN FILTER PAGE -->
 <div id="screen-filters" class="screen">
     <div class="filter-header">
@@ -1373,6 +1376,8 @@ let adsCache=[], adRotationInterval=null, adPendingFile=null;
 let currentOrderDetailId=null;
 let myStockAlerts=new Set(); 
 let allowedAdmins = [];
+let displayLimit = 20; 
+let isFetchingMore = false;
 // NEW: Search Filter Variables
 let searchFilterBrand = '';
 let searchFilterSize = '';
@@ -1695,7 +1700,7 @@ function showScreen(name){
 }
 
 // NEW: Clear Search Text Function
-function clearSearchText() {
+function clearSearchText() {displayLimit=20;
   const searchInput = document.getElementById('shopSearch');
   if(searchInput) searchInput.value = '';
   const clearBtn = document.getElementById('clearSearchBtn');
@@ -2786,7 +2791,7 @@ function loadAdminChats(){const list=document.getElementById('adminChatsList');i
 async function openAdminChat(uid,name){currentAdminChatUid=uid;currentAdminChatUserName=name;document.getElementById('adminChatUserName').textContent=name;showScreen('admin-chat-view');await updateDoc(doc(db,'support_chats',uid),{unreadAdmin:0});const messagesEl=document.getElementById('adminChatMessages');messagesEl.innerHTML='<div class="loading-row">Loading...</div>';if(unsubAdminChat)unsubAdminChat();unsubAdminChat=onSnapshot(query(collection(db,'support_chats',uid,'messages'),orderBy('date','asc')),snap=>{if(snap.empty){messagesEl.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:20px;font-size:13px">No messages</div>';return}messagesEl.innerHTML=snap.docs.map(d=>{const m=d.data();const time=m.date?new Date(m.date.seconds*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';const sender=m.sender==='admin'?'customer':'admin';return`<div class="chat-msg ${sender==='customer'?'customer':'admin'}">${escapeHtml(m.text)}<div class="chat-msg-time">${time}</div></div>`}).join('');messagesEl.scrollTop=messagesEl.scrollHeight})}
 async function sendAdminChatMsg(){const inp=document.getElementById('adminChatInput');const text=inp.value.trim();if(!text||!currentAdminChatUid)return;inp.value='';try{await addDoc(collection(db,'support_chats',currentAdminChatUid,'messages'),{sender:'admin',text,date:serverTimestamp()});await updateDoc(doc(db,'support_chats',currentAdminChatUid),{lastMessage:text,lastMessageAt:serverTimestamp(),unreadCustomer:increment(1)})}catch(e){alert('Error: '+e.message)}}
 
-function setMainCategory(cat){mainCategory=cat;document.querySelectorAll('.cat-icon-item').forEach(item=>{item.classList.toggle('active',item.getAttribute('onclick').includes(`'${cat}'`))});renderShop()}
+function setMainCategory(cat){displayLimit=20;mainCategory=cat;document.querySelectorAll('.cat-icon-item').forEach(item=>{item.classList.toggle('active',item.getAttribute('onclick').includes(`'${cat}'`))});renderShop()}
 
 // UPDATED onSearchInput
  function openSearchPage() {
@@ -2826,37 +2831,43 @@ function renderRecentSearchesHorizontal() {
   body.innerHTML = html;
 }
 
+let searchTimeout;
 function handleFullSearch(q) {
   const body = document.getElementById('fullSearchBody');
-  if(!q || q.trim() === '') {
-    renderRecentSearchesHorizontal();
-    return;
+  
+  if(!q || q.trim() === '') { 
+      renderRecentSearchesHorizontal(); 
+      return; 
   }
-  
-  saveRecentSearch(q);
-  const matches = categoriesCache.filter(c => c.name.toLowerCase().includes(q.toLowerCase()));
-  
-  if(matches.length === 0) {
-    body.innerHTML = '<div style="text-align:center; padding:30px; color:#d81b60; font-weight:bold;">No products found</div>';
-    return;
-  }
-  
-  let html = '';
-  matches.forEach(m => {
-    const img = (m.photoUrls && m.photoUrls.length > 0) ? m.photoUrls[0] : (m.photoUrl || 'logo.png');
-    html += `<div class="suggest-item" onclick="selectFullSearch('${escapeHtml(m.name)}')">
-              <img src="${optImg(img, 150)}">
-              <div>
-                <div class="s-name">${escapeHtml(m.name)}</div>
-              <div class="s-price">₹${getEffectivePrice(m)}</div>
-              </div>
-              <div style="color:#d81b60;">↗️</div>
-            </div>`;
-  });
-  body.innerHTML = html;
-}
 
-function selectFullSearch(name) {
+  // 300ms wait karega, taaki customer pura word type kar le
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+      saveRecentSearch(q);
+      const matches = categoriesCache.filter(c => c.name.toLowerCase().includes(q.toLowerCase()));
+      
+      if(matches.length === 0) {
+        body.innerHTML = '<div style="text-align:center; padding:30px; color:#d81b60; font-weight:bold;">No products found</div>';
+        return;
+      }
+
+      let html = '';
+      // Sirf top 10 products dikhayega
+      matches.slice(0, 10).forEach(m => {
+        const img = (m.photoUrls && m.photoUrls.length > 0) ? m.photoUrls[0] : (m.photoUrl || 'logo.png');
+        html += `<div class="suggest-item" onclick="selectFullSearch('${escapeHtml(m.name)}')">
+                  <img src="${optImg(img, 150)}" loading="lazy">
+                  <div>
+                    <div class="s-name">${escapeHtml(m.name)}</div>
+                    <div class="s-price">₹${getEffectivePrice(m)}</div>
+                  </div>
+                  <div style="color:#d81b60;">↗️</div>
+                </div>`;
+      });
+      body.innerHTML = html;
+  }, 300); 
+}
+function selectFullSearch(name) {displayLimit=20;
   closeSearchPage(); // Pehle search page band karega
   searchQuery = name.toLowerCase();
   saveRecentSearch(name);
@@ -2984,8 +2995,35 @@ function renderShop(){
   if(sortOrder==='low-high')items.sort((a,b)=>getEffectivePrice(a)-getEffectivePrice(b));else if(sortOrder==='high-low')items.sort((a,b)=>getEffectivePrice(b)-getEffectivePrice(a));else items.sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));
   
   if(items.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim)">No products found</div>';return}
-  
-  grid.innerHTML = items.map(c => getProductCardHTML(c)).join('');
+  // 1. Sirf limited products screen par draw karo
+  const itemsToDisplay = items.slice(0, displayLimit); 
+  grid.innerHTML = itemsToDisplay.map(c => getProductCardHTML(c)).join('');
+
+  // 2. Auto-scroll trigger ko manage karo
+  const sentinel = document.getElementById('infiniteScrollSentinel');
+  if (sentinel) {
+      if (displayLimit < items.length) {
+          sentinel.style.display = 'block'; 
+          setTimeout(setupInfiniteScroll, 100); 
+      } else {
+          sentinel.style.display = 'none'; 
+      }
+  }
+}
+  function setupInfiniteScroll() {
+    const sentinel = document.getElementById('infiniteScrollSentinel');
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !isFetchingMore) {
+            isFetchingMore = true;
+            displayLimit += 20; // 20 naye products add karo
+            renderShop();       
+            setTimeout(() => { isFetchingMore = false; }, 500); 
+        }
+    }, { rootMargin: '200px' }); 
+
+    observer.observe(sentinel);
 }
 function shareProductCard(id){
   const c=categoriesCache.find(x=>x.id===id);if(!c)return;
@@ -3001,7 +3039,7 @@ function renderWatchlistGrid(){
   grid.innerHTML=items.map(c=>{
     const out=(c.times||0)<=0;const price=getEffectivePrice(c);const isFlash=isFlashActive(c);const off=getDiscountPercent(c.originalPrice,price);const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const inCart=cartProductIds.has(c.id);const flashBadge=isFlash?`<div class="flash-badge">⚡ FLASH</div>`:'';
     const fakeRating = (4.1 + (c.name.length % 8) * 0.1).toFixed(1);
-    return `<div class="product-card" onclick="openProductDetails('${c.id}')"><div class="img-wrap"><img src="${optImg(img,400)}">
+    return `<div class="product-card" onclick="openProductDetails('${c.id}')"><div class="img-wrap"><img src="${optImg(img,400)}" loading="lazy">
       <button class="share-card-btn" onclick="event.stopPropagation(); shareProductCard('${c.id}')">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       </button>
