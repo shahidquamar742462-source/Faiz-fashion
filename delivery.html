@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FAIZ FASHION - Delivery App</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+:root{--bg:#f4f6f8;--card:#ffffff;--text:#1e293b;--text-dim:#64748b;--primary:#e52d27;--success:#10b981;--border:#e2e8f0}
+body{background:var(--bg);color:var(--text);min-height:100vh}
+.header{background:var(--primary);color:#fff;padding:20px;text-align:center;box-shadow:0 4px 10px rgba(229,45,39,0.2)}
+.header h1{font-size:20px;font-weight:900;letter-spacing:1px}
+.header p{font-size:12px;margin-top:5px;opacity:0.9}
+.login-box{background:var(--card);padding:30px 20px;margin:40px 20px;border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,0.05);text-align:center}
+.login-box h2{font-size:22px;margin-bottom:10px}
+.login-box p{font-size:14px;color:var(--text-dim);margin-bottom:20px}
+.login-box input{width:100%;padding:15px;border:2px solid var(--border);border-radius:12px;font-size:18px;text-align:center;letter-spacing:2px;outline:none;transition:0.2s}
+.login-box input:focus{border-color:var(--primary)}
+.login-box button{width:100%;padding:15px;margin-top:15px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer}
+.container{padding:15px;max-width:500px;margin:0 auto;padding-bottom:50px}
+.order-card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:15px;box-shadow:0 4px 12px rgba(0,0,0,0.05);border-left:5px solid var(--primary)}
+.order-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:10px}
+.order-id{font-weight:900;font-size:16px;color:var(--text)}
+.order-price{font-weight:900;font-size:18px;color:var(--success)}
+.cust-name{font-size:16px;font-weight:700;margin-bottom:5px}
+.cust-address{font-size:13px;color:var(--text-dim);margin-bottom:12px;line-height:1.4}
+.items-list{background:var(--bg);padding:10px;border-radius:8px;margin-bottom:15px;font-size:13px}
+.item-row{display:flex;justify-content:space-between;margin-bottom:5px}
+.item-row:last-child{margin-bottom:0}
+.btn-group{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.btn{padding:12px;border-radius:10px;font-size:14px;font-weight:800;text-align:center;text-decoration:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
+.btn-call{background:#3498db;color:#fff}
+.btn-map{background:#f39c12;color:#fff}
+.btn-deliver{background:var(--success);color:#fff;grid-column:1/-1;padding:16px;font-size:16px;box-shadow:0 4px 15px rgba(16,185,129,0.3)}
+.loading{text-align:center;padding:40px;color:var(--text-dim);font-weight:600}
+.empty{text-align:center;padding:40px;color:var(--text-dim);font-weight:600}
+.logout-btn{position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.2);border:none;color:#fff;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+    <div class="header">
+        <h1>FAIZ FASHION</h1>
+        <p>Delivery Partner App</p>
+    </div>
+    <div class="login-box">
+        <h2>Welcome, Rider! 🛵</h2>
+        <p>Apna registered mobile number daalein</p>
+        <input type="tel" id="phoneInput" maxlength="10" placeholder="10-digit number" inputmode="numeric">
+        <button onclick="loginRider()">Login</button>
+        <div id="loginError" style="color:var(--primary);font-size:13px;margin-top:10px;font-weight:700"></div>
+    </div>
+</div>
+
+<div id="dashboardScreen" style="display:none;">
+    <div class="header" style="position:relative;">
+        <button class="logout-btn" onclick="logoutRider()">Logout</button>
+        <h1>My Deliveries</h1>
+        <p id="riderPhoneDisplay">Loading...</p>
+    </div>
+    <div class="container" id="ordersContainer">
+        <div class="loading">Loading orders...</div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig={apiKey:"AIzaSyCBLRe3QajETrVTuK-ljrOVndJO9ndZiuU",authDomain:"faiz-fashion.firebaseapp.com",projectId:"faiz-fashion",storageBucket:"faiz-fashion.firebasestorage.app",messagingSenderId:"188226858699",appId:"1:188226858699:web:328e68db2b95b366a1f54e"};
+const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);
+
+let currentRiderPhone = localStorage.getItem('riderPhone') || null;
+let unsubscribeOrders = null;
+
+// Check if already logged in
+onAuthStateChanged(auth, (user) => {
+    if (user && currentRiderPhone) {
+        showDashboard();
+    } else if (user && !currentRiderPhone) {
+        signOut(auth);
+        showLogin();
+    }
+});
+
+function loginRider() {
+    const phone = document.getElementById('phoneInput').value.trim();
+    if (phone.length !== 10) {
+        document.getElementById('loginError').innerText = "Please enter a valid 10-digit number";
+        return;
+    }
+    
+    document.getElementById('loginError').innerText = "";
+    document.getElementById('loginScreen').innerHTML = '<div class="loading">Authenticating...</div>';
+    
+    // Sign in anonymously to Firestore (needed for security rules)
+    signInAnonymously(auth).then(() => {
+        currentRiderPhone = phone;
+        localStorage.setItem('riderPhone', phone);
+        showDashboard();
+    }).catch((error) => {
+        alert("Login failed: " + error.message);
+        window.location.reload();
+    });
+}
+
+function showDashboard() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboardScreen').style.display = 'block';
+    document.getElementById('riderPhoneDisplay').innerText = "Rider: " + currentRiderPhone;
+    listenOrders();
+}
+
+function logoutRider() {
+    if(confirm("Are you sure you want to logout?")) {
+        localStorage.removeItem('riderPhone');
+        if(unsubscribeOrders) unsubscribeOrders();
+        signOut(auth).then(() => window.location.reload());
+    }
+}
+
+function listenOrders() {
+    if (unsubscribeOrders) unsubscribeOrders();
+    
+    const q = query(collection(db, 'orders'), where('deliveryBoy.phone', '==', currentRiderPhone));
+    
+    unsubscribeOrders = onSnapshot(q, (snap) => {
+        const container = document.getElementById('ordersContainer');
+        
+        // Filter: Only show orders that are not fully delivered or cancelled
+        const activeOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+            .filter(o => !['Delivered', 'Cancelled'].includes(o.status) && o.status !== 'Pending');
+            
+        if (activeOrders.length === 0) {
+            container.innerHTML = '<div class="empty"><div style="font-size:40px;margin-bottom:10px">🎉</div>Abhi koi pending order nahi hai.<br>Naya order aate hi yahan dikhega.</div>';
+            return;
+        }
+
+        container.innerHTML = activeOrders.map(o => {
+            const mapBtn = (o.latitude && o.longitude) 
+                ? `<a href="https://www.google.com/maps?q=${o.latitude},${o.longitude}" target="_blank" class="btn btn-map">📍 Map</a>` 
+                : `<div class="btn btn-map" style="opacity:0.5;cursor:not-allowed">📍 No Location</div>`;
+                
+            const callBtn = `<a href="tel:${o.phone}" class="btn btn-call">📞 Call</a>`;
+            
+            const itemsHtml = o.items.map(i => `
+                <div class="item-row">
+                    <span>${i.name} ${i.size ? '('+i.size+')' : ''}</span>
+                    <strong>x${i.qty || 1}</strong>
+                </div>
+            `).join('');
+
+            return `
+            <div class="order-card">
+                <div class="order-head">
+                    <div class="order-id">#${o.orderCode || o.id.slice(-6)}</div>
+                    <div class="order-price">₹${o.total}</div>
+                </div>
+                <div class="cust-name">${o.customerName}</div>
+                <div class="cust-address">${o.building ? o.building + ', ' : ''}${o.address}</div>
+                
+                <div class="items-list">
+                    ${itemsHtml}
+                </div>
+
+                <div class="btn-group">
+                    ${callBtn}
+                    ${mapBtn}
+                </div>
+                <button class="btn btn-deliver" onclick="verifyAndDeliver('${o.id}', '${o.deliveryOtp}')">✅ Mark as Delivered</button>
+            </div>
+            `;
+        }).join('');
+    }, (error) => {
+        console.error(error);
+        document.getElementById('ordersContainer').innerHTML = '<div class="empty" style="color:red">Error loading orders. Please logout and login again.</div>';
+    });
+}
+
+window.verifyAndDeliver = async function(orderId, correctOtp) {
+    const enteredOtp = prompt("Customer se OTP lein aur yahan enter karein:");
+    if (enteredOtp === null) return; // Cancelled
+    
+    if (enteredOtp !== String(correctOtp)) {
+        return alert("❌ Galat OTP! Kripya customer se sahi OTP lein.");
+    }
+    
+    if(confirm("OTP Sahi hai. Kya aapne order customer ko de diya hai?")) {
+        try {
+            await updateDoc(doc(db, 'orders', orderId), { 
+                status: 'Delivered', 
+                deliveredAt: serverTimestamp() 
+            });
+            alert("✅ Order Successfully Delivered!");
+        } catch (e) {
+            alert("Error: " + e.message);
+        }
+    }
+}
+</script>
+</body>
+</html>
