@@ -2161,73 +2161,43 @@ function renderFlashSaleBanner(){
   update();flashSaleCountdownInterval=setInterval(update,1000);
 }
 
+let isFirstCategoryLoad = true; // Ye line add karni hai (agar pehle se nahi hai)
+
 function listenCategories(){
   unsubCategories = onSnapshot(collection(db,'categories'), snap => {
     
-    // Agar pehli baar data load ho raha hai (App start hote waqt)
-    if (categoriesCache.length === 0) {
-      categoriesCache = snap.docs.map(d=>({id:d.id,...d.data()}));
-      renderAdminCategories(); renderShop(); renderWatchlistGrid(); 
-      renderNewArrivalsAndHot(); renderDealsAndSuggested(); renderFlashSaleBanner();
-      return;
+    // Pehli baar jab app khule, toh saara data cache me daalo
+    if (isFirstCategoryLoad) {
+        categoriesCache = snap.docs.map(d => ({id:d.id, ...d.data()}));
+        isFirstCategoryLoad = false;
+    } else {
+        // Uske baad sirf jo naya aaya ya edit hua hai usko update karo (Purane products ko mat chhedo)
+        snap.docChanges().forEach(change => {
+            const data = { id: change.doc.id, ...change.doc.data() };
+            if (change.type === 'added') {
+                if (!categoriesCache.find(c => c.id === data.id)) {
+                    categoriesCache.unshift(data); 
+                }
+            } else if (change.type === 'modified') {
+                const idx = categoriesCache.findIndex(c => c.id === data.id);
+                if (idx > -1) categoriesCache[idx] = data; 
+            } else if (change.type === 'removed') {
+                categoriesCache = categoriesCache.filter(c => c.id !== data.id); 
+            }
+        });
     }
 
-    // Agar naya product, edit ya delete hua hai
-    let needsFullRefresh = false;
-
-    snap.docChanges().forEach(change => {
-      const product = { id: change.doc.id, ...change.doc.data() };
-
-      if (change.type === 'added') {
-        // Naya Product aaya
-        categoriesCache.push(product);
-        
-        // Sirf tabhi screen par add karo agar Shop page khula hai aur koi search/filter nahi chal raha
-        const isShopActive = document.getElementById('screen-shop').classList.contains('active');
-        if (isShopActive && mainCategory === 'All' && !searchQuery && !filterInStock && filterMaxPrice === null && sortOrder === 'default') {
-          const grid = document.getElementById('shopGrid');
-          if (grid) {
-            // Purane ko chhede bina, bas naya product sabse upar add kar do
-            grid.insertAdjacentHTML('afterbegin', getProductCardHTML(product));
-          }
-        } else if (isShopActive) {
-          needsFullRefresh = true; // Agar search/filter chal raha hai toh list update karni padegi
-        }
-      } 
-      
-      else if (change.type === 'modified') {
-        // Product edit hua
-        const idx = categoriesCache.findIndex(c => c.id === product.id);
-        if (idx > -1) categoriesCache[idx] = product;
-
-        // Screen par purane card ko naye HTML se replace kar do
-        const existingCard = document.querySelector(`.product-card[data-id="${product.id}"]`);
-        if (existingCard) {
-          const wrapper = document.createElement('div');
-          wrapper.innerHTML = getProductCardHTML(product);
-          existingCard.replaceWith(wrapper.firstElementChild);
-        } else {
-          needsFullRefresh = true;
-        }
-      } 
-      
-      else if (change.type === 'removed') {
-        // Product delete hua
-        categoriesCache = categoriesCache.filter(c => c.id !== product.id);
-        const existingCard = document.querySelector(`.product-card[data-id="${product.id}"]`);
-        if (existingCard) existingCard.remove(); // Direct screen se hata do
-      }
-    });
-
-    // Baaki UI updates (Admin panel, watchlist, etc.)
-    renderAdminCategories(); renderWatchlistGrid(); 
-    renderNewArrivalsAndHot(); renderDealsAndSuggested(); renderFlashSaleBanner();
+    // UI Refresh (Ye tumhara purana logic hai, safe hai)
+    renderAdminCategories(); 
+    renderShop(); 
+    renderWatchlistGrid(); 
+    renderNewArrivalsAndHot(); 
+    renderDealsAndSuggested(); 
+    renderFlashSaleBanner();
+    
     if(document.getElementById('screen-cart').classList.contains('active')) renderCart();
-    if(document.getElementById('screen-product-details').classList.contains('active') && currentDetailProduct) loadFrequentlyBought(currentDetailProduct);
-
-    // Agar filter ya search on tha, tabhi full list render karo
-    if (needsFullRefresh) {
-      renderShop();
+    if(document.getElementById('screen-product-details').classList.contains('active') && currentDetailProduct) {
+        loadFrequentlyBought(currentDetailProduct);
     }
   });
 }
@@ -2541,8 +2511,25 @@ function loadAdminAds(){
 async function toggleAdActive(id,current){try{await updateDoc(doc(db,'ads',id),{active:!current})}catch(e){alert('Error: '+e.message)}}
 async function deleteAd(id){if(!confirm('Delete this ad?'))return;try{await deleteDoc(doc(db,'ads',id));alert('✅ Deleted')}catch(e){alert('Error: '+e.message)}}
 
-function loadAdminOrders(){const list=document.getElementById('adminOrdersList');if(!list)return;if(unsubAdminOrders)unsubAdminOrders();unsubAdminOrders=onSnapshot(collection(db,'orders'),snap=>{if(snap.empty){list.innerHTML='<div class="loading-row">No orders</div>';return}let arr=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.deletedByAdmin!==true);arr.sort((a,b)=>(b.date?.toMillis()||0)-(a.date?.toMillis()||0));allAdminOrdersCache=arr;updateAdminNotifBadge();document.getElementById('statReturns').textContent=arr.filter(o=>o.returnStatus==='Requested').length;renderAdminOrdersList();})}
-function setAdminCatFilter(cat) {
+function loadAdminOrders(){
+  const list = document.getElementById('adminOrdersList');
+  if(!list) return;
+  if(unsubAdminOrders) unsubAdminOrders();
+  
+  unsubAdminOrders = onSnapshot(collection(db,'orders'), snap => {
+    if(snap.empty){ list.innerHTML = '<div class="loading-row">No orders</div>'; return; }
+    
+    let arr = snap.docs.map(d => ({id:d.id, ...d.data()})).filter(o => o.deletedByAdmin !== true);
+    arr.sort((a,b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
+    
+    allAdminOrdersCache = arr; 
+    updateAdminNotifBadge();
+    document.getElementById('statReturns').textContent = arr.filter(o => o.returnStatus === 'Requested').length;
+    
+    // Ye line naya order aate hi list ko turant update karegi
+    renderAdminOrdersList(); 
+  });
+}
     adminCatFilter = cat;
     document.querySelectorAll('#adminOrderCatFilters .filter-chip').forEach(btn => btn.classList.remove('active'));
     document.getElementById('adminCat-' + cat).classList.add('active');
@@ -3197,11 +3184,56 @@ for(let item of items){try{ await updateDoc(doc(db,'categories',item.productId),
     hideLoading();btn.disabled=false;btn.textContent='Place Order';
     const upiMsg=`📱 *UPI PAYMENT*\n\nPay ₹${Math.round(total)} to: ${upiId||'Contact admin'}\n\nAfter payment, screenshot WhatsApp karein: ${whatsappNumber}\n\nOrder ID: ${orderCode}`;
     if(confirm(upiMsg+'\n\nAapne payment kar diya? (OK = Order place karein)')){showLoading();btn.disabled=true;btn.textContent='Placing...';await finalizeOrder({paymentStatus:'Pending Verification',paymentMethod:'UPI'})}
-  }else if(selectedPaymentMethod==='razorpay'){
-    if(!razorpayKey){hideLoading();btn.disabled=false;btn.textContent='Place Order';return alert('❌ Razorpay not configured.')}
-    hideLoading();btn.disabled=false;btn.textContent='Place Order';
-    const options={key:razorpayKey,amount:Math.round(total*100),currency:'INR',name:'FAIZ FASHION',description:`Order #${orderCode}`,prefill:{name,contact:phone},theme:{color:'#e52d27'},handler:async function(response){showLoading();btn.disabled=true;btn.textContent='Confirming...';await finalizeOrder({paymentStatus:'Paid',paymentMethod:'Razorpay',paymentId:response.razorpay_payment_id})},modal:{ondismiss:function(){if(confirm('Payment cancelled. Try again?'))submitOrder()}}};
-    try{const rzp=new Razorpay(options);rzp.open()}catch(e){alert('Razorpay error: '+e.message)}
+} else if(selectedPaymentMethod==='razorpay'){
+    if(!razorpayKey){
+        hideLoading(); btn.disabled=false; btn.textContent='Place Order'; 
+        return alert('❌ Razorpay not configured. Please set the key in Admin Settings.');
+    }
+    
+    if(typeof Razorpay === 'undefined'){
+        hideLoading(); btn.disabled=false; btn.textContent='Place Order';
+        return alert('❌ Razorpay SDK not loaded. Please check your internet and refresh the page.');
+    }
+
+    hideLoading(); btn.disabled=false; btn.textContent='Place Order';
+    
+    const options = {
+        key: razorpayKey,
+        amount: Math.round(total * 100),
+        currency: "INR",
+        name: 'FAIZ FASHION',
+        description: `Order #${orderCode}`,
+        prefill: { name, contact: phone },
+        theme: { color: '#e52d27' },
+        
+        handler: async function(response){
+            showLoading(); btn.disabled=true; btn.textContent='Confirming...';
+            document.body.style.overflow = 'auto'; 
+            await finalizeOrder({paymentStatus:'Paid', paymentMethod:'Razorpay', paymentId:response.razorpay_payment_id});
+        },
+        
+        modal: {
+            ondismiss: function(){
+                document.body.style.overflow = 'auto'; 
+                if(confirm('Payment cancelled. Do you want to try again?')){
+                    submitOrder();
+                }
+            }
+        }
+    };
+    
+    try {
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (response){
+            document.body.style.overflow = 'auto'; 
+            alert('❌ Payment Failed: ' + response.error.description);
+        });
+        rzp.open();
+    } catch(e) {
+        document.body.style.overflow = 'auto'; 
+        alert('Razorpay Error: ' + e.message);
+    }
+  }
   }
 }
 
