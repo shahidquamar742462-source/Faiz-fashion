@@ -3324,43 +3324,51 @@ function spinWheel(){const btn=document.getElementById('spinBtn');btn.disabled=t
 function renderAdminEmails(){
   const list = document.getElementById('adminEmailList');
   if(!list) return;
+  
   if(allowedAdmins.length === 0){
-    list.innerHTML = '<div style="font-size:12px;color:var(--text-dim)">No extra admins added.</div>';
+    list.innerHTML = '<div style="font-size:12px;color:var(--text-dim);text-align:center;padding:10px;">Koi extra admin nahi hai.</div>';
     return;
   }
+  
   list.innerHTML = allowedAdmins.map(e => `
-    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--card2);padding:10px;border-radius:8px;margin-bottom:5px">
-      <span style="font-size:14px;font-weight:600;color:var(--text)">${escapeHtml(e)}</span>
-      <button onclick="removeAdminEmail('${escapeHtml(e)}')" style="background:none;border:none;color:var(--danger);font-size:16px;cursor:pointer">✕</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--card2);padding:10px;border-radius:8px;margin-bottom:5px;border:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:16px;">👤</span>
+        <span style="font-size:13px;font-weight:700;color:var(--text)">${escapeHtml(e)}</span>
+      </div>
+      <button onclick="removeAdminEmail('${escapeHtml(e)}')" style="background:rgba(250,82,82,0.1);border:none;color:var(--danger);font-size:14px;padding:5px 10px;border-radius:6px;cursor:pointer;font-weight:800">🗑️ Remove</button>
     </div>
   `).join('');
 }
 
 async function addAdminEmail(){
   if(!isAdminUser) return;
-  const email = document.getElementById('newAdminEmail').value.trim().toLowerCase();
+  const emailInput = document.getElementById('newAdminEmail');
+  const email = emailInput.value.trim().toLowerCase();
+  
   if(!email || !email.includes('@')) return alert('Valid Gmail ID required');
-  if(email === ADMIN_EMAIL) return alert('This is already the main Admin');
-  if(allowedAdmins.includes(email)) return alert('Already an admin');
+  if(email === ADMIN_EMAIL) return alert('Ye super admin hai, isko add karne ki zaroorat nahi.');
+  if(allowedAdmins.includes(email)) return alert('Ye Gmail pehle se admin hai!');
   
   showLoading();
   try {
     allowedAdmins.push(email);
     await setDoc(doc(db,'settings','config'), { allowedAdmins }, { merge: true });
-    document.getElementById('newAdminEmail').value = '';
-    alert('✅ Admin added!');
+    emailInput.value = '';
+    alert('✅ Naya Admin add ho gaya!');
   } catch(e) { alert('Error: '+e.message); }
   hideLoading();
 }
 
 async function removeAdminEmail(email){
   if(!isAdminUser) return;
-  if(!confirm(`Remove ${email} from admin?`)) return;
+  if(!confirm(`Kya aap ${email} ko admin se hata dena chahte hain?`)) return;
+  
   showLoading();
   try {
     allowedAdmins = allowedAdmins.filter(e => e !== email);
     await setDoc(doc(db,'settings','config'), { allowedAdmins }, { merge: true });
-    alert('✅ Removed!');
+    alert('✅ Admin remove ho gaya!');
   } catch(e) { alert('Error: '+e.message); }
   hideLoading();
 }
@@ -3368,16 +3376,20 @@ async function removeAdminEmail(email){
 function updateAdminStatus(){
   const user = auth.currentUser;
   if(!user) return;
-  // Check karo ki user main admin hai ya list me add kiya hua admin hai
-  isAdminUser = (user.email === ADMIN_EMAIL) || allowedAdmins.includes(user.email);
   
-  // Agar naya admin login hua hai aur abhi admin panel me nahi hai, toh use wahan bhejo
-  if(isAdminUser && !document.getElementById('screen-admin').classList.contains('active') && !document.getElementById('screen-settings').classList.contains('active')) {
-      showScreen('admin');
-      renderAdminCategories();
+  const isSuperAdmin = user.email === ADMIN_EMAIL;
+  const isAddedAdmin = allowedAdmins.includes(user.email);
+  
+  // Agar user admin tha, par ab remove kar diya gaya hai
+  if (isAdminUser && !isSuperAdmin && !isAddedAdmin) {
+      alert("❌ Aapka Admin access hata liya gaya hai.");
+      handleLogout(); // Auto logout
+      return;
   }
+
+  isAdminUser = isSuperAdmin || isAddedAdmin;
 }
-const EXPORTS=['openSearchPage','closeSearchPage','handleFullSearch','selectFullSearch','sharePreOrderLocation','openOtpmodal','showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders','calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail','requestStockAlert','checkFirstOrderBonus','getSizeRecommendation','updateSizeRecommendation','lookupPincodeDebounced','lookupPincode','selectPincode','trackProductView','trackCartAdd','loadProductAnalytics','loadAbandonedCarts','setLanguage','applyLanguage','renderNewArrivalsAndHot','renderDealsAndSuggested','openProfileDetails','saveProfileDetails','openFilterScreen','closeFilterScreen','switchFilterTab','updateTempFilter','clearTempFilters','applyFilters','updateApplyButtonText','clearSearchText','goToShopHome'];
+const EXPORTS=['openSearchPage','closeSearchPage','handleFullSearch','selectFullSearch','sharePreOrderLocation','openOtpmodal','showScreen','loginWithGoogle','loginWithAnonymous','handleLogin','handleReset','handleLogout','promptSettingsPassword','unlockAdminOtp','openSettings','saveSettings','previewBanner','removePendingBanner','removeExistingBanner','openCategoryForm','previewPhoto','removeExistingPhoto','removeNewPhoto','saveCategory','deleteCategory','previewCatSizeGuide','saveCoupon','deleteCoupon','changeAdminPassword','setMainCategory','onSearchInput','selectAutocomplete','sortProducts','toggleInStockFilter','openPriceRange','clearAllFilters','openProductDetails','shareProduct','shareProductCard','addToCartDetails','buyNowDetails','toggleWatchlist','toggleWatchlistDetails','goBackFromDetails','validateSizeColor','openSizeGuide','closeSizeGuide','toggleCartFromCard','removeCartItem','updateCartQty','applyCoupon','removeCoupon','openCheckout','calculateRedemption','useMaxPoints','calculateWalletRedemption','useMaxWallet','shareReferralCode','submitOrder','loadAdminOrders','updateOrderStatus','deleteOrder','updateReturnTracking','saveDeliveryBoy','printInvoice','showAdminNotifs','closeAdminNotifs','openReviewForm','closeReviewForm','submitReview','previewPrePhoto','toggleVoiceRecord','submitPreOrder','fillSavedAddress','loadAdminPreOrders','updatePreOrderStatus','deletePreOrder','loadAdminReviews','deleteReview','installPWA','toggleDarkMode','showAddAddressForm','saveNewAddress','deleteAddress','setOrderFilter','openReturnModal','closeReturnModal','updateReturnItemDetails','submitReturnRequest','toggleExchangeFields','toggleShopStatus','contactCall','contactWhatsApp','contactEmail','shareLocationFromOrder','requestGlobalLocation','requestCheckoutLocation','deleteCustomerOrder','openImageZoom','closeImageZoom','spinWheel','closeSpinWheel','filterAdminOrders', 'setAdminCatFilter', 'setAdminStatusFilter', 'renderAdminOrdersList', 'addAdminEmail', 'removeAdminEmail', 'calculatePreOrderTotal','sendPreOrderPrice','savePreOrderDeliveryBoy','acceptPreOrderPrice','filterAdminPreOrders','adminAdjustWallet','addUserWallet','startVoiceSearch','loadFrequentlyBought','quickAddToCart','toggleBoughtWith','populateBoughtWithList','openCancelModal','closeCancelModal','confirmCancelOrder','openOtpModal','closeOtpModal','verifyDeliveryOtp','showTierInfo','loadDashboard','openCustomerChat','sendCustomerChatMsg','openAdminChat','sendAdminChatMsg','openQAForm','closeQAForm','submitQA','answerQuestion','deleteQuestion','showRecentSearches','clearRecentSearches','selectPaymentMethod','viewCustomerOrders','switchCustOrderTab','filterDashboardUsers','renderSettingsRecentlyViewed','openOrderDetail','openReviewForProduct','previewAdImage','addAd','loadAdminAds','toggleAdActive','deleteAd','renderAdsCarousel','renderWatchlistGrid','renderOrderDetail','requestStockAlert','checkFirstOrderBonus','getSizeRecommendation','updateSizeRecommendation','lookupPincodeDebounced','lookupPincode','selectPincode','trackProductView','trackCartAdd','loadProductAnalytics','loadAbandonedCarts','setLanguage','applyLanguage','renderNewArrivalsAndHot','renderDealsAndSuggested','openProfileDetails','saveProfileDetails','openFilterScreen','closeFilterScreen','switchFilterTab','updateTempFilter','clearTempFilters','applyFilters','updateApplyButtonText','clearSearchText','goToShopHome'];
 EXPORTS.forEach(n=>{try{window[n]=eval(n)}catch(e){}});
 
 initTheme();
