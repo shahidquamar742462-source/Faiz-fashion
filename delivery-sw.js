@@ -1,4 +1,4 @@
-const CACHE_NAME = 'faiz-delivery-v3';
+const CACHE_NAME = 'faiz-delivery-v4';
 
 self.addEventListener('install', (event) => {
   // Naya service worker turant active ho jaye
