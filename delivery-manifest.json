@@ -1,6 +1,6 @@
 {
-  "name": "FAIZ FASHION Delivery",
-  "short_name": "FF Delivery",
+  "name": "QUMO Delivery",
+  "short_name": "QUMO Delivery",
   "start_url": "./delivery.html",
   "display": "standalone",
   "background_color": "#ffffff",
