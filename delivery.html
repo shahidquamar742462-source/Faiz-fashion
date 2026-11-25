@@ -9,7 +9,7 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
 :root{--bg:#f4f6f8;--card:#ffffff;--text:#1e293b;--text-dim:#64748b;--primary:#e52d27;--success:#10b981;--border:#e2e8f0}
 body{background:var(--bg);color:var(--text);min-height:100vh}
-.header{background:var(--primary);color:#fff;padding:20px;text-align:center;box-shadow:0 4px 10px rgba(229,45,39,0.2)}
+.header{background:var(--primary);color:#fff;padding:20px;text-align:center;box-shadow:0 4px 10px rgba(229,45,39,0.2);position:relative}
 .header h1{font-size:20px;font-weight:900;letter-spacing:1px}
 .header p{font-size:12px;margin-top:5px;opacity:0.9}
 .login-box{background:var(--card);padding:30px 20px;margin:40px 20px;border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,0.05);text-align:center}
@@ -19,7 +19,10 @@ body{background:var(--bg);color:var(--text);min-height:100vh}
 .login-box input:focus{border-color:var(--primary)}
 .login-box button{width:100%;padding:15px;margin-top:15px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer}
 .container{padding:15px;max-width:500px;margin:0 auto;padding-bottom:50px}
-.order-card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:15px;box-shadow:0 4px 12px rgba(0,0,0,0.05);border-left:5px solid var(--primary)}
+.notif-banner{background:#fff3cd;color:#856404;padding:12px;text-align:center;font-size:14px;font-weight:600;display:none;justify-content:space-between;align-items:center;border-bottom:1px solid #ffeeba}
+.notif-banner button{background:#856404;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-weight:bold;cursor:pointer}
+.order-card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:15px;box-shadow:0 4px 12px rgba(0,0,0,0.05);border-left:5px solid var(--primary);animation: slideIn 0.3s ease-out}
+@keyframes slideIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 .order-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:10px}
 .order-id{font-weight:900;font-size:16px;color:var(--text)}
 .order-price{font-weight:900;font-size:18px;color:var(--success)}
@@ -55,11 +58,18 @@ body{background:var(--bg);color:var(--text);min-height:100vh}
 </div>
 
 <div id="dashboardScreen" style="display:none;">
-    <div class="header" style="position:relative;">
+    <div class="header">
         <button class="logout-btn" onclick="logoutRider()">Logout</button>
         <h1>My Deliveries</h1>
         <p id="riderPhoneDisplay">Loading...</p>
     </div>
+    
+    <!-- Notification Banner -->
+    <div class="notif-banner" id="notifBanner">
+        <span>🔔 Enable notifications to get alerts for new orders.</span>
+        <button onclick="requestNotificationPermission()">Enable</button>
+    </div>
+
     <div class="container" id="ordersContainer">
         <div class="loading">Loading orders...</div>
     </div>
@@ -76,13 +86,20 @@ const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFire
 let currentRiderPhone = localStorage.getItem('riderPhone') || null;
 let unsubscribeOrders = null;
 
-// Check if already logged in
+// Check if already logged in (Persistent Login)
 onAuthStateChanged(auth, (user) => {
-    if (user && currentRiderPhone) {
-        showDashboard();
-    } else if (user && !currentRiderPhone) {
-        signOut(auth);
-        showLogin();
+    if (user) {
+        if (currentRiderPhone) {
+            showDashboard();
+        } else {
+            // If auth is there but no phone, ask for phone
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('dashboardScreen').style.display = 'none';
+        }
+    } else {
+        // Not logged in at all
+        document.getElementById('loginScreen').style.display = 'block';
+        document.getElementById('dashboardScreen').style.display = 'none';
     }
 });
 
@@ -96,7 +113,6 @@ function loginRider() {
     document.getElementById('loginError').innerText = "";
     document.getElementById('loginScreen').innerHTML = '<div class="loading">Authenticating...</div>';
     
-    // Sign in anonymously to Firestore (needed for security rules)
     signInAnonymously(auth).then(() => {
         currentRiderPhone = phone;
         localStorage.setItem('riderPhone', phone);
@@ -111,6 +127,12 @@ function showDashboard() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('dashboardScreen').style.display = 'block';
     document.getElementById('riderPhoneDisplay').innerText = "Rider: " + currentRiderPhone;
+    
+    // Check notification permission
+    if ("Notification" in window && Notification.permission === "default") {
+        document.getElementById('notifBanner').style.display = 'flex';
+    }
+
     listenOrders();
 }
 
@@ -122,6 +144,32 @@ function logoutRider() {
     }
 }
 
+// --- NOTIFICATIONS ---
+window.requestNotificationPermission = function() {
+    if ("Notification" in window) {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                document.getElementById('notifBanner').style.display = 'none';
+                alert("Notifications enabled successfully!");
+                new Notification("Notifications Enabled", { body: "You will now get alerts for new orders." });
+            }
+        });
+    } else {
+        alert("Your browser does not support notifications.");
+    }
+}
+
+function showNewOrderNotification(order) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("🚨 New Order Assigned!", {
+            body: `Order #${order.orderCode || ''} for ${order.customerName}\nAmount: ₹${order.total}`,
+            icon: "logo.png", // Make sure logo.png is in the same folder
+            vibrate: [200, 100, 200]
+        });
+    }
+}
+
+// --- REAL TIME ORDERS ---
 function listenOrders() {
     if (unsubscribeOrders) unsubscribeOrders();
     
@@ -130,7 +178,17 @@ function listenOrders() {
     unsubscribeOrders = onSnapshot(q, (snap) => {
         const container = document.getElementById('ordersContainer');
         
-        // Filter: Only show orders that are not fully delivered or cancelled
+        // Check if a new order was added in real-time
+        snap.docChanges().forEach(change => {
+            if (change.type === "added") {
+                const newOrder = change.doc.data();
+                if (!['Delivered', 'Cancelled', 'Pending'].includes(newOrder.status)) {
+                    showNewOrderNotification(newOrder);
+                }
+            }
+        });
+
+        // Filter active orders
         const activeOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }))
             .filter(o => !['Delivered', 'Cancelled'].includes(o.status) && o.status !== 'Pending');
             
@@ -175,14 +233,18 @@ function listenOrders() {
             `;
         }).join('');
     }, (error) => {
-        console.error(error);
-        document.getElementById('ordersContainer').innerHTML = '<div class="empty" style="color:red">Error loading orders. Please logout and login again.</div>';
+        console.error("Snapshot error: ", error);
+        document.getElementById('ordersContainer').innerHTML = `
+            <div class="empty" style="color:var(--primary)">
+                Error loading orders.<br><br>
+                <button onclick="logoutRider()" style="padding:10px; border-radius:8px; border:none; background:var(--text); color:#fff;">Logout & Retry</button>
+            </div>`;
     });
 }
 
 window.verifyAndDeliver = async function(orderId, correctOtp) {
     const enteredOtp = prompt("Customer se OTP lein aur yahan enter karein:");
-    if (enteredOtp === null) return; // Cancelled
+    if (enteredOtp === null) return;
     
     if (enteredOtp !== String(correctOtp)) {
         return alert("❌ Galat OTP! Kripya customer se sahi OTP lein.");
@@ -200,7 +262,9 @@ window.verifyAndDeliver = async function(orderId, correctOtp) {
         }
     }
 }
-    window.loginRider = loginRider; window.logoutRider = logoutRider;
+
+window.loginRider = loginRider;
+window.logoutRider = logoutRider;
 </script>
 </body>
 </html>
