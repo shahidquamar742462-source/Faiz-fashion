@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0a0a0a">
-<title>FAIZ FASHION</title>
+<title>QUMO</title>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://firestore.googleapis.com">
 <link rel="manifest" href="manifest.json">
@@ -483,7 +483,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 <div id="screen-splash" class="screen active">
   <div class="landing-container">
     <div class="logo-circle" style="margin:0 auto 20px"><img src="logo.png" alt="FAIZ FASHION" onerror="this.style.display='none'"></div>
-    <h1 class="app-name">FAIZ FASHION</h1>
+    <h1 class="app-name">QUMO</h1>
     <p class="tagline" style="margin-bottom:30px">Wear Your Style</p>
     <div style="width:44px;height:44px;border:4px solid #e52d27;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto"></div>
   </div>
@@ -493,7 +493,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   <button onclick="showScreen('login')" style="position:absolute;top:20px;right:20px;width:45px;height:45px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text-dim);font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:100">⚙️</button>
   <div class="landing-container">
     <div class="logo-circle"><img src="logo.png" alt="FAIZ FASHION" onerror="this.style.display='none'"></div>
-    <h1 class="app-name">FAIZ FASHION</h1>
+    <h1 class="app-name">QUMO</h1>
     <p class="tagline">Wear Your Style</p>
     <div class="box-grid" style="margin-top:10px">
       <button class="box-btn" onclick="showScreen('customer-login')"><div class="box-icon">🛍️</div><div class="box-title">Customer Login</div><div class="box-sub">Browse & Shop</div></button>
@@ -539,7 +539,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 
 <div id="screen-admin" class="screen">
   <div class="admin-header">
-    <div style="margin-bottom:15px"><h2>FAIZ FASHION</h2><p style="font-size:12px;color:var(--text-dim)">Admin Panel</p></div>
+    <div style="margin-bottom:15px"><h2>QUMO</h2><p style="font-size:12px;color:var(--text-dim)">Admin Panel</p></div>
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;width:100%">
       <button class="btn-small" style="padding:10px 3px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9px;font-weight:700;margin:0" onclick="showScreen('admin-orders')"><span style="font-size:16px">📦</span>Orders</button>
       <button class="btn-small" style="padding:10px 3px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9px;font-weight:700;margin:0" onclick="showScreen('admin-preorders')"><span style="font-size:16px">📝</span>Pre</button>
@@ -812,7 +812,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   
   <div class="top-bar">
     <div class="top-row">
-      <h2>FAIZ FASHION</h2>
+      <h2>QUMO</h2>
       <div style="display:flex;gap:8px">
         <button class="icon-btn" onclick="showScreen('cart')">🛒<span class="badge" id="shopCartBadge">0</span></button>
       </div>
@@ -2674,7 +2674,7 @@ function printInvoice(id){
   const o=allAdminOrdersCache.find(x=>x.id===id);if(!o)return;const date=o.date?new Date(o.date.toMillis()).toLocaleString():'';
   const items=o.items.map(i=>`<tr><td style="padding:8px;border:1px solid #ccc">${escapeHtml(i.name)}${i.size?' ('+i.size+')':''}</td><td style="padding:8px;border:1px solid #ccc;text-align:center">${i.qty||1}</td><td style="padding:8px;border:1px solid #ccc;text-align:right">₹${i.price}</td><td style="padding:8px;border:1px solid #ccc;text-align:right">₹${(i.qty||1)*i.price}</td></tr>`).join('');
   const pa=document.getElementById('printArea');pa.style.display='block';
-  pa.innerHTML=`<div style="font-family:Arial;padding:20px;max-width:600px;margin:0 auto"><h1 style="text-align:center;color:#d4af37;border-bottom:2px solid #d4af37;padding-bottom:10px">FAIZ FASHION</h1><div style="display:flex;justify-content:space-between;margin-bottom:15px"><div><b>Order:</b> #${o.orderCode||o.id.slice(-8)}<br><b>Date:</b> ${date}</div><div style="text-align:right"><b>Customer:</b> ${escapeHtml(o.customerName)}<br><b>Phone:</b> ${escapeHtml(o.phone)}</div></div><div style="margin-bottom:15px;padding:10px;border:1px solid #ccc"><b>Address:</b> ${escapeHtml((o.building||'')+(o.building?', ':'')+o.address)}</div><table style="width:100%;border-collapse:collapse;margin-bottom:15px"><thead><tr style="background:#f0f0f0"><th style="padding:8px;border:1px solid #ccc;text-align:left">Item</th><th style="padding:8px;border:1px solid #ccc">Qty</th><th style="padding:8px;border:1px solid #ccc">Price</th><th style="padding:8px;border:1px solid #ccc">Total</th></tr></thead><tbody>${items}</tbody></table><div style="text-align:right;font-size:14px"><div>Subtotal: ₹${o.subtotal}</div>${o.couponDiscount?'<div style="color:green">Coupon: -₹'+o.couponDiscount+'</div>':''}<div>Delivery: ₹${o.deliveryCharge}</div><div>Platform: ₹${o.platformFee}</div><div>Handling: ₹${o.handlingCharge}</div>${o.pointsRedeemed?'<div style="color:green">Points: -₹'+o.pointsRedeemed+'</div>':''}${o.walletUsed?'<div style="color:green">Wallet: -₹'+Math.round(o.walletUsed)+'</div>':''}<div style="font-size:18px;font-weight:bold;border-top:2px solid #d4af37;padding-top:8px;margin-top:8px">TOTAL: ₹${o.total}</div></div><p style="text-align:center;margin-top:30px;font-size:11px;color:#666">Thank you for shopping with FAIZ FASHION!</p></div>`;
+  pa.innerHTML=`<div style="font-family:Arial;padding:20px;max-width:600px;margin:0 auto"><h1 style="text-align:center;color:#d4af37;border-bottom:2px solid #d4af37;padding-bottom:10px">QUMO</h1><div style="display:flex;justify-content:space-between;margin-bottom:15px"><div><b>Order:</b> #${o.orderCode||o.id.slice(-8)}<br><b>Date:</b> ${date}</div><div style="text-align:right"><b>Customer:</b> ${escapeHtml(o.customerName)}<br><b>Phone:</b> ${escapeHtml(o.phone)}</div></div><div style="margin-bottom:15px;padding:10px;border:1px solid #ccc"><b>Address:</b> ${escapeHtml((o.building||'')+(o.building?', ':'')+o.address)}</div><table style="width:100%;border-collapse:collapse;margin-bottom:15px"><thead><tr style="background:#f0f0f0"><th style="padding:8px;border:1px solid #ccc;text-align:left">Item</th><th style="padding:8px;border:1px solid #ccc">Qty</th><th style="padding:8px;border:1px solid #ccc">Price</th><th style="padding:8px;border:1px solid #ccc">Total</th></tr></thead><tbody>${items}</tbody></table><div style="text-align:right;font-size:14px"><div>Subtotal: ₹${o.subtotal}</div>${o.couponDiscount?'<div style="color:green">Coupon: -₹'+o.couponDiscount+'</div>':''}<div>Delivery: ₹${o.deliveryCharge}</div><div>Platform: ₹${o.platformFee}</div><div>Handling: ₹${o.handlingCharge}</div>${o.pointsRedeemed?'<div style="color:green">Points: -₹'+o.pointsRedeemed+'</div>':''}${o.walletUsed?'<div style="color:green">Wallet: -₹'+Math.round(o.walletUsed)+'</div>':''}<div style="font-size:18px;font-weight:bold;border-top:2px solid #d4af37;padding-top:8px;margin-top:8px">TOTAL: ₹${o.total}</div></div><p style="text-align:center;margin-top:30px;font-size:11px;color:#666">Thank you for shopping with FAIZ FASHION!</p></div>`;
   setTimeout(()=>{window.print();setTimeout(()=>{pa.style.display='none';pa.innerHTML=''},500)},100);
 }
 
@@ -3203,7 +3203,7 @@ for(let item of items){try{ await updateDoc(doc(db,'categories',item.productId),
         key: razorpayKey,
         amount: Math.round(total * 100),
         currency: "INR",
-        name: 'FAIZ FASHION',
+        name: 'QUMO',
         description: `Order #${orderCode}`,
         prefill: { name, contact: phone },
         theme: { color: '#e52d27' },
@@ -3387,7 +3387,7 @@ function closeReturnModal(){document.getElementById('returnRequestModal').style.
 async function submitReturnRequest(){const reason=document.getElementById('retReason').value.trim();if(!reason)return alert('Reason required');const sel=document.getElementById('retItemSelect');const items=JSON.parse(sel.dataset.items||'[]');const item=items[sel.value];const type=document.getElementById('retType').value;const condition=document.getElementById('retCondition').value;const newSize=document.getElementById('retNewSize').value;const newColor=document.getElementById('retNewColor').value;if(type==='Exchange'&&(!newSize&&!newColor))return alert('Select new size/color');showLoading();try{await updateDoc(doc(db,'orders',currentReturnOrderId),{returnStatus:'Requested',returnDetails:{productId:item.productId,productName:item.name,type,condition,reason,newSize,newColor},returnTimeline:[{status:'Requested'}]});alert('✅ Submitted!');closeReturnModal()}catch(e){alert('Error: '+e.message)}hideLoading()}
 async function shareLocationFromOrder(orderId){if(!confirm('Share location?'))return;showLoading();try{const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:10000,enableHighAccuracy:true}));await updateDoc(doc(db,'orders',orderId),{latitude:pos.coords.latitude,longitude:pos.coords.longitude,locationShared:true});alert('✅ Shared!')}catch(e){alert('❌ Failed')}hideLoading()}
 function contactCall(){window.location.href='tel:+917838647693'}
-function contactWhatsApp(customMsg){let msg='Hello FAIZ FASHION';if(customMsg)msg=customMsg;window.open('https://wa.me/917838647693?text='+encodeURIComponent(msg),'_blank')}
+function contactWhatsApp(customMsg){let msg='Hello QUMO';if(customMsg)msg=customMsg;window.open('https://wa.me/917838647693?text='+encodeURIComponent(msg),'_blank')}
 function contactEmail(){window.open('mailto:shahidquamar72@gmail.com','_blank')}
 
 function checkSpinWheel(){const last=localStorage.getItem('lastSpinDate');const today=new Date().toDateString();if(last!==today&&!isAdminUser){setTimeout(()=>{document.getElementById('spinWheelModal').style.display='flex'},2000)}}
