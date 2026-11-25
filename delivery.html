@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>QUMO - Delivery App</title>
+<title>Qumo Delivery App</title>
 <link rel="manifest" href="delivery-manifest.json">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
@@ -45,7 +45,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh}
 
 <div id="loginScreen">
     <div class="header">
-        <h1>QUMO</h1>
+        <h1>Qumo</h1>
         <p>Delivery Partner App</p>
     </div>
     <div class="login-box">
@@ -64,7 +64,6 @@ body{background:var(--bg);color:var(--text);min-height:100vh}
         <p id="riderPhoneDisplay">Loading...</p>
     </div>
     
-    <!-- Notification Banner -->
     <div class="notif-banner" id="notifBanner">
         <span>🔔 Enable notifications to get alerts for new orders.</span>
         <button onclick="requestNotificationPermission()">Enable</button>
@@ -85,19 +84,17 @@ const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFire
 
 let currentRiderPhone = localStorage.getItem('riderPhone') || null;
 let unsubscribeOrders = null;
+let unsubscribePreOrders = null;
 
-// Check if already logged in (Persistent Login)
 onAuthStateChanged(auth, (user) => {
     if (user) {
         if (currentRiderPhone) {
             showDashboard();
         } else {
-            // If auth is there but no phone, ask for phone
             document.getElementById('loginScreen').style.display = 'block';
             document.getElementById('dashboardScreen').style.display = 'none';
         }
     } else {
-        // Not logged in at all
         document.getElementById('loginScreen').style.display = 'block';
         document.getElementById('dashboardScreen').style.display = 'none';
     }
@@ -128,7 +125,6 @@ function showDashboard() {
     document.getElementById('dashboardScreen').style.display = 'block';
     document.getElementById('riderPhoneDisplay').innerText = "Rider: " + currentRiderPhone;
     
-    // Check notification permission
     if ("Notification" in window && Notification.permission === "default") {
         document.getElementById('notifBanner').style.display = 'flex';
     }
@@ -140,11 +136,11 @@ function logoutRider() {
     if(confirm("Are you sure you want to logout?")) {
         localStorage.removeItem('riderPhone');
         if(unsubscribeOrders) unsubscribeOrders();
+        if(unsubscribePreOrders) unsubscribePreOrders();
         signOut(auth).then(() => window.location.reload());
     }
 }
 
-// --- NOTIFICATIONS ---
 window.requestNotificationPermission = function() {
     if ("Notification" in window) {
         Notification.requestPermission().then(permission => {
@@ -162,23 +158,22 @@ window.requestNotificationPermission = function() {
 function showNewOrderNotification(order) {
     if ("Notification" in window && Notification.permission === "granted") {
         new Notification("🚨 New Order Assigned!", {
-            body: `Order #${order.orderCode || ''} for ${order.customerName}\nAmount: ₹${order.total}`,
-            icon: "logo.png", // Make sure logo.png is in the same folder
+            body: `Order #${order.orderCode || ''} for ${order.customerName || 'Customer'}\nAmount: ₹${order.total || order.totalPrice || 0}`,
+            icon: "logo.png", 
             vibrate: [200, 100, 200]
         });
     }
 }
 
-// --- REAL TIME ORDERS ---
+let normalOrdersArr = [];
+let preOrdersArr = [];
+
 function listenOrders() {
     if (unsubscribeOrders) unsubscribeOrders();
+    if (unsubscribePreOrders) unsubscribePreOrders();
     
-    const q = query(collection(db, 'orders'), where('deliveryBoy.phone', '==', currentRiderPhone));
-    
-    unsubscribeOrders = onSnapshot(q, (snap) => {
-        const container = document.getElementById('ordersContainer');
-        
-        // Check if a new order was added in real-time
+    const q1 = query(collection(db, 'orders'), where('deliveryBoy.phone', '==', currentRiderPhone));
+    unsubscribeOrders = onSnapshot(q1, (snap) => {
         snap.docChanges().forEach(change => {
             if (change.type === "added") {
                 const newOrder = change.doc.data();
@@ -187,62 +182,90 @@ function listenOrders() {
                 }
             }
         });
-
-        // Filter active orders
-        const activeOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        normalOrdersArr = snap.docs.map(d => ({ id: d.id, type: 'normal', ...d.data() }))
             .filter(o => !['Delivered', 'Cancelled'].includes(o.status) && o.status !== 'Pending');
-            
-        if (activeOrders.length === 0) {
-            container.innerHTML = '<div class="empty"><div style="font-size:40px;margin-bottom:10px">🎉</div>Abhi koi pending order nahi hai.<br>Naya order aate hi yahan dikhega.</div>';
-            return;
-        }
+        renderCombinedOrders();
+    }, (error) => {
+        document.getElementById('ordersContainer').innerHTML = `<div class="empty" style="color:var(--primary)">Error loading normal orders.<br><br><button onclick="logoutRider()" style="padding:10px; border-radius:8px; border:none; background:var(--text); color:#fff;">Logout & Retry</button></div>`;
+    });
 
-        container.innerHTML = activeOrders.map(o => {
-            const mapBtn = (o.latitude && o.longitude) 
-                ? `<a href="https://www.google.com/maps?q=${o.latitude},${o.longitude}" target="_blank" class="btn btn-map">📍 Map</a>` 
-                : `<div class="btn btn-map" style="opacity:0.5;cursor:not-allowed">📍 No Location</div>`;
-                
-            const callBtn = `<a href="tel:${o.phone}" class="btn btn-call">📞 Call</a>`;
+    const q2 = query(collection(db, 'pre_orders'), where('deliveryBoy.phone', '==', currentRiderPhone));
+    unsubscribePreOrders = onSnapshot(q2, (snap) => {
+        snap.docChanges().forEach(change => {
+            if (change.type === "added") {
+                const newOrder = change.doc.data();
+                if (!['Delivered', 'Cancelled', 'Pending', 'Priced'].includes(newOrder.status)) {
+                    showNewOrderNotification(newOrder);
+                }
+            }
+        });
+        preOrdersArr = snap.docs.map(d => ({ id: d.id, type: 'pre', ...d.data() }))
+            .filter(o => !['Delivered', 'Cancelled', 'Pending', 'Priced'].includes(o.status));
+        renderCombinedOrders();
+    }, (error) => {
+        console.log("Pre-orders error (shayad index nahi hai)", error);
+    });
+}
+
+function renderCombinedOrders() {
+    const container = document.getElementById('ordersContainer');
+    const allOrders = [...normalOrdersArr, ...preOrdersArr].sort((a,b) => (b.date?.toMillis()||0) - (a.date?.toMillis()||0));
+
+    if (allOrders.length === 0) {
+        container.innerHTML = '<div class="empty"><div style="font-size:40px;margin-bottom:10px">🎉</div>Abhi koi pending order nahi hai.<br>Naya order aate hi yahan dikhega.</div>';
+        return;
+    }
+
+    container.innerHTML = allOrders.map(o => {
+        const mapBtn = (o.latitude && o.longitude) 
+            ? `<a href="https://www.google.com/maps?q=${o.latitude},${o.longitude}" target="_blank" class="btn btn-map">📍 Map</a>` 
+            : `<div class="btn btn-map" style="opacity:0.5;cursor:not-allowed">📍 No Location</div>`;
             
-            const itemsHtml = o.items.map(i => `
+        const callBtn = `<a href="tel:${o.phone}" class="btn btn-call">📞 Call</a>`;
+        
+        let detailsHtml = '';
+        if (o.type === 'normal') {
+            detailsHtml = o.items.map(i => `
                 <div class="item-row">
                     <span>${i.name} ${i.size ? '('+i.size+')' : ''}</span>
                     <strong>x${i.qty || 1}</strong>
                 </div>
             `).join('');
-
-            return `
-            <div class="order-card">
-                <div class="order-head">
-                    <div class="order-id">#${o.orderCode || o.id.slice(-6)}</div>
-                    <div class="order-price">₹${o.total}</div>
-                </div>
-                <div class="cust-name">${o.customerName}</div>
-                <div class="cust-address">${o.building ? o.building + ', ' : ''}${o.address}</div>
-                
-                <div class="items-list">
-                    ${itemsHtml}
-                </div>
-
-                <div class="btn-group">
-                    ${callBtn}
-                    ${mapBtn}
-                </div>
-                <button class="btn btn-deliver" onclick="verifyAndDeliver('${o.id}', '${o.deliveryOtp}')">✅ Mark as Delivered</button>
-            </div>
+        } else {
+            detailsHtml = `
+                <div style="font-weight:bold; font-size:13px; margin-bottom:5px;">Pre-Order Details:</div>
+                <div style="color:var(--text-dim); font-size:12px;">${o.description || 'No description'}</div>
             `;
-        }).join('');
-    }, (error) => {
-        console.error("Snapshot error: ", error);
-        document.getElementById('ordersContainer').innerHTML = `
-            <div class="empty" style="color:var(--primary)">
-                Error loading orders.<br><br>
-                <button onclick="logoutRider()" style="padding:10px; border-radius:8px; border:none; background:var(--text); color:#fff;">Logout & Retry</button>
-            </div>`;
-    });
+        }
+
+        const tag = o.type === 'pre' ? `<span style="background:#f39c12; color:#fff; font-size:10px; padding:3px 6px; border-radius:4px; margin-left:10px;">PRE-ORDER</span>` : '';
+        const price = o.type === 'pre' ? (o.totalPrice || 0) : o.total;
+        const otp = o.deliveryOtp || 'N/A';
+
+        return `
+        <div class="order-card">
+            <div class="order-head">
+                <div class="order-id">#${o.orderCode || o.id.slice(-6)} ${tag}</div>
+                <div class="order-price">₹${price}</div>
+            </div>
+            <div class="cust-name">${o.customerName || 'Customer'}</div>
+            <div class="cust-address">${o.building ? o.building + ', ' : ''}${o.address}</div>
+            
+            <div class="items-list">
+                ${detailsHtml}
+            </div>
+
+            <div class="btn-group">
+                ${callBtn}
+                ${mapBtn}
+            </div>
+            <button class="btn btn-deliver" onclick="verifyAndDeliver('${o.id}', '${otp}', '${o.type}')">✅ Mark as Delivered</button>
+        </div>
+        `;
+    }).join('');
 }
 
-window.verifyAndDeliver = async function(orderId, correctOtp) {
+window.verifyAndDeliver = async function(orderId, correctOtp, type) {
     const enteredOtp = prompt("Customer se OTP lein aur yahan enter karein:");
     if (enteredOtp === null) return;
     
@@ -252,7 +275,8 @@ window.verifyAndDeliver = async function(orderId, correctOtp) {
     
     if(confirm("OTP Sahi hai. Kya aapne order customer ko de diya hai?")) {
         try {
-            await updateDoc(doc(db, 'orders', orderId), { 
+            const collectionName = type === 'pre' ? 'pre_orders' : 'orders';
+            await updateDoc(doc(db, collectionName, orderId), { 
                 status: 'Delivered', 
                 deliveredAt: serverTimestamp() 
             });
@@ -266,20 +290,18 @@ window.verifyAndDeliver = async function(orderId, correctOtp) {
 window.loginRider = loginRider;
 window.logoutRider = logoutRider;
 </script>
-    <script>
+
+<!-- AUTO UPDATE CODE -->
+<script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('delivery-sw.js').then(reg => {
-      
-      // Har baar app khulne par check karega ki naya update aaya hai kya
       reg.update();
-
       reg.onupdatefound = () => {
         const installingWorker = reg.installing;
         installingWorker.onstatechange = () => {
           if (installingWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
-              // Naya update mil gaya hai!
               if (confirm('🚀 Naya Update Available Hai!\n\nNaya version use karne ke liye OK dabayein.')) {
                 window.location.reload();
               }
