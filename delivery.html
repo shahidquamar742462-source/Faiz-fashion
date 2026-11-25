@@ -266,5 +266,30 @@ window.verifyAndDeliver = async function(orderId, correctOtp) {
 window.loginRider = loginRider;
 window.logoutRider = logoutRider;
 </script>
+    <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('delivery-sw.js').then(reg => {
+      
+      // Har baar app khulne par check karega ki naya update aaya hai kya
+      reg.update();
+
+      reg.onupdatefound = () => {
+        const installingWorker = reg.installing;
+        installingWorker.onstatechange = () => {
+          if (installingWorker.state === 'installed') {
+            if (navigator.serviceWorker.controller) {
+              // Naya update mil gaya hai!
+              if (confirm('🚀 Naya Update Available Hai!\n\nNaya version use karne ke liye OK dabayein.')) {
+                window.location.reload();
+              }
+            }
+          }
+        };
+      };
+    }).catch(err => console.log('SW registration failed: ', err));
+  });
+}
+</script>
 </body>
 </html>
