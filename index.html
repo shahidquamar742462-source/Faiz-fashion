@@ -3907,187 +3907,47 @@ function updateAdminStatus(){
 
   isAdminUser = isSuperAdmin || isAddedAdmin;
 }
-// Saare functions ko window par attach kar raha hai taaki buttons kaam karein
-window.showScreen = showScreen;
-window.openSearchPage = openSearchPage;
-window.closeSearchPage = closeSearchPage;
-window.handleFullSearch = handleFullSearch;
-window.selectFullSearch = selectFullSearch;
-window.sharePreOrderLocation = sharePreOrderLocation;
-window.openOtpModal = openOtpModal;
-window.loginWithGoogle = loginWithGoogle;
-window.loginWithAnonymous = loginWithAnonymous;
-window.handleLogin = handleLogin;
-window.handleReset = handleReset;
-window.handleLogout = handleLogout;
-window.promptSettingsPassword = promptSettingsPassword;
-window.unlockAdminOtp = unlockAdminOtp;
-window.openSettings = openSettings;
-window.saveSettings = saveSettings;
-window.previewBanner = previewBanner;
-window.removePendingBanner = removePendingBanner;
-window.removeExistingBanner = removeExistingBanner;
-window.openCategoryForm = openCategoryForm;
-window.previewPhoto = previewPhoto;
-window.removeExistingPhoto = removeExistingPhoto;
-window.removeNewPhoto = removeNewPhoto;
-window.saveCategory = saveCategory;
-window.deleteCategory = deleteCategory;
-window.previewCatSizeGuide = previewCatSizeGuide;
-window.saveCoupon = saveCoupon;
-window.deleteCoupon = deleteCoupon;
-window.changeAdminPassword = changeAdminPassword;
-window.setMainCategory = setMainCategory;
-window.selectAutocomplete = selectAutocomplete;
-window.sortProducts = sortProducts;
-window.toggleInStockFilter = toggleInStockFilter;
-window.openPriceRange = openPriceRange;
-window.clearAllFilters = clearAllFilters;
-window.openProductDetails = openProductDetails;
-window.shareProduct = shareProduct;
-window.shareProductCard = shareProductCard;
-window.addToCartDetails = addToCartDetails;
-window.buyNowDetails = buyNowDetails;
-window.toggleWatchlist = toggleWatchlist;
-window.toggleWatchlistDetails = toggleWatchlistDetails;
-window.goBackFromDetails = goBackFromDetails;
-window.validateSizeColor = validateSizeColor;
-window.openSizeGuide = openSizeGuide;
-window.closeSizeGuide = closeSizeGuide;
-window.toggleCartFromCard = toggleCartFromCard;
-window.removeCartItem = removeCartItem;
-window.updateCartQty = updateCartQty;
-window.applyCoupon = applyCoupon;
-window.removeCoupon = removeCoupon;
-window.openCheckout = openCheckout;
-window.calculateRedemption = calculateRedemption;
-window.useMaxPoints = useMaxPoints;
-window.calculateWalletRedemption = calculateWalletRedemption;
-window.useMaxWallet = useMaxWallet;
-window.shareReferralCode = shareReferralCode;
-window.submitOrder = submitOrder;
-window.loadAdminOrders = loadAdminOrders;
-window.updateOrderStatus = updateOrderStatus;
-window.deleteOrder = deleteOrder;
-window.updateReturnTracking = updateReturnTracking;
-window.saveDeliveryBoy = saveDeliveryBoy;
-window.printInvoice = printInvoice;
-window.showAdminNotifs = showAdminNotifs;
-window.closeAdminNotifs = closeAdminNotifs;
-window.openReviewForm = openReviewForm;
-window.closeReviewForm = closeReviewForm;
-window.submitReview = submitReview;
-window.previewPrePhoto = previewPrePhoto;
-window.toggleVoiceRecord = toggleVoiceRecord;
-window.submitPreOrder = submitPreOrder;
-window.fillSavedAddress = fillSavedAddress;
-window.loadAdminPreOrders = loadAdminPreOrders;
-window.updatePreOrderStatus = updatePreOrderStatus;
-window.deletePreOrder = deletePreOrder;
-window.loadAdminReviews = loadAdminReviews;
-window.deleteReview = deleteReview;
-window.installPWA = installPWA;
-window.toggleDarkMode = toggleDarkMode;
-window.showAddAddressForm = showAddAddressForm;
-window.saveNewAddress = saveNewAddress;
-window.deleteAddress = deleteAddress;
-window.setOrderFilter = setOrderFilter;
-window.openReturnModal = openReturnModal;
-window.closeReturnModal = closeReturnModal;
-window.updateReturnItemDetails = updateReturnItemDetails;
-window.submitReturnRequest = submitReturnRequest;
-window.toggleExchangeFields = toggleExchangeFields;
-window.toggleShopStatus = toggleShopStatus;
-window.contactCall = contactCall;
-window.contactWhatsApp = contactWhatsApp;
-window.contactEmail = contactEmail;
-window.shareLocationFromOrder = shareLocationFromOrder;
-window.requestGlobalLocation = requestGlobalLocation;
-window.requestCheckoutLocation = requestCheckoutLocation;
-window.deleteCustomerOrder = deleteCustomerOrder;
-window.openImageZoom = openImageZoom;
-window.closeImageZoom = closeImageZoom;
-window.spinWheel = spinWheel;
-window.closeSpinWheel = closeSpinWheel;
-window.filterAdminOrders = filterAdminOrders;
-window.setAdminCatFilter = setAdminCatFilter;
-window.setAdminStatusFilter = setAdminStatusFilter;
-window.renderAdminOrdersList = renderAdminOrdersList;
-window.addAdminEmail = addAdminEmail;
-window.removeAdminEmail = removeAdminEmail;
-window.calculatePreOrderTotal = calculatePreOrderTotal;
-window.sendPreOrderPrice = sendPreOrderPrice;
-window.savePreOrderDeliveryBoy = savePreOrderDeliveryBoy;
-window.acceptPreOrderPrice = acceptPreOrderPrice;
-window.filterAdminPreOrders = filterAdminPreOrders;
-window.adminAdjustWallet = adminAdjustWallet;
-window.addUserWallet = addUserWallet;
-window.startVoiceSearch = startVoiceSearch;
-window.loadFrequentlyBought = loadFrequentlyBought;
-window.quickAddToCart = quickAddToCart;
-window.toggleBoughtWith = toggleBoughtWith;
-window.populateBoughtWithList = populateBoughtWithList;
-window.openCancelModal = openCancelModal;
-window.closeCancelModal = closeCancelModal;
-window.confirmCancelOrder = confirmCancelOrder;
-window.closeOtpModal = closeOtpModal;
-window.verifyDeliveryOtp = verifyDeliveryOtp;
-window.showTierInfo = showTierInfo;
-window.loadDashboard = loadDashboard;
-window.openCustomerChat = openCustomerChat;
-window.sendCustomerChatMsg = sendCustomerChatMsg;
-window.openAdminChat = openAdminChat;
-window.sendAdminChatMsg = sendAdminChatMsg;
-window.openQAForm = openQAForm;
-window.closeQAForm = closeQAForm;
-window.submitQA = submitQA;
-window.answerQuestion = answerQuestion;
-window.deleteQuestion = deleteQuestion;
-window.showRecentSearches = showRecentSearches;
-window.clearRecentSearches = clearRecentSearches;
-window.selectPaymentMethod = selectPaymentMethod;
-window.viewCustomerOrders = viewCustomerOrders;
-window.switchCustOrderTab = switchCustOrderTab;
-window.filterDashboardUsers = filterDashboardUsers;
-window.renderSettingsRecentlyViewed = renderSettingsRecentlyViewed;
-window.openOrderDetail = openOrderDetail;
-window.openReviewForProduct = openReviewForProduct;
-window.previewAdImage = previewAdImage;
-window.addAd = addAd;
-window.loadAdminAds = loadAdminAds;
-window.toggleAdActive = toggleAdActive;
-window.deleteAd = deleteAd;
-window.renderAdsCarousel = renderAdsCarousel;
-window.renderWatchlistGrid = renderWatchlistGrid;
-window.renderOrderDetail = renderOrderDetail;
-window.requestStockAlert = requestStockAlert;
-window.checkFirstOrderBonus = checkFirstOrderBonus;
-window.updateSizeRecommendation = updateSizeRecommendation;
-window.lookupPincodeDebounced = lookupPincodeDebounced;
-window.lookupPincode = lookupPincode;
-window.selectPincode = selectPincode;
-window.trackProductView = trackProductView;
-window.trackCartAdd = trackCartAdd;
-window.loadProductAnalytics = loadProductAnalytics;
-window.loadAbandonedCarts = loadAbandonedCarts;
-window.setLanguage = setLanguage;
-window.applyLanguage = applyLanguage;
-window.renderNewArrivalsAndHot = renderNewArrivalsAndHot;
-window.renderDealsAndSuggested = renderDealsAndSuggested;
-window.openProfileDetails = openProfileDetails;
-window.saveProfileDetails = saveProfileDetails;
-window.openFilterScreen = openFilterScreen;
-window.closeFilterScreen = closeFilterScreen;
-window.switchFilterTab = switchFilterTab;
-window.updateTempFilter = updateTempFilter;
-window.clearTempFilters = clearTempFilters;
-window.applyFilters = applyFilters;
-window.updateApplyButtonText = updateApplyButtonText;
-window.saveReturnDeliveryBoy = saveReturnDeliveryBoy;
-window.clearSearchText = clearSearchText;
-window.goToShopHome = goToShopHome;
-window.renderAdminEmails = renderAdminEmails;
-window.updateAdminStatus = updateAdminStatus;
+const safeExports = [
+  'showScreen', 'openProductDetails', 'buyNowDetails', 'addToCartDetails', 'openCheckout', 'submitOrder', 
+  'toggleDarkMode', 'loginWithGoogle', 'loginWithAnonymous', 'handleLogout', 'toggleWatchlist', 
+  'toggleWatchlistDetails', 'goBackFromDetails', 'shareProduct', 'shareProductCard', 'toggleCartFromCard', 
+  'applyCoupon', 'removeCoupon', 'openSearchPage', 'closeSearchPage', 'selectFullSearch', 'clearSearchText', 
+  'goToShopHome', 'setMainCategory', 'sortProducts', 'toggleInStockFilter', 'openPriceRange', 'clearAllFilters', 
+  'openFilterScreen', 'closeFilterScreen', 'applyFilters', 'startVoiceSearch', 'openReviewForm', 'closeReviewForm', 
+  'submitReview', 'openQAForm', 'closeQAForm', 'submitQA', 'openOtpModal', 'closeOtpModal', 'verifyDeliveryOtp', 
+  'renderAdminEmails', 'updateAdminStatus', 'requestStockAlert', 'calculateRedemption', 'useMaxPoints', 
+  'calculateWalletRedemption', 'useMaxWallet', 'shareReferralCode', 'loadSavedAddresses', 'fillSavedAddress', 
+  'renderAddressesScreen', 'showAddAddressForm', 'saveNewAddress', 'deleteAddress', 'setOrderFilter', 
+  'openOrderDetail', 'openCancelModal', 'closeCancelModal', 'confirmCancelOrder', 'openReturnModal', 
+  'closeReturnModal', 'updateReturnItemDetails', 'submitReturnRequest', 'toggleExchangeFields', 
+  'openImageZoom', 'closeImageZoom', 'spinWheel', 'closeSpinWheel', 'installPWA', 'contactCall', 
+  'contactWhatsApp', 'contactEmail', 'requestGlobalLocation', 'requestCheckoutLocation', 'openProfileDetails', 
+  'saveProfileDetails', 'setLanguage', 'toggleShopStatus', 'showAdminNotifs', 'closeAdminNotifs', 
+  'updateOrderStatus', 'deleteOrder', 'updateReturnTracking', 'saveDeliveryBoy', 'printInvoice', 
+  'saveReturnDeliveryBoy', 'filterAdminOrders', 'setAdminCatFilter', 'setAdminStatusFilter', 
+  'renderAdminOrdersList', 'addAdminEmail', 'removeAdminEmail', 'calculatePreOrderTotal', 'sendPreOrderPrice', 
+  'savePreOrderDeliveryBoy', 'acceptPreOrderPrice', 'filterAdminPreOrders', 'adminAdjustWallet', 
+  'loadFrequentlyBought', 'quickAddToCart', 'toggleBoughtWith', 'populateBoughtWithList', 'openCustomerChat', 
+  'sendCustomerChatMsg', 'openAdminChat', 'sendAdminChatMsg', 'filterDashboardUsers', 'renderSettingsRecentlyViewed', 
+  'openReviewForProduct', 'previewAdImage', 'addAd', 'loadAdminAds', 'toggleAdActive', 'deleteAd', 
+  'renderAdsCarousel', 'renderWatchlistGrid', 'renderOrderDetail', 'updateSizeRecommendation', 
+  'lookupPincodeDebounced', 'lookupPincode', 'selectPincode', 'trackProductView', 'trackCartAdd', 
+  'loadProductAnalytics', 'loadAbandonedCarts', 'renderNewArrivalsAndHot', 'renderDealsAndSuggested', 
+  'switchFilterTab', 'updateTempFilter', 'clearTempFilters', 'updateApplyButtonText'
+];
+
+safeExports.forEach(functionName => {
+    try {
+        if (typeof window[functionName] === 'undefined' && typeof eval(functionName) === 'function') {
+            window[functionName] = eval(functionName);
+        } else if (typeof window[functionName] === 'undefined' && typeof window[functionName] !== 'function') {
+            // Agar function code me hai, toh assign karo
+            window[functionName] = eval(functionName);
+        }
+    } catch (e) {
+        console.log("Function missing or error in export: " + functionName);
+    }
+});
 
 initTheme();
 applyLanguage();
