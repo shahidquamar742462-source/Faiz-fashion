@@ -236,7 +236,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
   display: flex !important; /* JS isko control karega */
   justify-content: space-around;
   padding: 12px 10px;
-  z-index: 1000; /* Z-index badha diya taaki upar dikhe */
+  z-index: 99999; /* Z-index badha diya taaki upar dikhe */
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
   border-radius: 50px;
 }
@@ -3907,45 +3907,34 @@ function updateAdminStatus(){
 
   isAdminUser = isSuperAdmin || isAddedAdmin;
 }
-const safeExports = [
-  'showScreen', 'openProductDetails', 'buyNowDetails', 'addToCartDetails', 'openCheckout', 'submitOrder', 
-  'toggleDarkMode', 'loginWithGoogle', 'loginWithAnonymous', 'handleLogout', 'toggleWatchlist', 
-  'toggleWatchlistDetails', 'goBackFromDetails', 'shareProduct', 'shareProductCard', 'toggleCartFromCard', 
-  'applyCoupon', 'removeCoupon', 'openSearchPage', 'closeSearchPage', 'selectFullSearch', 'clearSearchText', 
-  'goToShopHome', 'setMainCategory', 'sortProducts', 'toggleInStockFilter', 'openPriceRange', 'clearAllFilters', 
-  'openFilterScreen', 'closeFilterScreen', 'applyFilters', 'startVoiceSearch', 'openReviewForm', 'closeReviewForm', 
-  'submitReview', 'openQAForm', 'closeQAForm', 'submitQA', 'openOtpModal', 'closeOtpModal', 'verifyDeliveryOtp', 
-  'renderAdminEmails', 'updateAdminStatus', 'requestStockAlert', 'calculateRedemption', 'useMaxPoints', 
-  'calculateWalletRedemption', 'useMaxWallet', 'shareReferralCode', 'loadSavedAddresses', 'fillSavedAddress', 
-  'renderAddressesScreen', 'showAddAddressForm', 'saveNewAddress', 'deleteAddress', 'setOrderFilter', 
-  'openOrderDetail', 'openCancelModal', 'closeCancelModal', 'confirmCancelOrder', 'openReturnModal', 
-  'closeReturnModal', 'updateReturnItemDetails', 'submitReturnRequest', 'toggleExchangeFields', 
-  'openImageZoom', 'closeImageZoom', 'spinWheel', 'closeSpinWheel', 'installPWA', 'contactCall', 
-  'contactWhatsApp', 'contactEmail', 'requestGlobalLocation', 'requestCheckoutLocation', 'openProfileDetails', 
-  'saveProfileDetails', 'setLanguage', 'toggleShopStatus', 'showAdminNotifs', 'closeAdminNotifs', 
-  'updateOrderStatus', 'deleteOrder', 'updateReturnTracking', 'saveDeliveryBoy', 'printInvoice', 
-  'saveReturnDeliveryBoy', 'filterAdminOrders', 'setAdminCatFilter', 'setAdminStatusFilter', 
-  'renderAdminOrdersList', 'addAdminEmail', 'removeAdminEmail', 'calculatePreOrderTotal', 'sendPreOrderPrice', 
-  'savePreOrderDeliveryBoy', 'acceptPreOrderPrice', 'filterAdminPreOrders', 'adminAdjustWallet', 
-  'loadFrequentlyBought', 'quickAddToCart', 'toggleBoughtWith', 'populateBoughtWithList', 'openCustomerChat', 
-  'sendCustomerChatMsg', 'openAdminChat', 'sendAdminChatMsg', 'filterDashboardUsers', 'renderSettingsRecentlyViewed', 
-  'openReviewForProduct', 'previewAdImage', 'addAd', 'loadAdminAds', 'toggleAdActive', 'deleteAd', 
-  'renderAdsCarousel', 'renderWatchlistGrid', 'renderOrderDetail', 'updateSizeRecommendation', 
-  'lookupPincodeDebounced', 'lookupPincode', 'selectPincode', 'trackProductView', 'trackCartAdd', 
-  'loadProductAnalytics', 'loadAbandonedCarts', 'renderNewArrivalsAndHot', 'renderDealsAndSuggested', 
-  'switchFilterTab', 'updateTempFilter', 'clearTempFilters', 'updateApplyButtonText'
+// SAARE BUTTONS KO CHALU KARNE KA FINAL CODE
+const allFuncs = [
+  'promptSettingsPassword', 'openCategoryForm', 'deleteCategory', 'unlockAdminOtp', 
+  'openOtpModal', 'closeOtpModal', 'verifyDeliveryOtp', 'deleteOrder', 'deletePreOrder',
+  'updateOrderStatus', 'updatePreOrderStatus', 'saveDeliveryBoy', 'savePreOrderDeliveryBoy',
+  'showAdminNotifs', 'closeAdminNotifs', 'filterAdminOrders', 'setAdminCatFilter', 'setAdminStatusFilter',
+  'showScreen', 'goToShopHome', 'openProductDetails', 'buyNowDetails', 'addToCartDetails',
+  'toggleWatchlist', 'toggleWatchlistDetails', 'shareProduct', 'shareProductCard', 
+  'toggleCartFromCard', 'openSearchPage', 'closeSearchPage', 'setMainCategory', 
+  'toggleInStockFilter', 'openPriceRange', 'clearAllFilters', 'sortProducts',
+  'openCheckout', 'submitOrder', 'applyCoupon', 'removeCoupon', 'calculateRedemption', 
+  'useMaxPoints', 'calculateWalletRedemption', 'useMaxWallet', 'fillSavedAddress',
+  'loginWithGoogle', 'loginWithAnonymous', 'handleLogout', 'toggleDarkMode',
+  'openFilterScreen', 'closeFilterScreen', 'applyFilters', 'clearTempFilters',
+  'startVoiceSearch', 'openReviewForm', 'closeReviewForm', 'submitReview', 
+  'openQAForm', 'closeQAForm', 'submitQA', 'showAddAddressForm', 'saveNewAddress', 
+  'deleteAddress', 'setOrderFilter', 'openOrderDetail', 'openCancelModal', 
+  'closeCancelModal', 'confirmCancelOrder', 'openReturnModal', 'closeReturnModal', 
+  'updateReturnItemDetails', 'submitReturnRequest', 'toggleExchangeFields'
 ];
 
-safeExports.forEach(functionName => {
+allFuncs.forEach(fn => {
     try {
-        if (typeof window[functionName] === 'undefined' && typeof eval(functionName) === 'function') {
-            window[functionName] = eval(functionName);
-        } else if (typeof window[functionName] === 'undefined' && typeof window[functionName] !== 'function') {
-            // Agar function code me hai, toh assign karo
-            window[functionName] = eval(functionName);
+        if (typeof eval(fn) === 'function') {
+            window[fn] = eval(fn);
         }
-    } catch (e) {
-        console.log("Function missing or error in export: " + functionName);
+    } catch(e) {
+        // Crash nahi hoga
     }
 });
 
