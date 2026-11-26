@@ -1881,9 +1881,7 @@ body {
   </div>
   <div id="shopGrid" class="product-grid"></div>
 </div>
-<div id="shopGrid" class="product-grid"></div>
-  
-  <!-- YE NAYA DIV ADD KARO (Auto Scroll Trigger) -->
+ <!-- YE NAYA DIV ADD KARO (Auto Scroll Trigger) -->
   <div id="infiniteScrollSentinel" style="height: 20px; width: 100%; margin-bottom: 20px;"></div>
 <!-- NEW: FULL SCREEN FILTER PAGE -->
 <div id="screen-filters" class="screen">
@@ -2665,7 +2663,7 @@ function showScreen(name){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.screen===name));
   
   if(name==='shop'){renderShop();renderRecentlyViewed();renderNewArrivalsAndHot();renderDealsAndSuggested();checkSpinWheel();checkFirstOrderBonus()}
-  if(name==='cart'){renderCart();loadSavedAddresses()}
+  if(name==='cart'){renderCart();}
   if(name==='orders'){loadCustomerOrders();updateRewardsDisplay();renderAdsCarousel()}
   if(name==='my-preorders')loadMyPreOrders();
   if(name==='addresses')renderAddressesScreen();
@@ -4157,7 +4155,7 @@ function renderPaymentOptions(){
 }
 function selectPaymentMethod(id){selectedPaymentMethod=id;document.querySelectorAll('.payment-option').forEach(el=>{const isActive=el.id==='pay-opt-'+id;el.classList.toggle('selected',isActive);el.querySelector('input').checked=isActive})}
 
-function openCheckout(){if(!isShopOpen)return alert('🛑 Shop is closed');if(cartItems.length===0)return alert('Cart is empty');const pincodeGroup=document.getElementById('chkPincodeGroup');pincodeGroup.style.display=allowedAreas.length>0?'block':'none';updateCheckoutLocStatus();const g=document.getElementById('pointsRedeemGroup');if(userPoints>0){g.style.display='block';document.getElementById('chkPointBalance').textContent=userPoints}else g.style.display='none';const wg=document.getElementById('walletRedeemGroup');if(userWallet>0){wg.style.display='block';document.getElementById('chkWalletBalance').textContent=Math.round(userWallet)}else wg.style.display='none';renderPaymentOptions();showScreen('checkout')}
+function openCheckout(){if(!isShopOpen)return alert('🛑 Shop is closed');if(cartItems.length===0)return alert('Cart is empty');const pincodeGroup=document.getElementById('chkPincodeGroup');pincodeGroup.style.display=allowedAreas.length>0?'block':'none';updateCheckoutLocStatus();const g=document.getElementById('pointsRedeemGroup');if(userPoints>0){g.style.display='block';document.getElementById('chkPointBalance').textContent=userPoints}else g.style.display='none';const wg=document.getElementById('walletRedeemGroup');if(userWallet>0){wg.style.display='block';document.getElementById('chkWalletBalance').textContent=Math.round(userWallet)}else wg.style.display='none';renderPaymentOptions();loadSavedAddresses();showScreen('checkout')}
 
 function buildOrderWhatsAppMsg(name,phone,building,address,landmark,items,total,orderCode){let m=`🛍️ *NEW ORDER*\n\n*Order:* #${orderCode}\n\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Address:*\n${building?building+', ':''}${address}\n\n📦 *Items:*\n`;items.forEach((i,idx)=>{m+=`${idx+1}. ${i.name}`;if(i.size)m+=` | Size: ${i.size}`;if(i.color)m+=` | Color: ${i.color}`;m+=`\n   Qty: ${i.qty} × ₹${i.price}\n`});m+=`\n💰 *Total: ₹${Math.round(total)}*`;return m}
 
