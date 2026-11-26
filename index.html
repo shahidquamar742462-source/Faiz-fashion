@@ -1062,6 +1062,11 @@ body {
 <div id="screen-settings" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('admin')">←</button><h2>Settings</h2></div>
   <div class="form-container">
+    <div class="settings-section" style="border:1px solid var(--border); margin-top:20px;">
+      <h3 style="color:var(--text)">🏪 Seller Details</h3>
+      <div class="input-group"><label>Seller Name</label><input type="text" id="settingsSellerName" placeholder="Qumo Fashion"></div>
+      <div class="input-group"><label>Seller Address</label><textarea id="settingsSellerAddress" rows="2" placeholder="Full address"></textarea></div>
+    </div>
     <button class="btn-primary" onclick="openCategoryForm()" style="margin-bottom:20px;background:var(--success);color:#fff">+ Add New Product</button>
     <!-- Ye naya box add karo -->
     <div class="settings-section" style="border:1px solid var(--border)">
@@ -1473,7 +1478,10 @@ body {
 <div id="returnRequestModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--card);padding:20px;border-radius:16px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto">
     <h3 style="margin-bottom:15px;color:var(--text)">🔄 Return / Exchange</h3>
-    <div class="input-group"><label>Select Product</label><select id="retItemSelect" onchange="updateReturnItemDetails()"></select></div>
+    <div class="input-group"><label>Select Product</label><div class="input-group">
+  <label>Select Product(s) to Return/Exchange</label>
+  <div id="retItemsList" style="max-height: 150px; overflow-y: auto; background: var(--card2); padding: 10px; border-radius: 8px;"></div>
+</div>
     <div class="input-group"><label>Request Type</label><select id="retType" onchange="toggleExchangeFields()"><option value="Return">Return</option><option value="Exchange">Exchange</option></select></div>
     <div class="input-group" id="exchangeSizeGroup" style="display:none"><label>New Size</label><select id="retNewSize"></select></div>
     <div class="input-group" id="exchangeColorGroup" style="display:none"><label>New Color</label><select id="retNewColor"></select></div>
@@ -2800,6 +2808,8 @@ async function openSettings(){
   if(snap.exists()){
     const d=snap.data();
     document.getElementById('settingsWhatsapp').value=d.whatsappNumber||'';document.getElementById('settingsDelCharge').value=d.deliveryCharge??50;document.getElementById('settingsFreeAbove').value=d.freeDeliveryAbove??1000;document.getElementById('settingsPlatformFee').value=d.platformFee??10;document.getElementById('settingsHandlingCharge').value=d.handlingCharge??20;document.getElementById('settingsAllowedAreas').value=d.allowedAreas||'';document.getElementById('settingsPaymentMode').value=d.paymentMode||'cod';document.getElementById('settingsUpiId').value=d.upiId||'';document.getElementById('settingsRazorpayKey').value=d.razorpayKey||'';
+    document.getElementById('settingsSellerName').value = d.sellerName || '';
+    document.getElementById('settingsSellerAddress').value = d.sellerAddress || '';
     if(d.saleEnd?.seconds){const dt=new Date(d.saleEnd.seconds*1000);const local=new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString().slice(0,16);document.getElementById('settingsSaleEnd').value=local}else document.getElementById('settingsSaleEnd').value='';
     existingBannersCache=Array.isArray(d.bannerUrls)?d.bannerUrls:(d.bannerUrl?[d.bannerUrl]:[]);document.getElementById('bannerPreviews').innerHTML=existingBannersCache.map((u,i)=>`<div class="preview-box"><img src="${u}"><button type="button" class="remove-btn" onclick="removeExistingBanner(${i})">✕</button></div>`).join('');document.getElementById('bannerPlaceholder').textContent=existingBannersCache.length>0?`✅ ${existingBannersCache.length} banner(s)`:'📷 Upload banners';
   }
@@ -2811,13 +2821,15 @@ function removeExistingBanner(i){existingBannersCache.splice(i,1);document.getEl
 
 async function saveSettings(){
   const num=document.getElementById('settingsWhatsapp').value.replace(/\D/g,'');const delC=parseFloat(document.getElementById('settingsDelCharge').value)||0;const freeAbv=parseFloat(document.getElementById('settingsFreeAbove').value)||0;const platF=parseFloat(document.getElementById('settingsPlatformFee').value)||0;const handC=parseFloat(document.getElementById('settingsHandlingCharge').value)||0;const saleEndVal=document.getElementById('settingsSaleEnd').value;const allowedAreasVal=document.getElementById('settingsAllowedAreas').value.trim();const payMode=document.getElementById('settingsPaymentMode').value;const uId=document.getElementById('settingsUpiId').value.trim();const rpKey=document.getElementById('settingsRazorpayKey').value.trim();
+  const sellerName = document.getElementById('settingsSellerName').value.trim();
+const sellerAddress = document.getElementById('settingsSellerAddress').value.trim();
   showLoading();
   try{
     let finalBanners=[...existingBannersCache];
     for(const f of pendingBannerFiles){
       finalBanners.push(await uploadToCloudinary(f, 'image'));
     }
-    const payload={whatsappNumber:num,bannerUrls:finalBanners,bannerUrl:finalBanners[0]||'',deliveryCharge:delC,freeDeliveryAbove:freeAbv,platformFee:platF,handlingCharge:handC,allowedAreas:allowedAreasVal,paymentMode:payMode,upiId:uId,razorpayKey:rpKey};
+    const payload={whatsappNumber:num,sellerName: sellerName, sellerAddress: sellerAddress,bannerUrls:finalBanners,bannerUrl:finalBanners[0]||'',deliveryCharge:delC,freeDeliveryAbove:freeAbv,platformFee:platF,handlingCharge:handC,allowedAreas:allowedAreasVal,paymentMode:payMode,upiId:uId,razorpayKey:rpKey};
     if(saleEndVal)payload.saleEnd=new Date(saleEndVal);else payload.saleEnd=null;
     await setDoc(doc(db,'settings','config'),payload,{merge:true});pendingBannerFiles=[];document.getElementById('bannerPhoto').value='';alert('✅ Settings Saved!');
   }catch(e){alert('Error: '+e.message)}
@@ -3733,11 +3745,83 @@ async function saveReturnDeliveryBoy(id) {
   hideLoading();
 }
 let currentReturnOrderId=null;
-function openReturnModal(orderId){const order=allOrdersCache.find(o=>o.id===orderId);if(!order)return;currentReturnOrderId=orderId;const items=order.items.filter(i=>{const p=categoriesCache.find(c=>c.id===i.productId);return p&&p.returnPolicy!=='No Return Policy'});const sel=document.getElementById('retItemSelect');sel.innerHTML=items.map((i,idx)=>`<option value="${idx}">${i.name} (${i.size||'-'})</option>`).join('');sel.dataset.items=JSON.stringify(items);updateReturnItemDetails();document.getElementById('returnRequestModal').style.display='flex'}
-function updateReturnItemDetails(){const sel=document.getElementById('retItemSelect');const items=JSON.parse(sel.dataset.items||'[]');const item=items[sel.value];if(!item)return;const product=categoriesCache.find(c=>c.id===item.productId);const typeSel=document.getElementById('retType');if(product.returnPolicy==='Only Exchange Policy'||product.returnPolicy==='Only Exchange No Return'){typeSel.innerHTML='<option value="Exchange">Exchange</option>';typeSel.disabled=true}else{typeSel.innerHTML='<option value="Return">Return</option><option value="Exchange">Exchange</option>';typeSel.disabled=false}document.getElementById('retNewSize').innerHTML='<option value="">-- Size --</option>'+(product.sizes||[]).map(s=>`<option value="${s}">${s}</option>`).join('');document.getElementById('retNewColor').innerHTML='<option value="">-- Color --</option>'+(product.colors||[]).map(c=>`<option value="${c}">${c}</option>`).join('');toggleExchangeFields()}
+function openReturnModal(orderId){
+  const order = allOrdersCache.find(o => o.id === orderId);
+  if(!order) return;
+  currentReturnOrderId = orderId;
+  const items = order.items.filter(i => {
+      const p = categoriesCache.find(c => c.id === i.productId);
+      return p && p.returnPolicy !== 'No Return Policy';
+  });
+  const list = document.getElementById('retItemsList');
+  list.innerHTML = items.map((i, idx) => `
+    <label style="display:flex; align-items:center; gap:10px; margin-bottom:8px; background:var(--card); padding:8px; border-radius:6px; cursor:pointer;">
+      <input type="checkbox" class="ret-item-cb" value="${idx}" onchange="updateReturnItemDetails()" style="width:18px; height:18px; accent-color:var(--primary)">
+      <div style="flex:1;">
+        <div style="font-weight:700; font-size:13px;">${escapeHtml(i.name)}</div>
+        <div style="font-size:11px; color:var(--text-dim);">Size: ${i.size || '-'} | Qty: ${i.qty || 1}</div>
+      </div>
+    </label>
+  `).join('');
+  list.dataset.items = JSON.stringify(items);
+  document.getElementById('retReason').value = '';
+  document.getElementById('returnRequestModal').style.display = 'flex';
+}
+  function updateReturnItemDetails(){
+  const cbs = document.querySelectorAll('.ret-item-cb:checked');
+  const type = document.getElementById('retType').value;
+  if (type === 'Exchange' && cbs.length > 1) {
+    alert('⚠️ Exchange ke liye aap ek baar me sirf 1 hi item select kar sakte hain.');
+    cbs[cbs.length - 1].checked = false;
+    return;
+  }
+  const ex = type === 'Exchange';
+  document.getElementById('exchangeSizeGroup').style.display = ex ? 'block' : 'none';
+  document.getElementById('exchangeColorGroup').style.display = ex ? 'block' : 'none';
+  if (ex && cbs.length === 1) {
+    const items = JSON.parse(document.getElementById('retItemsList').dataset.items || '[]');
+    const selectedItem = items[parseInt(cbs[0].value)];
+    const product = categoriesCache.find(c => c.id === selectedItem.productId);
+    if (product) {
+      document.getElementById('retNewSize').innerHTML = '<option value="">-- Size --</option>' + (product.sizes || []).map(s => `<option value="${s}">${s}</option>`).join('');
+      document.getElementById('retNewColor').innerHTML = '<option value="">-- Color --</option>' + (product.colors || []).map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+  }
+}
 function toggleExchangeFields(){const ex=document.getElementById('retType').value==='Exchange';document.getElementById('exchangeSizeGroup').style.display=ex?'block':'none';document.getElementById('exchangeColorGroup').style.display=ex?'block':'none'}
 function closeReturnModal(){document.getElementById('returnRequestModal').style.display='none';document.getElementById('retReason').value=''}
-async function submitReturnRequest(){const reason=document.getElementById('retReason').value.trim();if(!reason)return alert('Reason required');const sel=document.getElementById('retItemSelect');const items=JSON.parse(sel.dataset.items||'[]');const item=items[sel.value];const type=document.getElementById('retType').value;const condition=document.getElementById('retCondition').value;const newSize=document.getElementById('retNewSize').value;const newColor=document.getElementById('retNewColor').value;if(type==='Exchange'&&(!newSize&&!newColor))return alert('Select new size/color');showLoading();try{await updateDoc(doc(db,'orders',currentReturnOrderId),{returnStatus:'Requested',returnDetails:{productId:item.productId,productName:item.name,type,condition,reason,newSize,newColor},returnTimeline:[{status:'Requested'}]});alert('✅ Submitted!');closeReturnModal()}catch(e){alert('Error: '+e.message)}hideLoading()}
+async function submitReturnRequest(){
+  const reason = document.getElementById('retReason').value.trim();
+  if(!reason) return alert('Reason likhna zaroori hai!');
+  const cbs = document.querySelectorAll('.ret-item-cb:checked');
+  if(cbs.length === 0) return alert('Kripya kam se kam 1 product select karein.');
+  const items = JSON.parse(document.getElementById('retItemsList').dataset.items || '[]');
+  const selectedItems = Array.from(cbs).map(cb => items[parseInt(cb.value)]);
+  const type = document.getElementById('retType').value;
+  const condition = document.getElementById('retCondition').value;
+  const newSize = document.getElementById('retNewSize').value;
+  const newColor = document.getElementById('retNewColor').value;
+  if(type === 'Exchange') {
+      if(selectedItems.length > 1) return alert('Exchange ke liye sirf 1 item select karein.');
+      if(!newSize && !newColor) return alert('Naya Size ya Color select karein.');
+  }
+  showLoading();
+  try {
+    const primaryItem = selectedItems[0];
+    const itemNames = selectedItems.map(i => i.name).join(', ');
+    await updateDoc(doc(db, 'orders', currentReturnOrderId), {
+      returnStatus: 'Requested',
+      returnDetails: {
+        productId: primaryItem.productId, productName: itemNames, type: type,
+        condition: condition, reason: reason, newSize: newSize, newColor: newColor
+      },
+      returnTimeline: [{ status: 'Requested' }]
+    });
+    alert('✅ Return/Exchange Request Submit Ho Gayi!');
+    closeReturnModal();
+  } catch(e) { alert('Error: ' + e.message); }
+  hideLoading();
+}
 async function shareLocationFromOrder(orderId){if(!confirm('Share location?'))return;showLoading();try{const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:10000,enableHighAccuracy:true}));await updateDoc(doc(db,'orders',orderId),{latitude:pos.coords.latitude,longitude:pos.coords.longitude,locationShared:true});alert('✅ Shared!')}catch(e){alert('❌ Failed')}hideLoading()}
 function contactCall(){window.location.href='tel:+917838647693'}
 function contactWhatsApp(customMsg){let msg='Hello QUMO';if(customMsg)msg=customMsg;window.open('https://wa.me/917838647693?text='+encodeURIComponent(msg),'_blank')}
