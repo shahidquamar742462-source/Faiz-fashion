@@ -228,7 +228,18 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .recent-card p{font-size:12px;padding:8px;font-weight:700}
 
 /* FLOATING BOTTOM NAV */
-.bottom-nav{position:fixed;bottom:12px;left:12px;right:12px;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border:1px solid var(--border);display:none;justify-content:space-around;padding:12px 0 15px;z-index:20;box-shadow:0 5px 25px rgba(0,0,0,0.15);border-radius:24px}
+.bottom-nav {
+  position: fixed;
+  bottom: 15px; left: 15px; right: 15px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  display: none; /* JS isko control karega */
+  justify-content: space-around;
+  padding: 12px 10px;
+  z-index: 1000; /* Z-index badha diya taaki upar dikhe */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  border-radius: 50px;
+}
 .nav-item{background:none;border:none;color:var(--text-dim);font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;cursor:pointer;transition:all .2s ease}
 .nav-item:active{transform:scale(.9)}
 .nav-item.active{color:#e52d27;font-weight:900}
@@ -1983,7 +1994,7 @@ function renderNewArrivalsAndHot(){
 function showScreen(name){
   if(ADMIN_SCREENS.includes(name)&&!isAdminUser){alert('Admin required');return}
   
-  if(typeof closeSearchMode === 'function') closeSearchMode();
+  if(typeof closeSearchPage === 'function') closeSearchPage();
 
   // 1. Saari purani screens ko force se chhupayega (White screen bhi hat jayega)
   document.querySelectorAll('.screen').forEach(s => {
