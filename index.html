@@ -3907,37 +3907,44 @@ function updateAdminStatus(){
 
   isAdminUser = isSuperAdmin || isAddedAdmin;
 }
-// SAARE BUTTONS KO CHALU KARNE KA FINAL CODE
-const allFuncs = [
-  'promptSettingsPassword', 'openCategoryForm', 'deleteCategory', 'unlockAdminOtp', 
-  'openOtpModal', 'closeOtpModal', 'verifyDeliveryOtp', 'deleteOrder', 'deletePreOrder',
-  'updateOrderStatus', 'updatePreOrderStatus', 'saveDeliveryBoy', 'savePreOrderDeliveryBoy',
-  'showAdminNotifs', 'closeAdminNotifs', 'filterAdminOrders', 'setAdminCatFilter', 'setAdminStatusFilter',
-  'showScreen', 'goToShopHome', 'openProductDetails', 'buyNowDetails', 'addToCartDetails',
-  'toggleWatchlist', 'toggleWatchlistDetails', 'shareProduct', 'shareProductCard', 
-  'toggleCartFromCard', 'openSearchPage', 'closeSearchPage', 'setMainCategory', 
-  'toggleInStockFilter', 'openPriceRange', 'clearAllFilters', 'sortProducts',
-  'openCheckout', 'submitOrder', 'applyCoupon', 'removeCoupon', 'calculateRedemption', 
-  'useMaxPoints', 'calculateWalletRedemption', 'useMaxWallet', 'fillSavedAddress',
-  'loginWithGoogle', 'loginWithAnonymous', 'handleLogout', 'toggleDarkMode',
-  'openFilterScreen', 'closeFilterScreen', 'applyFilters', 'clearTempFilters',
-  'startVoiceSearch', 'openReviewForm', 'closeReviewForm', 'submitReview', 
-  'openQAForm', 'closeQAForm', 'submitQA', 'showAddAddressForm', 'saveNewAddress', 
-  'deleteAddress', 'setOrderFilter', 'openOrderDetail', 'openCancelModal', 
-  'closeCancelModal', 'confirmCancelOrder', 'openReturnModal', 'closeReturnModal', 
-  'updateReturnItemDetails', 'submitReturnRequest', 'toggleExchangeFields'
-];
-
-allFuncs.forEach(fn => {
-    try {
-        if (typeof eval(fn) === 'function') {
-            window[fn] = eval(fn);
-        }
-    } catch(e) {
-        // Crash nahi hoga
-    }
-});
-
+// ==========================================
+// FINAL FIX: SAARE BUTTONS KO CHALU KARNE KE LIYE
+// ==========================================
+window.showScreen = showScreen;
+window.goToShopHome = goToShopHome;
+window.openProductDetails = openProductDetails;
+window.goBackFromDetails = goBackFromDetails;
+window.buyNowDetails = buyNowDetails;
+window.addToCartDetails = addToCartDetails;
+window.toggleWatchlist = toggleWatchlist;
+window.toggleWatchlistDetails = toggleWatchlistDetails;
+window.shareProduct = shareProduct;
+window.shareProductCard = shareProductCard;
+window.toggleCartFromCard = toggleCartFromCard;
+window.promptSettingsPassword = promptSettingsPassword;
+window.openCategoryForm = openCategoryForm;
+window.deleteCategory = deleteCategory;
+window.unlockAdminOtp = unlockAdminOtp;
+window.openOtpModal = openOtpModal;
+window.closeOtpModal = closeOtpModal;
+window.verifyDeliveryOtp = verifyDeliveryOtp;
+window.openCheckout = openCheckout;
+window.submitOrder = submitOrder;
+window.loginWithGoogle = loginWithGoogle;
+window.loginWithAnonymous = loginWithAnonymous;
+window.openSearchPage = openSearchPage;
+window.closeSearchPage = closeSearchPage;
+window.openFilterScreen = openFilterScreen;
+window.closeFilterScreen = closeFilterScreen;
+window.applyFilters = applyFilters;
+window.removeCartItem = removeCartItem;
+window.updateCartQty = updateCartQty;
+window.applyCoupon = applyCoupon;
+window.removeCoupon = removeCoupon;
+window.setMainCategory = setMainCategory;
+window.toggleDarkMode = toggleDarkMode;
+window.handleLogout = handleLogout;
+// ==========================================
 initTheme();
 applyLanguage();
 
