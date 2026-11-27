@@ -871,6 +871,25 @@ body:not(.light) .filter-footer {
 body:not(.light) .filter-sidebar {
   background: var(--card2) !important;
 }
+  /* Naye Size/Color Buttons ke liye */
+.variant-box {
+    padding: 10px 15px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text);
+    transition: 0.2s;
+    min-width: 50px;
+    text-align: center;
+}
+.variant-box.active {
+    border: 2px solid var(--primary);
+    background: rgba(229, 45, 39, 0.1);
+    color: var(--primary);
+}
 </style>
 </head>
 <body class="light">
@@ -1109,6 +1128,10 @@ body:not(.light) .filter-sidebar {
       <div class="input-group" style="flex:1"><label>Sizes</label><input type="text" id="catSizes" placeholder="S, M, L"></div>
     </div>
     <div class="input-group"><label>Colors</label><input type="text" id="catColors" placeholder="Black, White"></div>
+    <div class="input-group">
+      <label>Size Prices (Optional)</label>
+      <input type="text" id="catSizePrices" placeholder="S:500, M:550, L:600 (Leave empty for default)">
+    </div>
     <div class="input-group"><label>Description</label><textarea id="catDescription" rows="2"></textarea></div>
     <div class="input-group"><label>🛒 Frequently Bought With</label><div id="boughtWithList" style="max-height:180px;overflow-y:auto;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px"></div></div>
     <div class="input-group"><label>Bundle Offer</label>
@@ -1476,19 +1499,32 @@ body:not(.light) .filter-sidebar {
   </div>
   <div class="detail-gallery" id="detailGallery" onclick="openImageZoom(event)"></div>
   <div class="detail-body">
-    <div class="detail-title" id="detailName"></div>
+   <div class="detail-title" id="detailName"></div>
+    
+    <!-- Description ab Price ke upar aayega -->
+    <div class="detail-desc" id="detailDesc" style="margin-bottom: 10px; font-size: 14px; color: var(--text-dim);"></div> 
+    
     <div class="detail-price"><span class="disc" id="detailDisc"></span><span class="orig" id="detailOrig"></span><span class="off" id="detailOff"></span></div>
     <div class="detail-policy" id="detailPolicy"></div>
     <div id="detailFlashInfo" class="bundle-info" style="display:none;background:rgba(255,107,107,0.15);border-color:#ff6b6b"></div>
     <div id="detailBundleInfo" class="bundle-info" style="display:none"></div>
     <div id="detailWholesaleInfo" class="bundle-info" style="display:none;background:rgba(46,204,113,0.1);border-color:var(--success);color:var(--success)"></div>
     <button id="sizeGuideBtn" onclick="openSizeGuide()" style="display:none;margin-bottom:15px;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:13px">📏 Size Guide</button>
-    <div class="detail-desc" id="detailDesc"></div>
-    <div class="size-color-row">
-      <select id="detailSize" onchange="validateSizeColor()"><option value="">Size</option></select>
-      <select id="detailColor" onchange="validateSizeColor()"><option value="">Color</option></select>
+    
+    <!-- Naya Color Selection UI -->
+    <div id="colorSection" style="margin-bottom: 20px; display: none;">
+        <div style="font-weight: 700; font-size: 14px; margin-bottom: 10px;">Selected Color: <span id="selectedColorText" style="color: var(--primary);">None</span></div>
+        <div id="detailColorContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
     </div>
+
+    <!-- Naya Size Selection UI -->
+    <div id="sizeSection" style="margin-bottom: 20px; display: none;">
+        <div style="font-weight: 700; font-size: 14px; margin-bottom: 10px;">Selected Size: <span id="selectedSizeText" style="color: var(--primary);">None</span></div>
+        <div id="detailSizeContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+    </div>
+
     <div id="sizeRecommendationHint" class="size-hint" style="display:none"></div>
+    <div id="detailStockMsg" style="font-size:12px;color:var(--danger);font-weight:700;margin-bottom:15px"></div>
     <div id="detailStockMsg" style="font-size:12px;color:var(--danger);font-weight:700"></div>
     <div id="fbtSection" class="fbt-section" style="display:none">
       <div class="related-title">🛒 Frequently Bought Together</div>
@@ -1779,6 +1815,8 @@ const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 let currentUid=null,isAdminUser=false,categoriesCache=[],cartItems=[],cartProductIds=new Set(),watchlistIds=new Set(),couponsCache=[];
 let whatsappNumber="917838647693",mainCategory='All',searchQuery='',sortOrder='default';
 let discountPercent=0,appliedCoupon='',currentDetailProduct=null,bannerUrl='',saleEndTime=null;
+  let selectedDetailSize = '';
+let selectedDetailColor = '';
 let deliveryCharge=50,freeDeliveryAbove=1000,platformFee=10,handlingCharge=20;
 let editingCouponCode=null,editingId=null,currentPhotoFiles=[],existingPhotoUrls=[];
 let currentPrePhotoFile=null,mediaRecorder=null,audioChunks=[],audioBlob=null;
@@ -2864,7 +2902,7 @@ function openCategoryForm(id){
   if(editingId){
     const c=categoriesCache.find(x=>x.id===editingId);
     if(c){
-      document.getElementById('catName').value=c.name;document.getElementById('catMainCat').value=c.mainCategory||'Men';document.getElementById('catReturnPolicy').value=c.returnPolicy||'No Return Policy';document.getElementById('catTimes').value=c.times||0;document.getElementById('catSizes').value=c.sizes?c.sizes.join(', '):'';document.getElementById('catColors').value=c.colors?c.colors.join(', '):'';document.getElementById('catDescription').value=c.description||'';document.getElementById('catOriginalPrice').value=c.originalPrice;document.getElementById('catDiscountPrice').value=c.discountPrice;document.getElementById('catBundleQty').value=c.bundleQty||'';document.getElementById('catBundlePrice').value=c.bundlePrice||'';document.getElementById('catFlashPrice').value=c.flashPrice||'';document.getElementById('catFlashEnd').value=c.flashEnd?(new Date(c.flashEnd.seconds?c.flashEnd.seconds*1000:c.flashEnd).toISOString().slice(0,16)):'';document.getElementById('catWholesalePrice').value=c.wholesalePrice||'';document.getElementById('catWholesaleMinQty').value=c.wholesaleMinQty||'';existingPhotoUrls=(c.photoUrls&&c.photoUrls.length>0)?[...c.photoUrls]:(c.photoUrl?[c.photoUrl]:[]);boughtWithSelection=Array.isArray(c.boughtWith)?[...c.boughtWith]:[];catSizeGuideUrl=c.sizeGuideUrl||'';
+      document.getElementById('catName').value=c.name;document.getElementById('catMainCat').value=c.mainCategory||'Men';document.getElementById('catReturnPolicy').value=c.returnPolicy||'No Return Policy';document.getElementById('catTimes').value=c.times||0;document.getElementById('catSizes').value=c.sizes?c.sizes.join(', '):'';document.getElementById('catColors').value=c.colors?c.colors.join(', '):'';document.getElementById('catDescription').value=c.description||'';document.getElementById('catOriginalPrice').value=c.originalPrice;document.getElementById('catDiscountPrice').value=c.discountPrice;document.getElementById('catBundleQty').value=c.bundleQty||'';document.getElementById('catBundlePrice').value=c.bundlePrice||'';document.getElementById('catSizePrices').value = c.sizePrices ? Object.entries(c.sizePrices).map(([k,v]) => `${k}:${v}`).join(', ') : '';document.getElementById('catFlashPrice').value=c.flashPrice||'';document.getElementById('catFlashEnd').value=c.flashEnd?(new Date(c.flashEnd.seconds?c.flashEnd.seconds*1000:c.flashEnd).toISOString().slice(0,16)):'';document.getElementById('catWholesalePrice').value=c.wholesalePrice||'';document.getElementById('catWholesaleMinQty').value=c.wholesaleMinQty||'';existingPhotoUrls=(c.photoUrls&&c.photoUrls.length>0)?[...c.photoUrls]:(c.photoUrl?[c.photoUrl]:[]);boughtWithSelection=Array.isArray(c.boughtWith)?[...c.boughtWith]:[];catSizeGuideUrl=c.sizeGuideUrl||'';
       if(catSizeGuideUrl){document.getElementById('catSizeGuidePreview').src=catSizeGuideUrl;document.getElementById('catSizeGuidePreview').style.display='block';document.getElementById('catSizeGuidePlaceholder').style.display='none'}
       renderPhotoPreviews();
     }
@@ -2877,7 +2915,14 @@ function removeExistingPhoto(i){existingPhotoUrls.splice(i,1);renderPhotoPreview
 function removeNewPhoto(i){currentPhotoFiles.splice(i,1);renderPhotoPreviews()}
 
 async function saveCategory(){
-  const name=document.getElementById('catName').value.trim();const main=document.getElementById('catMainCat').value;const rp=document.getElementById('catReturnPolicy').value;const times=parseInt(document.getElementById('catTimes').value)||0;const sizes=document.getElementById('catSizes').value.split(',').map(s=>s.trim()).filter(s=>s);const colors=document.getElementById('catColors').value.split(',').map(s=>s.trim()).filter(s=>s);const desc=document.getElementById('catDescription').value.trim();const op=parseFloat(document.getElementById('catOriginalPrice').value)||0;const dp=parseFloat(document.getElementById('catDiscountPrice').value)||0;const bq=parseInt(document.getElementById('catBundleQty').value)||0;const bp=parseFloat(document.getElementById('catBundlePrice').value)||0;const fp=parseFloat(document.getElementById('catFlashPrice').value)||0;const fe=document.getElementById('catFlashEnd').value;const wp=parseFloat(document.getElementById('catWholesalePrice').value)||0;const wm=parseInt(document.getElementById('catWholesaleMinQty').value)||0;
+  const name=document.getElementById('catName').value.trim();const main=document.getElementById('catMainCat').value;const rp=document.getElementById('catReturnPolicy').value;const times=parseInt(document.getElementById('catTimes').value)||0;const sizes=document.getElementById('catSizes').value.split(',').map(s=>s.trim()).filter(s=>s);const sizePriceStr = document.getElementById('catSizePrices').value.trim();
+  let sizePrices = {};
+  if(sizePriceStr) {
+      sizePriceStr.split(',').forEach(part => {
+          const [sz, pr] = part.split(':');
+          if(sz && pr) sizePrices[sz.trim()] = parseFloat(pr.trim());
+      });
+  }const colors=document.getElementById('catColors').value.split(',').map(s=>s.trim()).filter(s=>s);const desc=document.getElementById('catDescription').value.trim();const op=parseFloat(document.getElementById('catOriginalPrice').value)||0;const dp=parseFloat(document.getElementById('catDiscountPrice').value)||0;const bq=parseInt(document.getElementById('catBundleQty').value)||0;const bp=parseFloat(document.getElementById('catBundlePrice').value)||0;const fp=parseFloat(document.getElementById('catFlashPrice').value)||0;const fe=document.getElementById('catFlashEnd').value;const wp=parseFloat(document.getElementById('catWholesalePrice').value)||0;const wm=parseInt(document.getElementById('catWholesaleMinQty').value)||0;
   if(!name||op<=0||dp<=0){document.getElementById('catError').textContent='Name & Prices required';return}
   if(dp>op){document.getElementById('catError').textContent='Discount < Original required';return}
   if(existingPhotoUrls.length===0&&currentPhotoFiles.length===0){document.getElementById('catError').textContent='Photo required';return}
@@ -2896,7 +2941,7 @@ async function saveCategory(){
     if(catSizeGuideFile){
       finalSizeGuide = await uploadToCloudinary(catSizeGuideFile, 'image');
     }
-    const payload={name,mainCategory:main,returnPolicy:rp,times,sizes,colors,description:desc,originalPrice:op,discountPrice:dp,bundleQty:bq,bundlePrice:bp,flashPrice:fp,flashEnd:fe?new Date(fe):null,wholesalePrice:wp,wholesaleMinQty:wm,sizeGuideUrl:finalSizeGuide,photoUrl:finalPhotos[0],photoUrls:finalPhotos,boughtWith:[...boughtWithSelection],updatedAt:serverTimestamp()};
+    const payload={name,mainCategory:main,returnPolicy:rp,times,sizes,colors,sizePrices:sizePrices,description:desc,originalPrice:op,discountPrice:dp,bundleQty:bq,bundlePrice:bp,flashPrice:fp,flashEnd:fe?new Date(fe):null,wholesalePrice:wp,wholesaleMinQty:wm,sizeGuideUrl:finalSizeGuide,photoUrl:finalPhotos[0],photoUrls:finalPhotos,boughtWith:[...boughtWithSelection],updatedAt:serverTimestamp()};
     if(!editingId)payload.createdAt=serverTimestamp();
     if(isRestock) payload.lastRestockedAt = serverTimestamp();
     await setDoc(doc(db,'categories',id),payload,{merge:true});
@@ -3515,11 +3560,31 @@ function openProductDetails(id){
   const flashInfoEl=document.getElementById('detailFlashInfo');if(isFlash){flashInfoEl.style.display='block';const endTime=new Date(c.flashEnd.seconds?c.flashEnd.seconds*1000:c.flashEnd).toLocaleString();flashInfoEl.innerHTML=`⚡ <b>FLASH SALE!</b> Ends ${endTime} — was ₹${c.discountPrice}, now ₹${c.flashPrice}`}else flashInfoEl.style.display='none';
   const bundleEl=document.getElementById('detailBundleInfo');if(c.bundleQty>0&&c.bundlePrice>0){bundleEl.style.display='block';bundleEl.innerHTML=`🎁 <b>Bundle:</b> Buy ${c.bundleQty} for ₹${c.bundlePrice}`}else bundleEl.style.display='none';
   const wsEl=document.getElementById('detailWholesaleInfo');if(c.wholesalePrice>0&&c.wholesaleMinQty>0){wsEl.style.display='block';wsEl.innerHTML=`📦 <b>Wholesale:</b> Buy ${c.wholesaleMinQty}+ units at ₹${c.wholesalePrice}/unit`}else wsEl.style.display='none';
-  const sgBtn=document.getElementById('sizeGuideBtn');const catSG=c.sizeGuideUrl||sizeGuideUrl;sgBtn.style.display=catSG?'block':'none';sgBtn.dataset.url=catSG||'';
-  document.getElementById('detailDesc').textContent=c.description||'No description';
-  const sizesArr=c.sizes||[],colorsArr=c.colors||[];const sizeSel=document.getElementById('detailSize'),colorSel=document.getElementById('detailColor');
-  sizeSel.innerHTML='<option value="">Select Size *</option>'+sizesArr.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');colorSel.innerHTML='<option value="">Select Color *</option>'+colorsArr.map(col=>`<option value="${escapeHtml(col)}">${escapeHtml(col)}</option>`).join('');
-  sizeSel.style.display=sizesArr.length>0?'block':'none';colorSel.style.display=colorsArr.length>0?'block':'none';document.querySelector('.size-color-row').style.display=(sizesArr.length>0||colorsArr.length>0)?'flex':'none';
+  const sgBtn=document.getElementById('sizeGuideBtn');const catSG=c.sizeGuideUrl||sizeGuideUrl;sgBtn.style.display=catSG?'block':'none';sgBtn.dataset.url=catSG||''; 
+  selectedDetailSize = '';
+  selectedDetailColor = '';
+  const sizesArr = c.sizes || [];
+  const colorsArr = c.colors || [];
+  
+  const colorSection = document.getElementById('colorSection');
+  const colorContainer = document.getElementById('detailColorContainer');
+  document.getElementById('selectedColorText').textContent = 'None';
+  if(colorsArr.length > 0) {
+      colorSection.style.display = 'block';
+      colorContainer.innerHTML = colorsArr.map(col => `<div class="variant-box" data-color="${escapeHtml(col)}" onclick="selectDetailColor('${escapeHtml(col)}')">${escapeHtml(col)}</div>`).join('');
+  } else { colorSection.style.display = 'none'; }
+  
+  const sizeSection = document.getElementById('sizeSection');
+  const sizeContainer = document.getElementById('detailSizeContainer');
+  document.getElementById('selectedSizeText').textContent = 'None';
+  if(sizesArr.length > 0) {
+      sizeSection.style.display = 'block';
+      sizeContainer.innerHTML = sizesArr.map(sz => {
+          let priceText = '';
+          if(c.sizePrices && c.sizePrices[sz]) priceText = `<br><span style="font-size:11px;color:var(--text-dim)">₹${c.sizePrices[sz]}</span>`;
+          return `<div class="variant-box" data-size="${escapeHtml(sz)}" onclick="selectDetailSize('${escapeHtml(sz)}')">${escapeHtml(sz)}${priceText}</div>`;
+      }).join('');
+  } else { sizeSection.style.display = 'none'; }
   document.getElementById('detailStockMsg').textContent=(c.times||0)<=0?"OUT OF STOCK!":"";
   
   const bottomBar = document.getElementById('detailBottomBar');
@@ -3534,6 +3599,37 @@ function openProductDetails(id){
   updateSizeRecommendation(id);
   showScreen('product-details');
 }
+  function selectDetailSize(size) {
+    selectedDetailSize = size;
+    document.querySelectorAll('#detailSizeContainer .variant-box').forEach(b => {
+        if(b.dataset.size === size) b.classList.add('active');
+        else b.classList.remove('active');
+    });
+    document.getElementById('selectedSizeText').textContent = size;
+    
+    // Size ke hisab se price update karega
+    if (currentDetailProduct && currentDetailProduct.sizePrices && currentDetailProduct.sizePrices[size]) {
+        const newPrice = currentDetailProduct.sizePrices[size];
+        document.getElementById('detailDisc').textContent = '₹' + newPrice;
+        const orig = currentDetailProduct.originalPrice;
+        const off = getDiscountPercent(orig, newPrice);
+        document.getElementById('detailOff').textContent = off > 0 ? `${off}% OFF` : '';
+    } else {
+        const defaultPrice = getEffectivePrice(currentDetailProduct);
+        document.getElementById('detailDisc').textContent = '₹' + defaultPrice;
+        const off = getDiscountPercent(currentDetailProduct.originalPrice, defaultPrice);
+        document.getElementById('detailOff').textContent = off > 0 ? `${off}% OFF` : '';
+    }
+}
+
+function selectDetailColor(color) {
+    selectedDetailColor = color;
+    document.querySelectorAll('#detailColorContainer .variant-box').forEach(b => {
+        if(b.dataset.color === color) b.classList.add('active');
+        else b.classList.remove('active');
+    });
+    document.getElementById('selectedColorText').textContent = color;
+}
 function loadFrequentlyBought(product){const section=document.getElementById('fbtSection');const grid=document.getElementById('fbtGrid');if(!section||!grid)return;if(!product||!Array.isArray(product.boughtWith)||product.boughtWith.length===0){section.style.display='none';return}const items=product.boughtWith.map(id=>categoriesCache.find(c=>c.id===id)).filter(Boolean);if(items.length===0){section.style.display='none';return}section.style.display='block';grid.innerHTML=items.map(c=>{const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');return`<div class="fbt-card"><img src="${optImg(img,300)}" onclick="openProductDetails('${c.id}')"><div class="fbt-card-info"><div class="fbt-card-name">${escapeHtml(c.name)}</div><div class="fbt-card-price">₹${getEffectivePrice(c)}</div><button class="fbt-add-btn" onclick="quickAddToCart('${c.id}')">+ Add</button></div></div>`}).join('')}
 async function quickAddToCart(pid){if(!isShopOpen)return alert('🛑 Shop closed');const p=categoriesCache.find(c=>c.id===pid);if(!p)return;if((p.times||0)<=0)return alert('Out of stock');const hv=(p.sizes||[]).length>0||(p.colors||[]).length>0;if(hv){openProductDetails(pid);return}await addProductToCart(pid,'','');showToast('✅ Added to cart!')}
 function validateSizeColor(){const c=currentDetailProduct;if(!c)return;const s=document.getElementById('detailSize'),col=document.getElementById('detailColor');if((c.sizes||[]).length>0)s.classList.toggle('required-empty',!s.value);if((c.colors||[]).length>0)col.classList.toggle('required-empty',!col.value)}
@@ -3543,8 +3639,14 @@ async function addProductToCart(pid,size,color){const ex=cartItems.find(i=>i.pro
 async function removeCartItem(cid){await deleteDoc(doc(db,'users',currentUid,'cart',cid))}
 async function updateCartQty(cid,n){if(n<1){await removeCartItem(cid);return}if(n>50){alert('Max 50');return}await updateDoc(doc(db,'users',currentUid,'cart',cid),{qty:n})}
 async function toggleCartFromCard(pid){if(!isShopOpen)return alert('🛑 Shop closed');if(cartProductIds.has(pid)){openProductDetails(pid);return}const p=categoriesCache.find(c=>c.id===pid);if(!p)return;if((p.times||0)<=0)return alert('Out of stock');const hv=(p.sizes||[]).length>0||(p.colors||[]).length>0;if(hv){alert('Select size/color on product page');openProductDetails(pid);return}await addProductToCart(pid,'','');showToast('✅ Added to cart!')}
-async function addToCartDetails(){if(!isShopOpen)return alert('🛑 Shop closed');const c=currentDetailProduct;if(!c)return;if((c.times||0)<=0)return alert('Out of stock');const s=document.getElementById('detailSize').value,col=document.getElementById('detailColor').value;if((c.sizes||[]).length>0&&!s)return alert('⚠️ Select size');if((c.colors||[]).length>0&&!col)return alert('⚠️ Select color');await addProductToCart(c.id,s,col);showToast('✅ Added to cart!')}
-async function buyNowDetails(){if(!isShopOpen)return alert('🛑 Shop closed');const c=currentDetailProduct;if(!c)return;if((c.times||0)<=0)return alert('Out of stock');const s=document.getElementById('detailSize').value,col=document.getElementById('detailColor').value;if((c.sizes||[]).length>0&&!s)return alert('⚠️ Select size');if((c.colors||[]).length>0&&!col)return alert('⚠️ Select color');await addProductToCart(c.id,s,col);showScreen('cart')}
+async function addToCartDetails(){if(!isShopOpen)return alert('🛑 Shop closed');const c=currentDetailProduct;if(!c)return;if((c.times||0)<=0)return alert('Out of stock');const s = selectedDetailSize;
+const col = selectedDetailColor;
+if((c.sizes||[]).length>0 && !s) return alert('⚠️ Select size');
+if((c.colors||[]).length>0 && !col) return alert('⚠️ Select color');await addProductToCart(c.id,s,col);showToast('✅ Added to cart!')}
+async function buyNowDetails(){if(!isShopOpen)return alert('🛑 Shop closed');const c=currentDetailProduct;if(!c)return;if((c.times||0)<=0)return alert('Out of stock');const s = selectedDetailSize;
+const col = selectedDetailColor;
+if((c.sizes||[]).length>0 && !s) return alert('⚠️ Select size');
+if((c.colors||[]).length>0 && !col) return alert('⚠️ Select color');await addProductToCart(c.id,s,col);showScreen('cart')}
 async function toggleWatchlist(id){if(!currentUid||isAdminUser)return;const ref=doc(db,'users',currentUid,'watchlist',id);if(watchlistIds.has(id))await deleteDoc(ref);else await setDoc(ref,{addedAt:serverTimestamp()})}
 function updateDetailLikeBtn(){if(!currentDetailProduct)return;const liked=watchlistIds.has(currentDetailProduct.id);document.getElementById('detailLikeBtn').textContent=liked?'❤️':'🤍'}
 async function toggleWatchlistDetails(){if(!currentDetailProduct)return;await toggleWatchlist(currentDetailProduct.id)}
