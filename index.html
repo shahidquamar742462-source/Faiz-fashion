@@ -1644,10 +1644,26 @@ body {
 <div id="printArea" style="display:none"></div>
 
 <div id="bottomNav" class="bottom-nav">
-  <button class="nav-item active" data-screen="shop" onclick="goToShopHome()"><span class="nav-icon">🏠</span><span id="navShopLabel">Shop</span></button>
-  <button class="nav-item" data-screen="preorder" onclick="showScreen('preorder')"><span class="nav-icon">📝</span><span id="navPreLabel">Pre-Order</span></button>
-  <button class="nav-item" data-screen="cart" onclick="showScreen('cart')"><span class="nav-icon">🛒</span><span id="navCartLabel">Cart</span><span class="badge" id="navCartBadge" style="top:-2px">0</span></button>
-  <button class="nav-item" data-screen="customer-settings" onclick="showScreen('customer-settings')"><span class="nav-icon">👤</span><span id="navAccLabel">Account</span></button>
+  <button class="nav-item active" data-screen="shop" onclick="goToShopHome()">
+    <span class="nav-icon" style="font-size: 24px;">🏠</span>
+    <span id="navShopLabel">Shop</span>
+  </button>
+  
+  <button class="nav-item" data-screen="preorder" onclick="showScreen('preorder')">
+    <span class="nav-icon" style="font-size: 24px;">📝</span>
+    <span id="navPreLabel">Pre-Order</span>
+  </button>
+  
+  <button class="nav-item" data-screen="cart" onclick="showScreen('cart')">
+    <span class="nav-icon" style="font-size: 24px;">🛒</span>
+    <span id="navCartLabel">Cart</span>
+    <span class="badge" id="navCartBadge" style="top:-2px">0</span>
+  </button>
+  
+  <button class="nav-item" data-screen="customer-settings" onclick="showScreen('customer-settings')">
+    <span class="nav-icon" style="font-size: 24px;">👤</span>
+    <span id="navAccLabel">Account</span>
+  </button>
 </div>
 
 <script type="module">
