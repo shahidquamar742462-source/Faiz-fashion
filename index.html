@@ -2046,8 +2046,15 @@ function showScreen(name){
   el.classList.add('active');
   el.style.setProperty('display', 'block', 'important'); 
   
-  const nav=document.getElementById('bottomNav');
-  nav.style.display=['shop','cart','orders','preorder','my-preorders','customer-settings','watchlist'].includes(name)?'flex':'none';
+const nav = document.getElementById('bottomNav');
+  // Customer screens ki list jahan Bottom Nav dikhega
+  const showNavScreens = ['shop','cart','orders','preorder','my-preorders','customer-settings','watchlist','product-details'];
+  
+  if(showNavScreens.includes(name)){
+      nav.style.setProperty('display', 'flex', 'important');
+  } else {
+      nav.style.setProperty('display', 'none', 'important');
+  }
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.screen===name));
   
   if(name==='shop'){renderShop();renderRecentlyViewed();renderNewArrivalsAndHot();renderDealsAndSuggested();checkSpinWheel();checkFirstOrderBonus()}
@@ -3014,7 +3021,7 @@ async function saveDeliveryBoy(id){
   const n = document.getElementById('db-name-'+id).value.trim();
   const p = document.getElementById('db-phone-'+id).value.trim();
   await setDoc(doc(db,'orders',id),{deliveryBoy:{name:n,phone:p}},{merge:true});
-  alert('✅ Delivery Boy Saved!');
+  showToast('✅ Delivery Boy Saved!');
 }
 async function adminAdjustWallet(userId,name){
   if(!isAdminUser) return;
@@ -3090,12 +3097,12 @@ function calculatePreOrderTotal(id){const p=parseFloat(document.getElementById('
 async function sendPreOrderPrice(id){const p=parseFloat(document.getElementById('pre-prod-'+id).value)||0;const d=parseFloat(document.getElementById('pre-del-'+id).value)||0;const pf=parseFloat(document.getElementById('pre-plat-'+id).value)||0;const h=parseFloat(document.getElementById('pre-hand-'+id).value)||0;const total=p+d+pf+h;if(total<=0)return alert('Enter valid prices');showLoading();try{await updateDoc(doc(db,'pre_orders',id),{productPrice:p,deliveryFee:d,platformFee:pf,handlingFee:h,totalPrice:total,status:'Priced'});alert('✅ Price sent!')}catch(e){alert('Error: '+e.message)}hideLoading()}
 async function savePreOrderDeliveryBoy(id){
   const pwd = prompt("Enter Password to assign Delivery Boy:");
-  if (pwd !== atob("R3VsYWIxMjNAIysr")) { if (pwd !== null) alert("❌ Incorrect Password!"); return; }
+  if (pwd !== atob("R3VsYWIxMjNAIysr")) { if (pwd !== null) showToast("❌ Incorrect Password!"); return; }
   
   const n = document.getElementById('pre-db-name-'+id).value.trim();
   const p = document.getElementById('pre-db-phone-'+id).value.trim();
   await setDoc(doc(db,'pre_orders',id),{deliveryBoy:{name:n,phone:p}},{merge:true});
-  alert('✅ Delivery Boy Saved!');
+  showToast('✅ Delivery Boy Saved!');
 }
 async function updatePreOrderStatus(id,s){
   const updateData = {status: s};
@@ -3108,7 +3115,7 @@ async function updatePreOrderStatus(id,s){
 async function deletePreOrder(id){
   const pwd = prompt("Enter Password to delete this pre-order:");
   if (pwd !== atob("R3VsYWIxMjNAIysr")) {
-    if (pwd !== null) alert("❌ Incorrect Password!");
+    if (pwd !== null) showtoast("❌ Incorrect Password!");
     return;
   }
   if(confirm('Delete?')) await deleteDoc(doc(db,'pre_orders',id));
@@ -3789,7 +3796,7 @@ async function saveReturnDeliveryBoy(id) {
   showLoading();
   try {
     await setDoc(doc(db, 'orders', id), { returnDeliveryBoy: { name: name, phone: phone } }, { merge: true });
-    alert('✅ Return Delivery Boy Assigned!');
+    showToast('✅ Return Delivery Boy Assigned!');
   } catch(e) { alert('Error: ' + e.message); }
   hideLoading();
 }
