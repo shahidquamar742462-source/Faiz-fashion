@@ -3907,44 +3907,47 @@ function updateAdminStatus(){
 
   isAdminUser = isSuperAdmin || isAddedAdmin;
 }
-// ==========================================
-// FINAL FIX: SAARE BUTTONS KO CHALU KARNE KE LIYE
-// ==========================================
-window.showScreen = showScreen;
-window.goToShopHome = goToShopHome;
-window.openProductDetails = openProductDetails;
-window.goBackFromDetails = goBackFromDetails;
-window.buyNowDetails = buyNowDetails;
-window.addToCartDetails = addToCartDetails;
-window.toggleWatchlist = toggleWatchlist;
-window.toggleWatchlistDetails = toggleWatchlistDetails;
-window.shareProduct = shareProduct;
-window.shareProductCard = shareProductCard;
-window.toggleCartFromCard = toggleCartFromCard;
-window.promptSettingsPassword = promptSettingsPassword;
-window.openCategoryForm = openCategoryForm;
-window.deleteCategory = deleteCategory;
-window.unlockAdminOtp = unlockAdminOtp;
-window.openOtpModal = openOtpModal;
-window.closeOtpModal = closeOtpModal;
-window.verifyDeliveryOtp = verifyDeliveryOtp;
-window.openCheckout = openCheckout;
-window.submitOrder = submitOrder;
-window.loginWithGoogle = loginWithGoogle;
-window.loginWithAnonymous = loginWithAnonymous;
-window.openSearchPage = openSearchPage;
-window.closeSearchPage = closeSearchPage;
-window.openFilterScreen = openFilterScreen;
-window.closeFilterScreen = closeFilterScreen;
-window.applyFilters = applyFilters;
-window.removeCartItem = removeCartItem;
-window.updateCartQty = updateCartQty;
-window.applyCoupon = applyCoupon;
-window.removeCoupon = removeCoupon;
-window.setMainCategory = setMainCategory;
-window.toggleDarkMode = toggleDarkMode;
-window.handleLogout = handleLogout;
-// ==========================================
+const htmlFunctions = [
+    // Search & Navigation
+    'showScreen', 'goToShopHome', 'openSearchPage', 'closeSearchPage', 'handleFullSearch', 'selectFullSearch', 'clearSearchText',
+    'openProductDetails', 'goBackFromDetails', 'setMainCategory', 'sortProducts', 'toggleInStockFilter', 'openPriceRange', 'clearAllFilters',
+    'openFilterScreen', 'closeFilterScreen', 'applyFilters', 'clearTempFilters', 'startVoiceSearch',
+    
+    // Cart & Buy
+    'buyNowDetails', 'addToCartDetails', 'toggleCartFromCard', 'removeCartItem', 'updateCartQty', 'openCheckout', 'submitOrder',
+    'applyCoupon', 'removeCoupon', 'calculateRedemption', 'useMaxPoints', 'calculateWalletRedemption', 'useMaxWallet',
+    'selectPaymentMethod', 'fillSavedAddress', 'showAddAddressForm', 'saveNewAddress', 'lookupPincodeDebounced',
+    
+    // Product Actions
+    'toggleWatchlist', 'toggleWatchlistDetails', 'shareProduct', 'shareProductCard', 'openReviewForm', 'closeReviewForm',
+    'submitReview', 'openQAForm', 'closeQAForm', 'submitQA', 'openSizeGuide', 'closeSizeGuide', 'validateSizeColor',
+    'openImageZoom', 'closeImageZoom', 'requestStockAlert',
+    
+    // User Account
+    'loginWithGoogle', 'loginWithAnonymous', 'handleLogout', 'toggleDarkMode', 'openProfileDetails', 'saveProfileDetails',
+    'openCustomerChat', 'sendCustomerChatMsg', 'requestGlobalLocation', 'requestCheckoutLocation', 'setLanguage',
+    'setOrderFilter', 'openOrderDetail', 'openCancelModal', 'closeCancelModal', 'confirmCancelOrder',
+    'openReturnModal', 'closeReturnModal', 'updateReturnItemDetails', 'submitReturnRequest', 'toggleExchangeFields',
+    
+    // Admin Panel
+    'promptSettingsPassword', 'openCategoryForm', 'deleteCategory', 'unlockAdminOtp', 'openOtpModal', 'closeOtpModal',
+    'verifyDeliveryOtp', 'deleteOrder', 'deletePreOrder', 'updateOrderStatus', 'updatePreOrderStatus', 'saveDeliveryBoy',
+    'savePreOrderDeliveryBoy', 'showAdminNotifs', 'closeAdminNotifs', 'filterAdminOrders', 'setAdminCatFilter',
+    'setAdminStatusFilter', 'calculatePreOrderTotal', 'sendPreOrderPrice', 'acceptPreOrderPrice', 'filterAdminPreOrders',
+    'adminAdjustWallet', 'switchCustOrderTab', 'previewAdImage', 'addAd', 'saveSettings', 'saveCoupon', 'changeAdminPassword',
+    'toggleShopStatus', 'addAdminEmail', 'removeAdminEmail', 'printInvoice', 'filterDashboardUsers', 'saveReturnDeliveryBoy'
+];
+
+// Loop chala kar saare functions ko window (global) par set kar rahe hain
+htmlFunctions.forEach(fnName => {
+    try {
+        if (typeof eval(fnName) === 'function') {
+            window[fnName] = eval(fnName);
+        }
+    } catch (e) {
+        // Agar koi function idhar-udhar ho toh error nahi aayega, chupchap skip ho jayega
+    }
+});
 initTheme();
 applyLanguage();
 
