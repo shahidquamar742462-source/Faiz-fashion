@@ -3907,45 +3907,39 @@ function updateAdminStatus(){
 
   isAdminUser = isSuperAdmin || isAddedAdmin;
 }
-const htmlFunctions = [
-    // Search & Navigation
+const allHtmlFunctions = [
     'showScreen', 'goToShopHome', 'openSearchPage', 'closeSearchPage', 'handleFullSearch', 'selectFullSearch', 'clearSearchText',
     'openProductDetails', 'goBackFromDetails', 'setMainCategory', 'sortProducts', 'toggleInStockFilter', 'openPriceRange', 'clearAllFilters',
-    'openFilterScreen', 'closeFilterScreen', 'applyFilters', 'clearTempFilters', 'startVoiceSearch',
-    
-    // Cart & Buy
+    'openFilterScreen', 'closeFilterScreen', 'applyFilters', 'clearTempFilters', 'startVoiceSearch', 'selectAutocomplete',
     'buyNowDetails', 'addToCartDetails', 'toggleCartFromCard', 'removeCartItem', 'updateCartQty', 'openCheckout', 'submitOrder',
     'applyCoupon', 'removeCoupon', 'calculateRedemption', 'useMaxPoints', 'calculateWalletRedemption', 'useMaxWallet',
-    'selectPaymentMethod', 'fillSavedAddress', 'showAddAddressForm', 'saveNewAddress', 'lookupPincodeDebounced',
-    
-    // Product Actions
+    'selectPaymentMethod', 'fillSavedAddress', 'showAddAddressForm', 'saveNewAddress', 'deleteAddress', 'lookupPincodeDebounced',
     'toggleWatchlist', 'toggleWatchlistDetails', 'shareProduct', 'shareProductCard', 'openReviewForm', 'closeReviewForm',
     'submitReview', 'openQAForm', 'closeQAForm', 'submitQA', 'openSizeGuide', 'closeSizeGuide', 'validateSizeColor',
-    'openImageZoom', 'closeImageZoom', 'requestStockAlert',
-    
-    // User Account
+    'openImageZoom', 'closeImageZoom', 'requestStockAlert', 'shareLocationFromOrder', 'contactCall', 'contactWhatsApp', 'contactEmail',
     'loginWithGoogle', 'loginWithAnonymous', 'handleLogout', 'toggleDarkMode', 'openProfileDetails', 'saveProfileDetails',
     'openCustomerChat', 'sendCustomerChatMsg', 'requestGlobalLocation', 'requestCheckoutLocation', 'setLanguage',
     'setOrderFilter', 'openOrderDetail', 'openCancelModal', 'closeCancelModal', 'confirmCancelOrder',
     'openReturnModal', 'closeReturnModal', 'updateReturnItemDetails', 'submitReturnRequest', 'toggleExchangeFields',
-    
-    // Admin Panel
-    'promptSettingsPassword', 'openCategoryForm', 'deleteCategory', 'unlockAdminOtp', 'openOtpModal', 'closeOtpModal',
+    'promptSettingsPassword', 'openCategoryForm', 'saveCategory', 'deleteCategory', 'unlockAdminOtp', 'openOtpModal', 'closeOtpModal',
     'verifyDeliveryOtp', 'deleteOrder', 'deletePreOrder', 'updateOrderStatus', 'updatePreOrderStatus', 'saveDeliveryBoy',
     'savePreOrderDeliveryBoy', 'showAdminNotifs', 'closeAdminNotifs', 'filterAdminOrders', 'setAdminCatFilter',
     'setAdminStatusFilter', 'calculatePreOrderTotal', 'sendPreOrderPrice', 'acceptPreOrderPrice', 'filterAdminPreOrders',
-    'adminAdjustWallet', 'switchCustOrderTab', 'previewAdImage', 'addAd', 'saveSettings', 'saveCoupon', 'changeAdminPassword',
-    'toggleShopStatus', 'addAdminEmail', 'removeAdminEmail', 'printInvoice', 'filterDashboardUsers', 'saveReturnDeliveryBoy'
+    'adminAdjustWallet', 'switchCustOrderTab', 'previewAdImage', 'addAd', 'saveSettings', 'saveCoupon', 'deleteCoupon', 'changeAdminPassword',
+    'toggleShopStatus', 'addAdminEmail', 'removeAdminEmail', 'printInvoice', 'filterDashboardUsers', 'saveReturnDeliveryBoy',
+    'previewPhoto', 'removeExistingPhoto', 'removeNewPhoto', 'previewCatSizeGuide', 'toggleBoughtWith', 'populateBoughtWithList',
+    'previewBanner', 'removePendingBanner', 'removeExistingBanner', 'previewPrePhoto', 'toggleVoiceRecord', 'submitPreOrder',
+    'updateReturnTracking', 'clearRecentSearches', 'showRecentSearches', 'openAdminChat', 'sendAdminChatMsg', 'answerQuestion', 'deleteQuestion',
+    'switchFilterTab', 'updateTempFilter', 'updateApplyButtonText', 'spinWheel', 'closeSpinWheel', 'previewAdImage', 'addAd', 'loadAdminAds', 'toggleAdActive', 'deleteAd'
 ];
 
-// Loop chala kar saare functions ko window (global) par set kar rahe hain
-htmlFunctions.forEach(fnName => {
+allHtmlFunctions.forEach(fn => {
     try {
-        if (typeof eval(fnName) === 'function') {
-            window[fnName] = eval(fnName);
+        if (typeof eval(fn) === 'function') {
+            window[fn] = eval(fn);
         }
     } catch (e) {
-        // Agar koi function idhar-udhar ho toh error nahi aayega, chupchap skip ho jayega
+        console.log("Function missing: ", fn);
     }
 });
 initTheme();
