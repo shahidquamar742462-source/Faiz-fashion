@@ -1129,6 +1129,10 @@ body:not(.light) .filter-sidebar {
     </div>
     <div class="input-group"><label>Colors</label><input type="text" id="catColors" placeholder="Black, White"></div>
     <div class="input-group">
+  <label>Size Original Prices (MRP)</label>
+  <input type="text" id="catSizeOrigPrices" placeholder="S:1000, M:1200 (Optional)">
+</div>
+    <div class="input-group">
       <label>Size Prices (Optional)</label>
       <input type="text" id="catSizePrices" placeholder="S:500, M:550, L:600 (Leave empty for default)">
     </div>
@@ -1499,12 +1503,9 @@ body:not(.light) .filter-sidebar {
   </div>
   <div class="detail-gallery" id="detailGallery" onclick="openImageZoom(event)"></div>
   <div class="detail-body">
-   <div class="detail-title" id="detailName"></div>
-    
-    <!-- Description ab Price ke upar aayega -->
-    <div class="detail-desc" id="detailDesc" style="margin-bottom: 10px; font-size: 14px; color: var(--text-dim);"></div> 
-    
+<div class="detail-title" id="detailName"></div>
     <div class="detail-price"><span class="disc" id="detailDisc"></span><span class="orig" id="detailOrig"></span><span class="off" id="detailOff"></span></div>
+    <div class="detail-desc" id="detailDesc" style="margin-bottom: 10px; font-size: 14px; color: var(--text-dim);"></div>
     <div class="detail-policy" id="detailPolicy"></div>
     <div id="detailFlashInfo" class="bundle-info" style="display:none;background:rgba(255,107,107,0.15);border-color:#ff6b6b"></div>
     <div id="detailBundleInfo" class="bundle-info" style="display:none"></div>
@@ -1540,14 +1541,15 @@ body:not(.light) .filter-sidebar {
       <button class="btn-small" style="width:100%;margin-bottom:15px;background:var(--card);border:1px solid var(--border)" onclick="openQAForm()">+ Ask a Question</button>
       <div id="qaList"></div>
     </div>
-    <div class="related-title">You May Also Like</div>
-    <div class="related-grid" id="relatedProducts"></div>
-  </div>
-  <div class="detail-bottom-bar" id="detailBottomBar">
+      <div class="detail-bottom-bar" id="detailBottomBar">
     <button style="background:var(--card2);color:var(--text);border:1px solid var(--border)" onclick="addToCartDetails()">Add to Cart</button>
     <button style="background:var(--grad-fk);color:#fff" onclick="buyNowDetails()">Buy Now</button>
   </div>
 </div>
+    <div class="related-title">You May Also Like</div>
+    <div class="related-grid" id="relatedProducts"></div>
+  </div>
+
 
 <div id="screen-order-detail" class="screen">
   <div class="header"><button class="back-btn" onclick="showScreen('orders')">←</button><h2>Order Details</h2></div>
@@ -2902,7 +2904,7 @@ function openCategoryForm(id){
   if(editingId){
     const c=categoriesCache.find(x=>x.id===editingId);
     if(c){
-      document.getElementById('catName').value=c.name;document.getElementById('catMainCat').value=c.mainCategory||'Men';document.getElementById('catReturnPolicy').value=c.returnPolicy||'No Return Policy';document.getElementById('catTimes').value=c.times||0;document.getElementById('catSizes').value=c.sizes?c.sizes.join(', '):'';document.getElementById('catColors').value=c.colors?c.colors.join(', '):'';document.getElementById('catDescription').value=c.description||'';document.getElementById('catOriginalPrice').value=c.originalPrice;document.getElementById('catDiscountPrice').value=c.discountPrice;document.getElementById('catBundleQty').value=c.bundleQty||'';document.getElementById('catBundlePrice').value=c.bundlePrice||'';document.getElementById('catSizePrices').value = c.sizePrices ? Object.entries(c.sizePrices).map(([k,v]) => `${k}:${v}`).join(', ') : '';document.getElementById('catFlashPrice').value=c.flashPrice||'';document.getElementById('catFlashEnd').value=c.flashEnd?(new Date(c.flashEnd.seconds?c.flashEnd.seconds*1000:c.flashEnd).toISOString().slice(0,16)):'';document.getElementById('catWholesalePrice').value=c.wholesalePrice||'';document.getElementById('catWholesaleMinQty').value=c.wholesaleMinQty||'';existingPhotoUrls=(c.photoUrls&&c.photoUrls.length>0)?[...c.photoUrls]:(c.photoUrl?[c.photoUrl]:[]);boughtWithSelection=Array.isArray(c.boughtWith)?[...c.boughtWith]:[];catSizeGuideUrl=c.sizeGuideUrl||'';
+      document.getElementById('catName').value=c.name;document.getElementById('catMainCat').value=c.mainCategory||'Men';document.getElementById('catReturnPolicy').value=c.returnPolicy||'No Return Policy';document.getElementById('catTimes').value=c.times||0;document.getElementById('catSizes').value=c.sizes?c.sizes.join(', '):'';document.getElementById('catColors').value=c.colors?c.colors.join(', '):'';document.getElementById('catDescription').value=c.description||'';document.getElementById('catOriginalPrice').value=c.originalPrice;document.getElementById('catDiscountPrice').value=c.discountPrice;document.getElementById('catBundleQty').value=c.bundleQty||'';document.getElementById('catBundlePrice').value=c.bundlePrice||'';document.getElementById('catSizePrices').value = c.sizePrices ? Object.entries(c.sizePrices).map(([k,v]) => `${k}:${v}`).join(', ') : '';document.getElementById('catSizeOrigPrices').value = c.sizeOrigPrices ? Object.entries(c.sizeOrigPrices).map(([k,v]) => `${k}:${v}`).join(', ') : '';document.getElementById('catFlashPrice').value=c.flashPrice||'';document.getElementById('catFlashEnd').value=c.flashEnd?(new Date(c.flashEnd.seconds?c.flashEnd.seconds*1000:c.flashEnd).toISOString().slice(0,16)):'';document.getElementById('catWholesalePrice').value=c.wholesalePrice||'';document.getElementById('catWholesaleMinQty').value=c.wholesaleMinQty||'';existingPhotoUrls=(c.photoUrls&&c.photoUrls.length>0)?[...c.photoUrls]:(c.photoUrl?[c.photoUrl]:[]);boughtWithSelection=Array.isArray(c.boughtWith)?[...c.boughtWith]:[];catSizeGuideUrl=c.sizeGuideUrl||'';
       if(catSizeGuideUrl){document.getElementById('catSizeGuidePreview').src=catSizeGuideUrl;document.getElementById('catSizeGuidePreview').style.display='block';document.getElementById('catSizeGuidePlaceholder').style.display='none'}
       renderPhotoPreviews();
     }
@@ -2922,7 +2924,17 @@ async function saveCategory(){
           const [sz, pr] = part.split(':');
           if(sz && pr) sizePrices[sz.trim()] = parseFloat(pr.trim());
       });
-  }const colors=document.getElementById('catColors').value.split(',').map(s=>s.trim()).filter(s=>s);const desc=document.getElementById('catDescription').value.trim();const op=parseFloat(document.getElementById('catOriginalPrice').value)||0;const dp=parseFloat(document.getElementById('catDiscountPrice').value)||0;const bq=parseInt(document.getElementById('catBundleQty').value)||0;const bp=parseFloat(document.getElementById('catBundlePrice').value)||0;const fp=parseFloat(document.getElementById('catFlashPrice').value)||0;const fe=document.getElementById('catFlashEnd').value;const wp=parseFloat(document.getElementById('catWholesalePrice').value)||0;const wm=parseInt(document.getElementById('catWholesaleMinQty').value)||0;
+  }
+  
+  const colors=document.getElementById('catColors').value.split(',').map(s=>s.trim()).filter(s=>s);const desc=document.getElementById('catDescription').value.trim();const op=parseFloat(document.getElementById('catOriginalPrice').value)||0;const dp=parseFloat(document.getElementById('catDiscountPrice').value)||0;const bq=parseInt(document.getElementById('catBundleQty').value)||0;const bp=parseFloat(document.getElementById('catBundlePrice').value)||0;const fp=parseFloat(document.getElementById('catFlashPrice').value)||0;const fe=document.getElementById('catFlashEnd').value;const wp=parseFloat(document.getElementById('catWholesalePrice').value)||0;const wm=parseInt(document.getElementById('catWholesaleMinQty').value)||0;
+  const sizeOrigStr = document.getElementById('catSizeOrigPrices').value.trim();
+  let sizeOrigPrices = {};
+  if(sizeOrigStr) {
+      sizeOrigStr.split(',').forEach(part => {
+          const [sz, pr] = part.split(':');
+          if(sz && pr) sizeOrigPrices[sz.trim()] = parseFloat(pr.trim());
+      });
+  }
   if(!name||op<=0||dp<=0){document.getElementById('catError').textContent='Name & Prices required';return}
   if(dp>op){document.getElementById('catError').textContent='Discount < Original required';return}
   if(existingPhotoUrls.length===0&&currentPhotoFiles.length===0){document.getElementById('catError').textContent='Photo required';return}
@@ -2941,7 +2953,7 @@ async function saveCategory(){
     if(catSizeGuideFile){
       finalSizeGuide = await uploadToCloudinary(catSizeGuideFile, 'image');
     }
-    const payload={name,mainCategory:main,returnPolicy:rp,times,sizes,colors,sizePrices:sizePrices,description:desc,originalPrice:op,discountPrice:dp,bundleQty:bq,bundlePrice:bp,flashPrice:fp,flashEnd:fe?new Date(fe):null,wholesalePrice:wp,wholesaleMinQty:wm,sizeGuideUrl:finalSizeGuide,photoUrl:finalPhotos[0],photoUrls:finalPhotos,boughtWith:[...boughtWithSelection],updatedAt:serverTimestamp()};
+    const payload={name,mainCategory:main,returnPolicy:rp,times,sizes,colors,sizePrices:sizePrices,sizeOrigPrices:sizeOrigPrices,description:desc,originalPrice:op,discountPrice:dp,bundleQty:bq,bundlePrice:bp,flashPrice:fp,flashEnd:fe?new Date(fe):null,wholesalePrice:wp,wholesaleMinQty:wm,sizeGuideUrl:finalSizeGuide,photoUrl:finalPhotos[0],photoUrls:finalPhotos,boughtWith:[...boughtWithSelection],updatedAt:serverTimestamp()};
     if(!editingId)payload.createdAt=serverTimestamp();
     if(isRestock) payload.lastRestockedAt = serverTimestamp();
     await setDoc(doc(db,'categories',id),payload,{merge:true});
@@ -3602,7 +3614,6 @@ function openProductDetails(id){
 function selectDetailSize(size) {
     selectedDetailSize = size;
     
-    // Button ko highlight karo
     document.querySelectorAll('#detailSizeContainer .variant-box').forEach(b => {
         if(b.dataset.size === size) b.classList.add('active');
         else b.classList.remove('active');
@@ -3610,27 +3621,27 @@ function selectDetailSize(size) {
     
     const textEl = document.getElementById('selectedSizeText');
     textEl.textContent = size;
-    textEl.style.color = 'var(--primary)'; // Red se Primary color me badlega
+    textEl.style.color = 'var(--primary)';
     
-    // Price Update Logic
     if (currentDetailProduct) {
         const c = currentDetailProduct;
-        let displayPrice = getEffectivePrice(c); // Default price
+        let displayPrice = getEffectivePrice(c);
+        let displayOrig = c.originalPrice;
         
-        // Agar is size ka alag price admin ne set kiya hai
         if (c.sizePrices && c.sizePrices[size]) {
             displayPrice = c.sizePrices[size];
         }
+        if (c.sizeOrigPrices && c.sizeOrigPrices[size]) {
+            displayOrig = c.sizeOrigPrices[size];
+        }
         
-        // UI me naya price dikhao
         document.getElementById('detailDisc').textContent = '₹' + displayPrice;
+        document.getElementById('detailOrig').textContent = '₹' + displayOrig;
         
-        // Naya Discount calculate karo
-        const off = getDiscountPercent(c.originalPrice, displayPrice);
+        const off = getDiscountPercent(displayOrig, displayPrice);
         document.getElementById('detailOff').textContent = off > 0 ? `${off}% OFF` : '';
     }
 }
-
 function selectDetailColor(color) {
     selectedDetailColor = color;
     
@@ -3649,9 +3660,27 @@ async function quickAddToCart(pid){if(!isShopOpen)return alert('🛑 Shop closed
 function validateSizeColor(){const c=currentDetailProduct;if(!c)return;const s=document.getElementById('detailSize'),col=document.getElementById('detailColor');if((c.sizes||[]).length>0)s.classList.toggle('required-empty',!s.value);if((c.colors||[]).length>0)col.classList.toggle('required-empty',!col.value)}
 function openSizeGuide(){const url=document.getElementById('sizeGuideBtn').dataset.url;if(!url)return;document.getElementById('sizeGuideImg').src=url;document.getElementById('sizeGuideModal').style.display='flex'}
 function closeSizeGuide(){document.getElementById('sizeGuideModal').style.display='none'}
-async function addProductToCart(pid,size,color){const ex=cartItems.find(i=>i.productId===pid&&(i.size||'')===(size||'')&&(i.color||'')===(color||''));if(ex){await updateDoc(doc(db,'users',currentUid,'cart',ex.cartId),{qty:(ex.qty||1)+1})}else{let itemPrice = p.discountPrice; // Default price
-if (p.sizePrices && p.sizePrices[size]) { itemPrice = p.sizePrices[size]; }
-await addDoc(collection(db,'users',currentUid,'cart'),{productId:pid,size:size||'',color:color||'',price:itemPrice,qty:1,addedAt:serverTimestamp()})}trackCartAdd(pid)}
+ async function addProductToCart(pid,size,color){
+  const ex=cartItems.find(i=>i.productId===pid&&(i.size||'')===(size||'')&&(i.color||'')===(color||''));
+  if(ex){
+    await updateDoc(doc(db,'users',currentUid,'cart',ex.cartId),{qty:(ex.qty||1)+1})
+  }else{
+    // 👇 Yahan Bug tha, p define nahi tha. Ab theek kar diya hai.
+    const p = categoriesCache.find(c => c.id === pid);
+    let itemPrice = p ? getEffectivePrice(p) : 0; 
+    if (p && p.sizePrices && p.sizePrices[size]) { itemPrice = p.sizePrices[size]; }
+    
+    await addDoc(collection(db,'users',currentUid,'cart'),{
+      productId:pid, 
+      size:size||'', 
+      color:color||'', 
+      price:itemPrice, // 👈 Price yahan save ho rahi hai
+      qty:1, 
+      addedAt:serverTimestamp()
+    });
+  }
+  trackCartAdd(pid);
+}
 async function removeCartItem(cid){await deleteDoc(doc(db,'users',currentUid,'cart',cid))}
 async function updateCartQty(cid,n){if(n<1){await removeCartItem(cid);return}if(n>50){alert('Max 50');return}await updateDoc(doc(db,'users',currentUid,'cart',cid),{qty:n})}
 async function toggleCartFromCard(pid){if(!isShopOpen)return alert('🛑 Shop closed');if(cartProductIds.has(pid)){openProductDetails(pid);return}const p=categoriesCache.find(c=>c.id===pid);if(!p)return;if((p.times||0)<=0)return alert('Out of stock');const hv=(p.sizes||[]).length>0||(p.colors||[]).length>0;if(hv){alert('Select size/color on product page');openProductDetails(pid);return}await addProductToCart(pid,'','');showToast('✅ Added to cart!')}
