@@ -816,6 +816,61 @@ body {
   #screen-cart, #screen-checkout {
     padding-bottom: 160px !important; 
 }
+
+body:not(.light) {
+  --bg: #121212;
+  --card: #1e1e1e;
+  --card2: #2a2a2a;
+  --border: #333333;
+  --text: #f8f9fa;
+  --text-dim: #a0aab2;
+  --glass-bg: rgba(30, 30, 30, 0.85);
+}
+
+body:not(.light) .bottom-nav {
+  background: var(--card) !important;
+  border-color: var(--border) !important;
+}
+
+body:not(.light) .top-bar {
+  background: var(--glass-bg) !important;
+}
+
+body:not(.light) .icon-btn {
+  background: var(--card) !important;
+  color: var(--text) !important;
+}
+
+body:not(.light) .search-bar {
+  background: var(--card2) !important;
+  color: var(--text) !important;
+}
+
+body:not(.light) .heart-btn, 
+body:not(.light) .share-card-btn {
+  background: var(--card) !important;
+}
+
+body:not(.light) #fullSearchPage,
+body:not(.light) .search-body,
+body:not(.light) .search-input-wrap {
+  background: var(--bg) !important;
+}
+
+body:not(.light) .search-input-wrap input,
+body:not(.light) .suggest-item .s-name {
+  color: var(--text) !important;
+}
+
+body:not(.light) .filter-header,
+body:not(.light) .filter-content-area,
+body:not(.light) .filter-footer {
+  background: var(--card) !important;
+}
+
+body:not(.light) .filter-sidebar {
+  background: var(--card2) !important;
+}
 </style>
 </head>
 <body class="light">
