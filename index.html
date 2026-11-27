@@ -4056,15 +4056,25 @@ if('serviceWorker' in navigator){
 setTimeout(() => {
     const nav = document.getElementById('bottomNav');
     if(nav) {
-        document.body.appendChild(nav); // HTML se nikal kar body mein daal dega
-        nav.style.setProperty('display', 'flex', 'important');
+        document.body.appendChild(nav); 
         nav.style.setProperty('position', 'fixed', 'important');
         nav.style.setProperty('bottom', '15px', 'important');
         nav.style.setProperty('left', '15px', 'important');
         nav.style.setProperty('right', '15px', 'important');
         nav.style.setProperty('z-index', '999999', 'important');
+        
+        // 👇 NAYA LOGIC: Check karo kaunsi screen active hai
+        const activeScreen = document.querySelector('.screen.active');
+        const activeName = activeScreen ? activeScreen.id.replace('screen-', '') : '';
+        const showNavScreens = ['shop','cart','orders','preorder','my-preorders','customer-settings','watchlist','product-details'];
+        
+        if (showNavScreens.includes(activeName)) {
+            nav.style.setProperty('display', 'flex', 'important');
+        } else {
+            nav.style.setProperty('display', 'none', 'important');
+        }
     }
-}, 1000); // 1 second baad force se dikhega
+}, 1000);
 </script>
 </body>
 </html>
