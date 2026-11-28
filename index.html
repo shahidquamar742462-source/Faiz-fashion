@@ -209,18 +209,14 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;t
 .size-color-row select{flex:1;padding:14px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:15px;font-weight:600;outline:none}
 .size-color-row select.required-empty{border-color:var(--danger);background:#fff0f0}
 .detail-bottom-bar {
-  position: fixed;
-  bottom: 85px; /* Isko 0 se 85px kiya taaki bottom nav ke upar dikhe */
-  left: 15px; 
-  right: 15px;
-  background: var(--card);
-  padding: 12px 15px;
+  position: relative; 
+  margin-top: 20px;
+  margin-bottom: 50px; /* Niche thodi jagah chhodega */
+  background: transparent;
+  padding: 0 15px;
   display: flex;
   gap: 12px;
-  border: 1px solid var(--border);
-  border-radius: 12px; /* Rounded corners taaki bottom nav jaisa dikhe */
-  z-index: 100000; /* Z-index badhaya taaki button click ho sake */
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  z-index: 10;
 }
 .detail-bottom-bar button{padding:16px;border-radius:8px;font-size:16px;font-weight:800;border:none;flex:1;cursor:pointer}
 .review-section{margin-top:30px;border-top:1px solid var(--border);padding-top:20px}
@@ -2215,13 +2211,22 @@ function unlockAdminOtp(orderId) {
 function getEffectivePrice(p){if(p.flashPrice>0 && p.flashEnd && new Date(p.flashEnd.seconds?p.flashEnd.seconds*1000:p.flashEnd).getTime()>Date.now()){return p.flashPrice}return p.discountPrice}
 function isFlashActive(p){return p.flashPrice>0 && p.flashEnd && new Date(p.flashEnd.seconds?p.flashEnd.seconds*1000:p.flashEnd).getTime()>Date.now()}
 
-function calculateItemPrice(item,product){
-  const qty=item.qty||1;
-  if(product.wholesalePrice>0 && product.wholesaleMinQty>0 && qty>=product.wholesaleMinQty){return qty*product.wholesalePrice}
-  if(product.bundleQty>0&&product.bundlePrice>0){const b=Math.floor(qty/product.bundleQty);const r=qty%product.bundleQty;return b*product.bundlePrice+r*getEffectivePrice(product)}
-  return qty*getEffectivePrice(product);
+function calculateItemPrice(item, product){
+  const qty = item.qty || 1;
+  
+  // 👇 Yahan humne check lagaya hai ki agar cart me price save hai toh wahi use karo
+  const basePrice = item.price ? item.price : getEffectivePrice(product);
+  
+  if(product.wholesalePrice > 0 && product.wholesaleMinQty > 0 && qty >= product.wholesaleMinQty){
+      return qty * product.wholesalePrice;
+  }
+  if(product.bundleQty > 0 && product.bundlePrice > 0){
+      const b = Math.floor(qty / product.bundleQty);
+      const r = qty % product.bundleQty;
+      return b * product.bundlePrice + r * basePrice;
+  }
+  return qty * basePrice;
 }
-
 async function requestStockAlert(pid){
   if(!currentUid) return alert('Login required');
   try{
@@ -3763,7 +3768,7 @@ async function submitOrder(){
   const saveAddr=document.getElementById('chkSaveAddress').checked;
   if(allowedAreas.length>0){const pin=document.getElementById('chkPincode').value.trim().toLowerCase();if(!pin)return alert('Enter pincode');const ok=allowedAreas.some(a=>pin.includes(a)||a.includes(pin));if(!ok)return alert('❌ We do not deliver here')}
   if(!name||!phone||!address)return alert('Name, Phone, Address required');if(!/^\d{10}$/.test(phone))return alert('Phone 10 digits');
-  const items=cartItems.map(item=>{const c=categoriesCache.find(x=>x.id===item.productId);if(!c)return null;return{productId:item.productId,name:c.name,price:getEffectivePrice(c),img:(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||''),size:item.size||'',color:item.color||'',qty:item.qty||1}}).filter(Boolean);
+const items=cartItems.map(item=>{const c=categoriesCache.find(x=>x.id===item.productId);if(!c)return null;return{productId:item.productId,name:c.name,price:item.price ? item.price : getEffectivePrice(c),img:(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||''),size:item.size||'',color:item.color||'',qty:item.qty||1}}).filter(Boolean);
   if(items.length===0)return alert('Cart empty');for(let item of items){const c=categoriesCache.find(x=>x.id===item.productId);if(!c||(c.times||0)<item.qty)return alert(`"${item.name}" low stock`)}
   const btn=document.getElementById('btnPlaceOrder');btn.disabled=true;btn.textContent='Placing...';showLoading();
   let orderLat=userSavedLat,orderLng=userSavedLng,locShared=!!(userSavedLat&&userSavedLng);
