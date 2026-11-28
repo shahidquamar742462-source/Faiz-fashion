@@ -4209,9 +4209,9 @@ function updateAdminStatus(){
   isAdminUser = isSuperAdmin || isAddedAdmin;
 }
 const allHtmlFunctions = {
-    showScreen, goToShopHome, openSearchPage, closeSearchPage, selectDetailSize, selectDetailColor, handleFullSearch, selectFullSearch, clearSearchText,
+    showScreen, goToShopHome, openSearchPage, closeSearchPage, handleFullSearch, selectFullSearch, clearSearchText,
     openProductDetails, goBackFromDetails, setMainCategory, sortProducts, toggleInStockFilter, openPriceRange, clearAllFilters,
-    openFilterScreen, closeFilterScreen, applyFilters, clearTempFilters, startVoiceSearch, selectAutocomplete,
+    openFilterScreen, closeFilterScreen, applyFilters, clearTempFilters, startVoiceSearch, 
     buyNowDetails, addToCartDetails, toggleCartFromCard, removeCartItem, updateCartQty, openCheckout, submitOrder,
     applyCoupon, removeCoupon, calculateRedemption, useMaxPoints, calculateWalletRedemption, useMaxWallet,
     selectPaymentMethod, fillSavedAddress, showAddAddressForm, saveNewAddress, deleteAddress, lookupPincodeDebounced,
@@ -4232,12 +4232,12 @@ const allHtmlFunctions = {
     previewBanner, removePendingBanner, removeExistingBanner, previewPrePhoto, toggleVoiceRecord, submitPreOrder,
     updateReturnTracking, clearRecentSearches, showRecentSearches, openAdminChat, sendAdminChatMsg, answerQuestion, deleteQuestion,
     switchFilterTab, updateTempFilter, updateApplyButtonText, spinWheel, closeSpinWheel, loadAdminAds, toggleAdActive, deleteAd,
-    selectDetailSize, selectDetailColor 
+    selectDetailSize, selectDetailColor
 };
 
-Object.entries(allHtmlFunctions).forEach(([name, func]) => {
-    if (typeof func === 'function') {
-        window[name] = func;
+Object.keys(allHtmlFunctions).forEach(key => {
+    if (typeof allHtmlFunctions[key] === 'function') {
+        window[key] = allHtmlFunctions[key];
     }
 });
 initTheme();
