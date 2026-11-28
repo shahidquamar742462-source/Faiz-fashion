@@ -3836,22 +3836,27 @@ async function submitOrder(){
   const finalizeOrder=async(paymentExtra={})=>{
     try{
       // 2. LOGIC FIX: Negative Stock rokne ke liye Transaction
-      try {
+try {
         await runTransaction(db, async (transaction) => {
+            // 1. Pehle saare products read karo
+            const prodDocs = [];
             for (const item of items) {
                 const prodRef = doc(db, 'categories', item.productId);
                 const prodDoc = await transaction.get(prodRef);
                 if (!prodDoc.exists()) throw new Error("Product not found");
-                const newStock = (prodDoc.data().times || 0) - item.qty;
-                if (newStock < 0) throw new Error(`Out of stock: ${item.name}`);
-                transaction.update(prodRef, { times: newStock });
+                prodDocs.push({ ref: prodRef, doc: prodDoc, qty: item.qty, name: item.name });
+            }
+            // 2. Ab saare updates karo
+            for (const p of prodDocs) {
+                const newStock = (p.doc.data().times || 0) - p.qty;
+                if (newStock < 0) throw new Error(`Out of stock: ${p.name}`);
+                transaction.update(p.ref, { times: newStock });
             }
         });
-      } catch (error) {
+    } catch (error) {
         hideLoading(); btn.disabled = false; btn.textContent = 'Place Order';
-        return alert(`❌ ${error.message}`); 
-      }
-
+        return alert(`❌ ${error.message}`);
+    }
       const orderRef=await addDoc(collection(db,'orders'),{...orderData,...paymentExtra});
       if(saveAddr)await setDoc(doc(db,'users',currentUid,'addresses',Date.now().toString()),{name,phone,building,address,landmark});
       for(let item of cartItems)await deleteDoc(doc(db,'users',currentUid,'cart',item.cartId));
