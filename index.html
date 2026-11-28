@@ -1774,7 +1774,7 @@ body:not(.light) .filter-sidebar {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { initializeFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc, onSnapshot, serverTimestamp, addDoc, query, where, updateDoc, increment, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { initializeFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc, onSnapshot, serverTimestamp, addDoc, query, where, updateDoc, increment, orderBy, runTransaction, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig={apiKey:"AIzaSyCBLRe3QajETrVTuK-ljrOVndJO9ndZiuU",authDomain:"faiz-fashion.firebaseapp.com",projectId:"faiz-fashion",storageBucket:"faiz-fashion.firebasestorage.app",messagingSenderId:"188226858699",appId:"1:188226858699:web:328e68db2b95b366a1f54e"};
 const ADMIN_EMAIL="shahidquamar72@gmail.com";
@@ -2451,7 +2451,7 @@ function filterDashboardUsers(q) {
 async function loadDashboard(){
   const cont=document.getElementById('dashboardContent'); cont.innerHTML='<div class="loading-row">Loading...</div>';
   try{
-    const ordersSnap=await getDocs(collection(db,'orders')); const orders=ordersSnap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.status!=='Cancelled');
+    const ordersSnap=await getDocs(query(collection(db,'orders'),limit(100))); const orders=ordersSnap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.status!=='Cancelled');
     const now=Date.now(); const weekAgo=now-7*24*60*60*1000; const monthAgo=now-30*24*60*60*1000;
     const days={}; for(let i=6;i>=0;i--){const d=new Date(now-i*24*60*60*1000);const key=d.toISOString().slice(5,10);days[key]={label:key,rev:0,count:0}}
     let totalRev=0,totalOrders=0; let monthRev=0; const productSales={};
@@ -2668,20 +2668,17 @@ function renderFlashSaleBanner(){
 let isFirstCategoryLoad = true; // Ye line add karni hai (agar pehle se nahi hai)
 
 function listenCategories(){
-  unsubCategories = onSnapshot(collection(db,'categories'), snap => {
-    
-    // Pehli baar jab app khule, toh saara data cache me daalo
+  if(unsubCategories) unsubCategories(); // Memory leak fix
+  const q = query(collection(db,'categories'), limit(50)); // Performance fix
+  unsubCategories = onSnapshot(q, snap => {
     if (isFirstCategoryLoad) {
         categoriesCache = snap.docs.map(d => ({id:d.id, ...d.data()}));
         isFirstCategoryLoad = false;
     } else {
-        // Uske baad sirf jo naya aaya ya edit hua hai usko update karo (Purane products ko mat chhedo)
         snap.docChanges().forEach(change => {
             const data = { id: change.doc.id, ...change.doc.data() };
             if (change.type === 'added') {
-                if (!categoriesCache.find(c => c.id === data.id)) {
-                    categoriesCache.unshift(data); 
-                }
+                if (!categoriesCache.find(c => c.id === data.id)) categoriesCache.unshift(data); 
             } else if (change.type === 'modified') {
                 const idx = categoriesCache.findIndex(c => c.id === data.id);
                 if (idx > -1) categoriesCache[idx] = data; 
@@ -2690,26 +2687,17 @@ function listenCategories(){
             }
         });
     }
-
-    // UI Refresh (Ye tumhara purana logic hai, safe hai)
-    renderAdminCategories(); 
-    renderShop(); 
-    renderWatchlistGrid(); 
-    renderNewArrivalsAndHot(); 
-    renderDealsAndSuggested(); 
-    renderFlashSaleBanner();
-    
+    renderAdminCategories(); renderShop(); renderWatchlistGrid(); renderNewArrivalsAndHot(); renderDealsAndSuggested(); renderFlashSaleBanner();
     if(document.getElementById('screen-cart').classList.contains('active')) renderCart();
-    if(document.getElementById('screen-product-details').classList.contains('active') && currentDetailProduct) {
-        loadFrequentlyBought(currentDetailProduct);
-    }
+    if(document.getElementById('screen-product-details').classList.contains('active') && currentDetailProduct) loadFrequentlyBought(currentDetailProduct);
   });
 }
 function listenCart(){
+  if(unsubCart) unsubCart();
   unsubCart=onSnapshot(collection(db,'users',currentUid,'cart'),snap=>{
     cartItems=snap.docs.map(d=>({cartId:d.id,...d.data()}));
     cartProductIds=new Set(cartItems.map(i=>i.productId));
-    renderShop();renderCart();renderWatchlistGrid();renderDealsAndSuggested();
+    renderShop(); renderCart(); renderWatchlistGrid(); renderDealsAndSuggested();
     const c=cartItems.reduce((s,i)=>s+(i.qty||1),0);
     const scb=document.getElementById('shopCartBadge');if(scb)scb.textContent=c;
     const ncb=document.getElementById('navCartBadge');if(ncb)ncb.textContent=c;
@@ -2717,14 +2705,22 @@ function listenCart(){
     else { setDoc(doc(db,'users',currentUid), { cartItemCount: 0 }, {merge:true}).catch(()=>{}); }
   });
 }
-function listenWatchlist(){unsubWatchlist=onSnapshot(collection(db,'users',currentUid,'watchlist'),snap=>{watchlistIds=new Set(snap.docs.map(d=>d.id));renderShop();renderWatchlistGrid();if(document.getElementById('screen-product-details').classList.contains('active'))updateDetailLikeBtn()})}
+function listenWatchlist(){
+  if(unsubWatchlist) unsubWatchlist();
+  unsubWatchlist=onSnapshot(collection(db,'users',currentUid,'watchlist'),snap=>{
+    watchlistIds=new Set(snap.docs.map(d=>d.id));
+    renderShop(); renderWatchlistGrid();
+    if(document.getElementById('screen-product-details').classList.contains('active')) updateDetailLikeBtn();
+  });
+}
 function listenCoupons(){
+  if(unsubCoupons) unsubCoupons();
   unsubCoupons=onSnapshot(collection(db,'coupons'),async snap=>{
     couponsCache=snap.docs.map(d=>({id:d.id,...d.data()}));
     if(isAdminUser && !couponsCache.find(c => c.code === 'WELCOME10')){
       try{ await setDoc(doc(db,'coupons','WELCOME10'), {code:'WELCOME10', discountPercent:10, isWelcome:true, createdAt:serverTimestamp()}); }catch(e){}
     }
-    if(isAdminUser&&document.getElementById('screen-settings').classList.contains('active'))renderAdminCoupons();
+    if(isAdminUser&&document.getElementById('screen-settings').classList.contains('active')) renderAdminCoupons();
   });
 }
 
@@ -3041,7 +3037,7 @@ function loadAdminOrders(){
   if(!list) return;
   if(unsubAdminOrders) unsubAdminOrders();
   
-  unsubAdminOrders = onSnapshot(collection(db,'orders'), snap => {
+  unsubAdminOrders = onSnapshot(query(collection(db,'orders'), limit(100)), snap => {
     if(snap.empty){ list.innerHTML = '<div class="loading-row">No orders</div>'; return; }
     
     let arr = snap.docs.map(d => ({id:d.id, ...d.data()})).filter(o => o.deletedByAdmin !== true);
@@ -3431,9 +3427,6 @@ function updateClearFilterBtn(){document.getElementById('clearFilterBtn').style.
 
 function getProductCardHTML(c) {
   const out=(c.times||0)<=0;const price=getEffectivePrice(c);const isFlash=isFlashActive(c);const off=getDiscountPercent(c.originalPrice,price);const liked=watchlistIds.has(c.id);const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const inCart=cartProductIds.has(c.id);const flashBadge=isFlash?`<div class="flash-badge">⚡ FLASH</div>`:'';const alerted=myStockAlerts.has(c.id);const actionBtn=out?`<button class="btn-notify" onclick="event.stopPropagation();${alerted?'':'requestStockAlert(\''+c.id+'\')'}">${alerted?'✅ Notified':'🔔 Notify Me'}</button>`:`<button class="btn-cart" onclick="event.stopPropagation();toggleCartFromCard('${c.id}')">${inCart?'✓ In Cart':'+ Cart'}</button>`;
-  
-  const fakeRating = (4.1 + (c.name.length % 8) * 0.1).toFixed(1);
-
   return `<div class="product-card" data-id="${c.id}" onclick="openProductDetails('${c.id}')"><div class="img-wrap"><img src="${optImg(img,400)}">
   <button class="share-card-btn" onclick="event.stopPropagation(); shareProductCard('${c.id}')">
     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -3545,14 +3538,12 @@ function shareProductCard(id){
   const msg = `🛍️ *${c.name}*\n💰 ₹${getEffectivePrice(c)} (was ₹${c.originalPrice})\n\n👉 Buy now: ${url}`;
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
 }
-
 function renderWatchlistGrid(){
   const grid=document.getElementById('watchlistGrid');if(!grid)return;
   const items=categoriesCache.filter(c=>watchlistIds.has(c.id));
   if(items.length===0){ grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-dim)"><div style="font-size:48px;margin-bottom:10px">💔</div><div style="font-size:15px;font-weight:700">Your watchlist is empty</div><div style="font-size:12px;margin-top:5px">Like products to save them here</div></div>'; return; }
   grid.innerHTML=items.map(c=>{
     const out=(c.times||0)<=0;const price=getEffectivePrice(c);const isFlash=isFlashActive(c);const off=getDiscountPercent(c.originalPrice,price);const img=(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||'');const inCart=cartProductIds.has(c.id);const flashBadge=isFlash?`<div class="flash-badge">⚡ FLASH</div>`:'';
-    const fakeRating = (4.1 + (c.name.length % 8) * 0.1).toFixed(1);
     return `<div class="product-card" onclick="openProductDetails('${c.id}')"><div class="img-wrap"><img src="${optImg(img,400)}" loading="lazy">
       <button class="share-card-btn" onclick="event.stopPropagation(); shareProductCard('${c.id}')">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -3562,13 +3553,11 @@ function renderWatchlistGrid(){
       ${out?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;z-index:2">OUT OF STOCK</div>':''}</div><div class="product-info"><div class="pname">${escapeHtml(c.name)}</div><div class="price-line"><span class="disc" style="${isFlash?'color:#ff6b6b':''}">₹${price}</span><span style="text-decoration:line-through;font-size:11px;color:var(--text-dim)">₹${c.originalPrice}</span>${off>0?`<span style="color:${isFlash?'#ff6b6b':'var(--success)'};font-size:11px;font-weight:800">${off}% OFF</span>`:''}</div><div class="product-actions"><button class="btn-cart" onclick="event.stopPropagation();toggleCartFromCard('${c.id}')">${inCart?'✓ In Cart':'+ Cart'}</button></div></div></div>`;
   }).join('');
 }
-
 function goBackFromDetails(){showScreen(previousScreenForDetails||'shop')}
 function openProductDetails(id){
   const fromScreen=document.querySelector('.screen.active')?.id?.replace('screen-','');if(fromScreen&&fromScreen!=='product-details')previousScreenForDetails=fromScreen;
   currentDetailProduct=categoriesCache.find(c=>c.id===id);if(!currentDetailProduct)return;addRecentlyViewed(id);
   trackProductView(id);
-  
   const c=currentDetailProduct;const price=getEffectivePrice(c);const isFlash=isFlashActive(c);const off=getDiscountPercent(c.originalPrice,price);
   let images=c.photoUrls||(c.photoUrl?[c.photoUrl]:[]);if(images.length===0)images=['logo.png'];
   document.getElementById('detailGallery').innerHTML=images.map(img=>`<img src="${optImg(img,800)}">`).join('');
@@ -3773,6 +3762,21 @@ const items=cartItems.map(item=>{const c=categoriesCache.find(x=>x.id===item.pro
   const btn=document.getElementById('btnPlaceOrder');btn.disabled=true;btn.textContent='Placing...';showLoading();
   let orderLat=userSavedLat,orderLng=userSavedLng,locShared=!!(userSavedLat&&userSavedLng);
   if(!locShared){try{const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:8000,enableHighAccuracy:true}));orderLat=pos.coords.latitude;orderLng=pos.coords.longitude;locShared=true}catch(e){}}
+// 1. SECURITY FIX: Hacker se bachne ke liye price verify karo
+  for (let item of items) {
+      const originalProd = categoriesCache.find(c => c.id === item.productId);
+      if (originalProd) {
+          let realPrice = originalProd.discountPrice;
+          if(originalProd.sizePrices && originalProd.sizePrices[item.size]) {
+              realPrice = originalProd.sizePrices[item.size];
+          }
+          if (item.price < realPrice) {
+              hideLoading(); btn.disabled = false; btn.textContent = 'Place Order';
+              return alert(`❌ Security Error: Price mismatch for ${item.name}. Please refresh the app.`);
+          }
+      }
+  }
+
   let subtotal=items.reduce((s,i)=>{const c=categoriesCache.find(x=>x.id===i.productId);return s+(c?calculateItemPrice({qty:i.qty},c):i.price*i.qty)},0);
   const cd=discountPercent>0?Math.round(subtotal*discountPercent/100):0;const ac=subtotal-cd;
   let del=(ac>0&&ac<freeDeliveryAbove)?deliveryCharge:0;let pf=ac>0?platformFee:0,hc=ac>0?handlingCharge:0;
@@ -3784,6 +3788,34 @@ const items=cartItems.map(item=>{const c=categoriesCache.find(x=>x.id===item.pro
   const orderData={userId:currentUid,customerName:name,phone,building,address,landmark,items,couponUsed:appliedCoupon||'',couponDiscount:cd,subtotal:Math.round(subtotal),deliveryCharge:del,platformFee:pf,handlingCharge:hc,total:Math.round(total),pointsRedeemed:rp,pointsEarned:earned,walletUsed:wp,status:'Pending',latitude:orderLat,longitude:orderLng,locationShared:locShared,orderCode,deliveryOtp,paymentMethod:selectedPaymentMethod,paymentStatus:selectedPaymentMethod==='cod'?'Pending':'Pending',date:serverTimestamp()};
   
   const finalizeOrder=async(paymentExtra={})=>{
+    try{
+      // 2. LOGIC FIX: Negative Stock rokne ke liye Transaction
+      try {
+        await runTransaction(db, async (transaction) => {
+            for (const item of items) {
+                const prodRef = doc(db, 'categories', item.productId);
+                const prodDoc = await transaction.get(prodRef);
+                if (!prodDoc.exists()) throw new Error("Product not found");
+                const newStock = (prodDoc.data().times || 0) - item.qty;
+                if (newStock < 0) throw new Error(`Out of stock: ${item.name}`);
+                transaction.update(prodRef, { times: newStock });
+            }
+        });
+      } catch (error) {
+        hideLoading(); btn.disabled = false; btn.textContent = 'Place Order';
+        return alert(`❌ ${error.message}`); 
+      }
+
+      const orderRef=await addDoc(collection(db,'orders'),{...orderData,...paymentExtra});
+      if(saveAddr)await setDoc(doc(db,'users',currentUid,'addresses',Date.now().toString()),{name,phone,building,address,landmark});
+      for(let item of cartItems)await deleteDoc(doc(db,'users',currentUid,'cart',item.cartId));
+      
+      const rEl2=document.getElementById('chkRedeemPoints');if(rEl2)rEl2.value='';const wEl2=document.getElementById('chkWalletAmount');if(wEl2)wEl2.value='';
+      discountPercent=0;appliedCoupon='';hideLoading();btn.disabled=false;btn.textContent='Place Order';showScreen('shop');
+      const waMsg=buildOrderWhatsAppMsg(name,phone,building,address,landmark,items,total,orderCode);
+      setTimeout(()=>{if(confirm('✅ Order Placed!\n\nSend WhatsApp notification?'))window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waMsg)}`,'_blank')},300);
+    }catch(err){hideLoading();btn.disabled=false;btn.textContent='Place Order';alert('❌ '+err.message)}
+  };
     try{
       const orderRef=await addDoc(collection(db,'orders'),{...orderData,...paymentExtra});
       if(saveAddr)await setDoc(doc(db,'users',currentUid,'addresses',Date.now().toString()),{name,phone,building,address,landmark});
@@ -4161,39 +4193,36 @@ function updateAdminStatus(){
 
   isAdminUser = isSuperAdmin || isAddedAdmin;
 }
-const allHtmlFunctions = [
-    'showScreen', 'goToShopHome', 'openSearchPage', 'closeSearchPage','selectDetailSize','selectDetailColor', 'handleFullSearch', 'selectFullSearch', 'clearSearchText',
-    'openProductDetails', 'goBackFromDetails', 'setMainCategory', 'sortProducts', 'toggleInStockFilter', 'openPriceRange', 'clearAllFilters',
-    'openFilterScreen', 'closeFilterScreen', 'applyFilters', 'clearTempFilters', 'startVoiceSearch', 'selectAutocomplete',
-    'buyNowDetails', 'addToCartDetails', 'toggleCartFromCard', 'removeCartItem', 'updateCartQty', 'openCheckout', 'submitOrder',
-    'applyCoupon', 'removeCoupon', 'calculateRedemption', 'useMaxPoints', 'calculateWalletRedemption', 'useMaxWallet',
-    'selectPaymentMethod', 'fillSavedAddress', 'showAddAddressForm', 'saveNewAddress', 'deleteAddress', 'lookupPincodeDebounced',
-    'toggleWatchlist', 'toggleWatchlistDetails', 'shareProduct', 'shareProductCard', 'openReviewForm', 'closeReviewForm',
-    'submitReview', 'openQAForm', 'closeQAForm', 'submitQA', 'openSizeGuide', 'closeSizeGuide', 'validateSizeColor',
-    'openImageZoom', 'closeImageZoom', 'requestStockAlert', 'shareLocationFromOrder', 'contactCall', 'contactWhatsApp', 'contactEmail',
-    'loginWithGoogle', 'loginWithAnonymous', 'handleLogout', 'toggleDarkMode', 'openProfileDetails', 'saveProfileDetails',
-    'openCustomerChat', 'sendCustomerChatMsg', 'requestGlobalLocation', 'requestCheckoutLocation', 'setLanguage',
-    'setOrderFilter', 'openOrderDetail', 'openCancelModal', 'closeCancelModal', 'confirmCancelOrder',
-    'openReturnModal', 'closeReturnModal', 'updateReturnItemDetails', 'submitReturnRequest', 'toggleExchangeFields',
-    'promptSettingsPassword', 'openCategoryForm', 'saveCategory', 'deleteCategory', 'unlockAdminOtp', 'openOtpModal', 'closeOtpModal',
-    'verifyDeliveryOtp', 'deleteOrder', 'deletePreOrder', 'updateOrderStatus', 'updatePreOrderStatus', 'saveDeliveryBoy',
-    'savePreOrderDeliveryBoy', 'showAdminNotifs', 'closeAdminNotifs', 'filterAdminOrders', 'setAdminCatFilter',
-    'setAdminStatusFilter', 'calculatePreOrderTotal', 'sendPreOrderPrice', 'acceptPreOrderPrice', 'filterAdminPreOrders',
-    'adminAdjustWallet', 'switchCustOrderTab', 'previewAdImage', 'addAd', 'saveSettings', 'saveCoupon', 'deleteCoupon', 'changeAdminPassword',
-    'toggleShopStatus', 'addAdminEmail', 'removeAdminEmail', 'printInvoice', 'filterDashboardUsers', 'saveReturnDeliveryBoy',
-    'previewPhoto', 'removeExistingPhoto', 'removeNewPhoto', 'previewCatSizeGuide', 'toggleBoughtWith', 'populateBoughtWithList',
-    'previewBanner', 'removePendingBanner', 'removeExistingBanner', 'previewPrePhoto', 'toggleVoiceRecord', 'submitPreOrder',
-    'updateReturnTracking', 'clearRecentSearches', 'showRecentSearches', 'openAdminChat', 'sendAdminChatMsg', 'answerQuestion', 'deleteQuestion',
-    'switchFilterTab', 'updateTempFilter', 'updateApplyButtonText', 'spinWheel', 'closeSpinWheel', 'previewAdImage', 'addAd', 'loadAdminAds', 'toggleAdActive', 'deleteAd'
-];
+const allHtmlFunctions = {
+    showScreen, goToShopHome, openSearchPage, closeSearchPage, selectDetailSize, selectDetailColor, handleFullSearch, selectFullSearch, clearSearchText,
+    openProductDetails, goBackFromDetails, setMainCategory, sortProducts, toggleInStockFilter, openPriceRange, clearAllFilters,
+    openFilterScreen, closeFilterScreen, applyFilters, clearTempFilters, startVoiceSearch, selectAutocomplete,
+    buyNowDetails, addToCartDetails, toggleCartFromCard, removeCartItem, updateCartQty, openCheckout, submitOrder,
+    applyCoupon, removeCoupon, calculateRedemption, useMaxPoints, calculateWalletRedemption, useMaxWallet,
+    selectPaymentMethod, fillSavedAddress, showAddAddressForm, saveNewAddress, deleteAddress, lookupPincodeDebounced,
+    toggleWatchlist, toggleWatchlistDetails, shareProduct, shareProductCard, openReviewForm, closeReviewForm,
+    submitReview, openQAForm, closeQAForm, submitQA, openSizeGuide, closeSizeGuide, validateSizeColor,
+    openImageZoom, closeImageZoom, requestStockAlert, shareLocationFromOrder, contactCall, contactWhatsApp, contactEmail,
+    loginWithGoogle, loginWithAnonymous, handleLogout, toggleDarkMode, openProfileDetails, saveProfileDetails,
+    openCustomerChat, sendCustomerChatMsg, requestGlobalLocation, requestCheckoutLocation, setLanguage,
+    setOrderFilter, openOrderDetail, openCancelModal, closeCancelModal, confirmCancelOrder,
+    openReturnModal, closeReturnModal, updateReturnItemDetails, submitReturnRequest, toggleExchangeFields,
+    promptSettingsPassword, openCategoryForm, saveCategory, deleteCategory, unlockAdminOtp, openOtpModal, closeOtpModal,
+    verifyDeliveryOtp, deleteOrder, deletePreOrder, updateOrderStatus, updatePreOrderStatus, saveDeliveryBoy,
+    savePreOrderDeliveryBoy, showAdminNotifs, closeAdminNotifs, filterAdminOrders, setAdminCatFilter,
+    setAdminStatusFilter, calculatePreOrderTotal, sendPreOrderPrice, acceptPreOrderPrice, filterAdminPreOrders,
+    adminAdjustWallet, switchCustOrderTab, previewAdImage, addAd, saveSettings, saveCoupon, deleteCoupon, changeAdminPassword,
+    toggleShopStatus, addAdminEmail, removeAdminEmail, printInvoice, filterDashboardUsers, saveReturnDeliveryBoy,
+    previewPhoto, removeExistingPhoto, removeNewPhoto, previewCatSizeGuide, toggleBoughtWith, populateBoughtWithList,
+    previewBanner, removePendingBanner, removeExistingBanner, previewPrePhoto, toggleVoiceRecord, submitPreOrder,
+    updateReturnTracking, clearRecentSearches, showRecentSearches, openAdminChat, sendAdminChatMsg, answerQuestion, deleteQuestion,
+    switchFilterTab, updateTempFilter, updateApplyButtonText, spinWheel, closeSpinWheel, loadAdminAds, toggleAdActive, deleteAd,
+    selectDetailSize, selectDetailColor 
+};
 
-allHtmlFunctions.forEach(fn => {
-    try {
-        if (typeof eval(fn) === 'function') {
-            window[fn] = eval(fn);
-        }
-    } catch (e) {
-        console.log("Function missing: ", fn);
+Object.entries(allHtmlFunctions).forEach(([name, func]) => {
+    if (typeof func === 'function') {
+        window[name] = func;
     }
 });
 initTheme();
