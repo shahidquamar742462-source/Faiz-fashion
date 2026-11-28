@@ -3755,14 +3755,40 @@ async function submitOrder(){
   const name=document.getElementById('chkName').value.trim(),phone=document.getElementById('chkPhone').value.trim();
   const building=document.getElementById('chkBuilding').value.trim(),address=document.getElementById('chkAddress').value.trim(),landmark=document.getElementById('chkLandmark').value.trim();
   const saveAddr=document.getElementById('chkSaveAddress').checked;
-  if(allowedAreas.length>0){const pin=document.getElementById('chkPincode').value.trim().toLowerCase();if(!pin)return alert('Enter pincode');const ok=allowedAreas.some(a=>pin.includes(a)||a.includes(pin));if(!ok)return alert('❌ We do not deliver here')}
-  if(!name||!phone||!address)return alert('Name, Phone, Address required');if(!/^\d{10}$/.test(phone))return alert('Phone 10 digits');
-const items=cartItems.map(item=>{const c=categoriesCache.find(x=>x.id===item.productId);if(!c)return null;return{productId:item.productId,name:c.name,price:item.price ? item.price : getEffectivePrice(c),img:(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||''),size:item.size||'',color:item.color||'',qty:item.qty||1}}).filter(Boolean);
-  if(items.length===0)return alert('Cart empty');for(let item of items){const c=categoriesCache.find(x=>x.id===item.productId);if(!c||(c.times||0)<item.qty)return alert(`"${item.name}" low stock`)}
-  const btn=document.getElementById('btnPlaceOrder');btn.disabled=true;btn.textContent='Placing...';showLoading();
+  
+  if(allowedAreas.length>0){
+    const pin=document.getElementById('chkPincode').value.trim().toLowerCase();
+    if(!pin)return alert('Enter pincode');
+    const ok=allowedAreas.some(a=>pin.includes(a)||a.includes(pin));
+    if(!ok)return alert('❌ We do not deliver here');
+  }
+  if(!name||!phone||!address)return alert('Name, Phone, Address required');
+  if(!/^\d{10}$/.test(phone))return alert('Phone 10 digits');
+  
+  const items=cartItems.map(item=>{
+    const c=categoriesCache.find(x=>x.id===item.productId);
+    if(!c)return null;
+    return{productId:item.productId,name:c.name,price:item.price?item.price:getEffectivePrice(c),img:(c.photoUrls&&c.photoUrls.length>0)?c.photoUrls[0]:(c.photoUrl||''),size:item.size||'',color:item.color||'',qty:item.qty||1}
+  }).filter(Boolean);
+  
+  if(items.length===0)return alert('Cart empty');
+  for(let item of items){
+    const c=categoriesCache.find(x=>x.id===item.productId);
+    if(!c||(c.times||0)<item.qty)return alert(`"${item.name}" low stock`);
+  }
+  
+  const btn=document.getElementById('btnPlaceOrder');
+  btn.disabled=true;btn.textContent='Placing...';showLoading();
+  
   let orderLat=userSavedLat,orderLng=userSavedLng,locShared=!!(userSavedLat&&userSavedLng);
-  if(!locShared){try{const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:8000,enableHighAccuracy:true}));orderLat=pos.coords.latitude;orderLng=pos.coords.longitude;locShared=true}catch(e){}}
-// 1. SECURITY FIX: Hacker se bachne ke liye price verify karo
+  if(!locShared){
+    try{
+      const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:8000,enableHighAccuracy:true}));
+      orderLat=pos.coords.latitude;orderLng=pos.coords.longitude;locShared=true;
+    }catch(e){}
+  }
+  
+  // 1. SECURITY FIX: Hacker se bachne ke liye price verify karo
   for (let item of items) {
       const originalProd = categoriesCache.find(c => c.id === item.productId);
       if (originalProd) {
@@ -3776,8 +3802,8 @@ const items=cartItems.map(item=>{const c=categoriesCache.find(x=>x.id===item.pro
           }
       }
   }
-
-  let subtotal=items.reduce((s,i)=>{const c=categoriesCache.find(x=>x.id===i.productId);return s+(c?calculateItemPrice({qty:i.qty},c):i.price*i.qty)},0);
+  
+  let subtotal=items.reduce((s,i)=>{const c=categoriesCache.find(x=>x.id===i.productId);return s+(c?calculateItemPrice({qty:i.qty, price:i.price},c):i.price*i.qty)},0);
   const cd=discountPercent>0?Math.round(subtotal*discountPercent/100):0;const ac=subtotal-cd;
   let del=(ac>0&&ac<freeDeliveryAbove)?deliveryCharge:0;let pf=ac>0?platformFee:0,hc=ac>0?handlingCharge:0;
   const rEl=document.getElementById('chkRedeemPoints');const rp=rEl?(parseInt(rEl.value)||0):0;
@@ -3810,18 +3836,8 @@ const items=cartItems.map(item=>{const c=categoriesCache.find(x=>x.id===item.pro
       if(saveAddr)await setDoc(doc(db,'users',currentUid,'addresses',Date.now().toString()),{name,phone,building,address,landmark});
       for(let item of cartItems)await deleteDoc(doc(db,'users',currentUid,'cart',item.cartId));
       
-      const rEl2=document.getElementById('chkRedeemPoints');if(rEl2)rEl2.value='';const wEl2=document.getElementById('chkWalletAmount');if(wEl2)wEl2.value='';
-      discountPercent=0;appliedCoupon='';hideLoading();btn.disabled=false;btn.textContent='Place Order';showScreen('shop');
-      const waMsg=buildOrderWhatsAppMsg(name,phone,building,address,landmark,items,total,orderCode);
-      setTimeout(()=>{if(confirm('✅ Order Placed!\n\nSend WhatsApp notification?'))window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waMsg)}`,'_blank')},300);
-    }catch(err){hideLoading();btn.disabled=false;btn.textContent='Place Order';alert('❌ '+err.message)}
-  };
-    try{
-      const orderRef=await addDoc(collection(db,'orders'),{...orderData,...paymentExtra});
-      if(saveAddr)await setDoc(doc(db,'users',currentUid,'addresses',Date.now().toString()),{name,phone,building,address,landmark});
-      for(let item of cartItems)await deleteDoc(doc(db,'users',currentUid,'cart',item.cartId));
-for(let item of items){try{ await updateDoc(doc(db,'categories',item.productId), { times: increment(-item.qty) }); }catch(e){}}
-      const rEl2=document.getElementById('chkRedeemPoints');if(rEl2)rEl2.value='';const wEl2=document.getElementById('chkWalletAmount');if(wEl2)wEl2.value='';
+      const rEl2=document.getElementById('chkRedeemPoints');if(rEl2)rEl2.value='';
+      const wEl2=document.getElementById('chkWalletAmount');if(wEl2)wEl2.value='';
       discountPercent=0;appliedCoupon='';hideLoading();btn.disabled=false;btn.textContent='Place Order';showScreen('shop');
       const waMsg=buildOrderWhatsAppMsg(name,phone,building,address,landmark,items,total,orderCode);
       setTimeout(()=>{if(confirm('✅ Order Placed!\n\nSend WhatsApp notification?'))window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waMsg)}`,'_blank')},300);
@@ -3833,7 +3849,7 @@ for(let item of items){try{ await updateDoc(doc(db,'categories',item.productId),
     hideLoading();btn.disabled=false;btn.textContent='Place Order';
     const upiMsg=`📱 *UPI PAYMENT*\n\nPay ₹${Math.round(total)} to: ${upiId||'Contact admin'}\n\nAfter payment, screenshot WhatsApp karein: ${whatsappNumber}\n\nOrder ID: ${orderCode}`;
     if(confirm(upiMsg+'\n\nAapne payment kar diya? (OK = Order place karein)')){showLoading();btn.disabled=true;btn.textContent='Placing...';await finalizeOrder({paymentStatus:'Pending Verification',paymentMethod:'UPI'})}
-} else if(selectedPaymentMethod==='razorpay'){
+  } else if(selectedPaymentMethod==='razorpay'){
     if(!razorpayKey){
         hideLoading(); btn.disabled=false; btn.textContent='Place Order'; 
         return alert('❌ Razorpay not configured. Please set the key in Admin Settings.');
@@ -3883,8 +3899,7 @@ for(let item of items){try{ await updateDoc(doc(db,'categories',item.productId),
         alert('Razorpay Error: ' + e.message);
     }
   }
-  }
-
+}
 
 async function loadSavedAddresses(){const sel=document.getElementById('chkSavedAddress');if(!sel)return;sel.innerHTML='<option value="">-- Select --</option>';savedAddressesCache=[];const snap=await getDocs(collection(db,'users',currentUid,'addresses'));if(!snap.empty){document.getElementById('savedAddressGroup').style.display='block';snap.forEach(d=>{const a=d.data();savedAddressesCache.push({id:d.id,...a});const idx=savedAddressesCache.length-1;sel.innerHTML+=`<option value="${idx}">${escapeHtml(a.name)} - ${escapeHtml(a.address.substring(0,40))}</option>`})}else document.getElementById('savedAddressGroup').style.display='none'}
 function fillSavedAddress(v){if(v==='')return;const a=savedAddressesCache[parseInt(v)];if(!a)return;document.getElementById('chkName').value=a.name||'';document.getElementById('chkPhone').value=a.phone||'';document.getElementById('chkBuilding').value=a.building||'';document.getElementById('chkAddress').value=a.address||'';document.getElementById('chkLandmark').value=a.landmark||''}
