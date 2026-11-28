@@ -1172,6 +1172,13 @@ body:not(.light) .filter-sidebar {
       <div class="input-group"><label>Seller Address</label><textarea id="settingsSellerAddress" rows="2" placeholder="Full address"></textarea></div>
     </div>
     <button class="btn-primary" onclick="openCategoryForm()" style="margin-bottom:20px;background:var(--success);color:#fff">+ Add New Product</button>
+    <!-- Bulk Upload Section -->
+    <div class="settings-section" style="border:1px solid var(--border); margin-bottom:20px;">
+      <h3 style="color:var(--text)">📦 Bulk Product Upload (CSV)</h3>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Excel CSV file select karein jisme saare products hain.</p>
+      <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleCSVUpload(event)">
+      <button class="btn-primary" onclick="document.getElementById('csvFileInput').click()" style="background:var(--gold);color:#000">📁 Import Products from CSV</button>
+    </div>
     <!-- Ye naya box add karo -->
     <div class="settings-section" style="border:1px solid var(--border)">
       <h3 style="color:var(--text)">👑 Add New Admin</h3>
@@ -2975,6 +2982,125 @@ async function saveCategory(){
   }catch(e){document.getElementById('catError').textContent=e.message}
   hideLoading();btn.disabled=false;btn.textContent='Save Product';
 }
+  async function handleCSVUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  showLoading();
+  const reader = new FileReader();
+  
+  reader.onload = async function (event) {
+    const csvData = event.target.result;
+    const rows = csvData.split(/\r?\n/).filter(row => row.trim() !== '');
+    
+    if (rows.length < 2) {
+      hideLoading();
+      return alert("CSV file khaali hai ya format galat hai.");
+    }
+    
+    const dataRows = rows.slice(1); 
+    let successCount = 0;
+    let errorCount = 0;
+    
+    for (let i = 0; i < dataRows.length; i++) {
+      const cols = dataRows[i].split(',');
+      if (cols.length < 5) continue; 
+      
+      try {
+        const name = cols[0] ? cols[0].trim() : '';
+        const mainCat = cols[1] ? cols[1].trim() : 'Men';
+        const returnPolicy = cols[2] ? cols[2].trim() : 'No Return Policy';
+        
+        const imgUrlsStr = cols[3] ? cols[3].trim() : '';
+        const sizeGuideUrl = cols[4] ? cols[4].trim() : '';
+        
+        const stock = parseInt(cols[5]) || 0;
+        const sizes = cols[6] ? cols[6].split(',').map(s => s.trim()) : [];
+        const colors = cols[7] ? cols[7].split(',').map(c => c.trim()) : [];
+        
+        let sizeOrigPrices = {};
+        if (cols[8] && cols[8].trim() !== '') {
+            cols[8].split(',').forEach(part => {
+                const [sz, pr] = part.split(':');
+                if(sz && pr) sizeOrigPrices[sz.trim()] = parseFloat(pr.trim());
+            });
+        }
+        let sizePrices = {};
+        if (cols[9] && cols[9].trim() !== '') {
+            cols[9].split(',').forEach(part => {
+                const [sz, pr] = part.split(':');
+                if(sz && pr) sizePrices[sz.trim()] = parseFloat(pr.trim());
+            });
+        }
+
+        const desc = cols[10] ? cols[10].trim() : '';
+        
+        let boughtWith = [];
+        if (cols[11] && cols[11].trim() !== '') {
+            boughtWith = cols[11].split('|').map(id => id.trim()).filter(id => id !== '');
+        }
+
+        const bundleQty = parseInt(cols[12]) || 0;
+        const bundlePrice = parseFloat(cols[13]) || 0;
+        const originalPrice = parseFloat(cols[14]) || 0;
+        const discountPrice = parseFloat(cols[15]) || 0;
+        
+        const flashPrice = parseFloat(cols[16]) || 0;
+        let flashEnd = null;
+        if (cols[17] && cols[17].trim() !== '') {
+            flashEnd = new Date(cols[17].trim());
+            if(isNaN(flashEnd.getTime())) flashEnd = null;
+        }
+
+        const wholesalePrice = parseFloat(cols[18]) || 0;
+        const wholesaleMinQty = parseInt(cols[19]) || 0;
+
+        let photoUrls = [];
+        if (imgUrlsStr) {
+            photoUrls = imgUrlsStr.split('|').map(u => u.trim()).filter(u => u !== '');
+        }
+
+        await addDoc(collection(db, 'categories'), {
+          name: name,
+          mainCategory: mainCat,
+          returnPolicy: returnPolicy,
+          photoUrls: photoUrls,
+          photoUrl: photoUrls.length > 0 ? photoUrls[0] : '',
+          sizeGuideUrl: sizeGuideUrl,
+          times: stock,
+          sizes: sizes,
+          colors: colors,
+          sizeOrigPrices: sizeOrigPrices,
+          sizePrices: sizePrices,
+          description: desc,
+          boughtWith: boughtWith,
+          bundleQty: bundleQty,
+          bundlePrice: bundlePrice,
+          originalPrice: originalPrice,
+          discountPrice: discountPrice,
+          flashPrice: flashPrice,
+          flashEnd: flashEnd,
+          wholesalePrice: wholesalePrice,
+          wholesaleMinQty: wholesaleMinQty,
+          views: 0,
+          cartAdds: 0,
+          createdAt: serverTimestamp()
+        });
+        
+        successCount++;
+      } catch (err) {
+        console.error("Error adding row " + i, err);
+        errorCount++;
+      }
+    }
+    
+    hideLoading();
+    document.getElementById('csvFileInput').value = ''; 
+    alert(`✅ ${successCount} products upload ho gaye! ${errorCount > 0 ? `(${errorCount} fail hue)` : ''}`);
+  };
+  
+  reader.readAsText(file);
+}
 async function deleteCategory(id){
   const pwd = prompt("Enter Password to delete this product:");
   if (pwd !== atob("R3VsYWIxMjNAIysr")) {
@@ -4257,7 +4383,7 @@ const allHtmlFunctions = {
     previewBanner, removePendingBanner, removeExistingBanner, previewPrePhoto, toggleVoiceRecord, submitPreOrder,
     updateReturnTracking, clearRecentSearches, showRecentSearches, openAdminChat, sendAdminChatMsg, answerQuestion, deleteQuestion,
     switchFilterTab, updateTempFilter, updateApplyButtonText, spinWheel, closeSpinWheel, loadAdminAds, toggleAdActive, deleteAd,
-    selectDetailSize, selectDetailColor
+    selectDetailSize, selectDetailColor, handleCSVUpload
 };
 
 Object.keys(allHtmlFunctions).forEach(key => {
