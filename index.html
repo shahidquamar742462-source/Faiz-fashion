@@ -2362,16 +2362,33 @@ async function lookupPincode(pin){
   const box = document.getElementById('pincodeSuggestions'); if(!box) return;
   if(!/^\d{6}$/.test(pin)){ box.style.display='none'; return; }
   box.innerHTML = '<div class="autocomplete-item">Searching...</div>'; box.style.display = 'block';
+  
   try{
     const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
     const data = await res.json();
     if(data[0]?.Status === 'Success' && data[0].PostOffice?.length > 0){
-      const offices = data[0].PostOffice.slice(0, 5);
-      box.innerHTML = offices.map(o => `<div class="autocomplete-item" onmousedown="selectPincode('${escapeHtml(o.Name)}','${escapeHtml(o.District)}','${escapeHtml(o.State)}')"><span>📍 ${escapeHtml(o.Name)}</span><span style="color:var(--text-dim);font-size:11px">${escapeHtml(o.District)}</span></div>`).join('');
-    } else { box.innerHTML = '<div class="autocomplete-item" style="color:var(--danger)">No results for this pincode</div>'; }
+      // Yahan se slice(0,5) hata diya hai taaki saare area dikhein
+      box.innerHTML = data[0].PostOffice.map(o => `<div class="autocomplete-item" onmousedown="selectPincode('${escapeHtml(o.Name)}','${escapeHtml(o.District)}','${escapeHtml(o.State)}')"><span>📍 ${escapeHtml(o.Name)}</span><span style="color:var(--text-dim);font-size:11px">${escapeHtml(o.District)}</span></div>`).join('');
+    } else { 
+      box.innerHTML = '<div class="autocomplete-item" style="color:var(--danger)">No results for this pincode</div>'; 
+    }
   }catch(e){ box.style.display = 'none'; }
 }
-function selectPincode(name, district, state){ const lm = document.getElementById('chkLandmark'); if(lm) lm.value = `${name}, ${district}, ${state}`; const box = document.getElementById('pincodeSuggestions'); if(box) box.style.display = 'none'; }
+function selectPincode(name, district, state){ 
+  // Address box me auto-fill karo
+  const addrInput = document.getElementById('chkAddress');
+  if(addrInput) {
+      addrInput.value = `${name}, ${district}, ${state}`;
+  }
+  
+  // Landmark box me bhi bhar do agar khali hai
+  const lm = document.getElementById('chkLandmark'); 
+  if(lm && !lm.value) lm.value = name; 
+  
+  // Dropdown band karo
+  const box = document.getElementById('pincodeSuggestions'); 
+  if(box) box.style.display = 'none'; 
+}
 
 async function trackProductView(productId){ try{ await updateDoc(doc(db,'categories',productId), { views: increment(1) }); }catch(e){} }
 async function trackCartAdd(productId){ try{ await updateDoc(doc(db,'categories',productId), { cartAdds: increment(1) }); }catch(e){} }
@@ -3831,7 +3848,23 @@ async function buyNowDetails(){if(!isShopOpen)return alert('🛑 Shop closed');c
 const col = selectedDetailColor;
 if((c.sizes||[]).length>0 && !s) return alert('⚠️ Select size');
 if((c.colors||[]).length>0 && !col) return alert('⚠️ Select color');await addProductToCart(c.id,s,col);showScreen('cart')}
-async function toggleWatchlist(id){if(!currentUid||isAdminUser)return;const ref=doc(db,'users',currentUid,'watchlist',id);if(watchlistIds.has(id))await deleteDoc(ref);else await setDoc(ref,{addedAt:serverTimestamp()})}
+async function toggleWatchlist(id){
+  if(!currentUid) return;
+  if(isAdminUser) return alert("Admin account se watchlist use nahi kar sakte.");
+  
+  const ref=doc(db,'users',currentUid,'watchlist',id);
+  try {
+    if(watchlistIds.has(id)) {
+        await deleteDoc(ref);
+        showToast('💔 Removed from Watchlist');
+    } else {
+        await setDoc(ref,{addedAt:serverTimestamp()});
+        showToast('❤️ Added to Watchlist');
+    }
+  } catch(e) {
+    alert("Error: " + e.message);
+  }
+}
 function updateDetailLikeBtn(){if(!currentDetailProduct)return;const liked=watchlistIds.has(currentDetailProduct.id);document.getElementById('detailLikeBtn').textContent=liked?'❤️':'🤍'}
 async function toggleWatchlistDetails(){if(!currentDetailProduct)return;await toggleWatchlist(currentDetailProduct.id)}
 function shareProduct(){
