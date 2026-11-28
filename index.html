@@ -1711,7 +1711,7 @@ body:not(.light) .filter-sidebar {
     <div class="input-group"><label>Address</label><textarea id="chkAddress" rows="2"></textarea></div>
     <div class="input-group" id="chkPincodeGroup" style="display:none;position:relative">
       <label>Pincode (auto-suggest area)</label>
-      <input type="text" id="chkPincode" maxlength="6" placeholder="6-digit pincode" oninput="lookupPincodeDebounced(this.value)" autocomplete="off">
+<input type="text" id="chkPincode" maxlength="6" placeholder="6-digit pincode" oninput="lookupPincodeDebounced(this.value)" onfocus="lookupPincode(this.value)" autocomplete="off">
       <div class="autocomplete-box" id="pincodeSuggestions"></div>
     </div>
     <div class="input-group"><label>Landmark / Area</label><input type="text" id="chkLandmark" placeholder="Auto-filled from pincode"></div>
@@ -2361,14 +2361,20 @@ function lookupPincodeDebounced(val){ clearTimeout(pincodeTimer); pincodeTimer =
 async function lookupPincode(pin){
   const box = document.getElementById('pincodeSuggestions'); if(!box) return;
   if(!/^\d{6}$/.test(pin)){ box.style.display='none'; return; }
+  
   box.innerHTML = '<div class="autocomplete-item">Searching...</div>'; box.style.display = 'block';
   
   try{
     const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
     const data = await res.json();
     if(data[0]?.Status === 'Success' && data[0].PostOffice?.length > 0){
-      // Yahan se slice(0,5) hata diya hai taaki saare area dikhein
-      box.innerHTML = data[0].PostOffice.map(o => `<div class="autocomplete-item" onmousedown="selectPincode('${escapeHtml(o.Name)}','${escapeHtml(o.District)}','${escapeHtml(o.State)}')"><span>📍 ${escapeHtml(o.Name)}</span><span style="color:var(--text-dim);font-size:11px">${escapeHtml(o.District)}</span></div>`).join('');
+      box.innerHTML = data[0].PostOffice.map(o => {
+        // Area ke naam me agar ' hai toh use theek kar rahe hain
+        const n = escapeHtml(o.Name).replace(/'/g, "\\'");
+        const d = escapeHtml(o.District).replace(/'/g, "\\'");
+        const s = escapeHtml(o.State).replace(/'/g, "\\'");
+        return `<div class="autocomplete-item" onclick="selectPincode('${n}','${d}','${s}')"><span>📍 ${escapeHtml(o.Name)}</span><span style="color:var(--text-dim);font-size:11px">${escapeHtml(o.District)}</span></div>`;
+      }).join('');
     } else { 
       box.innerHTML = '<div class="autocomplete-item" style="color:var(--danger)">No results for this pincode</div>'; 
     }
@@ -2381,7 +2387,7 @@ function selectPincode(name, district, state){
       addrInput.value = `${name}, ${district}, ${state}`;
   }
   
-  // Landmark box me bhi bhar do agar khali hai
+  // Landmark box me bhi bhar do
   const lm = document.getElementById('chkLandmark'); 
   if(lm && !lm.value) lm.value = name; 
   
@@ -2389,7 +2395,6 @@ function selectPincode(name, district, state){
   const box = document.getElementById('pincodeSuggestions'); 
   if(box) box.style.display = 'none'; 
 }
-
 async function trackProductView(productId){ try{ await updateDoc(doc(db,'categories',productId), { views: increment(1) }); }catch(e){} }
 async function trackCartAdd(productId){ try{ await updateDoc(doc(db,'categories',productId), { cartAdds: increment(1) }); }catch(e){} }
 
